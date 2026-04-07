@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TestOnlyDelegateCheckTest {
 
     private static final int EXPECTED_VIOLATIONS = 6;
-    private static final String INVALID_FILE = "invalid/TestOnlyDelegateInvalid.java";
-    private static final String VALID_FILE = "valid/TestOnlyDelegateValid.java";
+    private static final String INVALID_FILE = "quality/invalid/TestOnlyDelegateInvalid.java";
+    private static final String VALID_FILE = "quality/valid/TestOnlyDelegateValid.java";
 
     @Test
     void invalidCasesProduceViolations() throws Exception {

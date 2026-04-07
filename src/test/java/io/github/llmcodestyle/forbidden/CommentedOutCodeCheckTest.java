@@ -21,7 +21,7 @@ class CommentedOutCodeCheckTest {
     void invalidCasesProduceViolations() throws Exception {
         List<AuditEvent> violations = TestCheckSupport.runFileSetCheck(
             CommentedOutCodeCheck.class,
-            "invalid/CommentedOutCodeInvalid.java",
+            "forbidden/invalid/CommentedOutCodeInvalid.java",
             Map.of("minConsecutiveLines", MIN_LINES_2));
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 3 commented-out code blocks, got: " + violations.size());
     }
@@ -31,7 +31,7 @@ class CommentedOutCodeCheckTest {
         assertTrue(
             TestCheckSupport.runFileSetCheck(
                 CommentedOutCodeCheck.class,
-                "valid/CommentedOutCodeValid.java",
+                "forbidden/valid/CommentedOutCodeValid.java",
                 Map.of("minConsecutiveLines", MIN_LINES_2)).isEmpty(),
             "Expected no violations");
     }
@@ -42,7 +42,7 @@ class CommentedOutCodeCheckTest {
         assertTrue(
             TestCheckSupport.runFileSetCheck(
                 CommentedOutCodeCheck.class,
-                "invalid/CommentedOutCodeInvalid.java",
+                "forbidden/invalid/CommentedOutCodeInvalid.java",
                 Map.of("minConsecutiveLines", MIN_LINES_3)).size() <= EXPECTED_VIOLATIONS,
             "Higher threshold should produce at most as many violations");
     }

@@ -17,12 +17,12 @@ class InlineRegexConstantCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(InlineRegexConstantCheck.class, "invalid/InlineRegexInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(InlineRegexConstantCheck.class, "simplify/invalid/InlineRegexInvalid.java", Map.of());
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 5 inline regex violations, got: " + violations.size());
     }
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        assertTrue(TestCheckSupport.runTreeWalkerCheck(InlineRegexConstantCheck.class, "valid/InlineRegexValid.java", Map.of()).isEmpty(), "Expected no violations");
+        assertTrue(TestCheckSupport.runTreeWalkerCheck(InlineRegexConstantCheck.class, "simplify/valid/InlineRegexValid.java", Map.of()).isEmpty(), "Expected no violations");
     }
 }

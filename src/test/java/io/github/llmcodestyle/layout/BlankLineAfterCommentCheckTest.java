@@ -19,7 +19,7 @@ class BlankLineAfterCommentCheckTest {
     void invalidCasesProduceViolations() throws Exception {
         List<AuditEvent> violations = TestCheckSupport.runFileSetCheck(
             BlankLineAfterCommentCheck.class,
-            "invalid/BlankLineAfterCommentInvalid.java",
+            "layout/invalid/BlankLineAfterCommentInvalid.java",
             Map.of("fileExtensions", "java"));
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 5 violations, got: " + violations.size());
     }
@@ -29,14 +29,17 @@ class BlankLineAfterCommentCheckTest {
         assertTrue(
             TestCheckSupport.runFileSetCheck(
                 BlankLineAfterCommentCheck.class,
-                "valid/BlankLineAfterCommentValid.java",
+                "layout/valid/BlankLineAfterCommentValid.java",
                 Map.of("fileExtensions", "java")).isEmpty(),
             "Expected no violations");
     }
 
     @Test
     void messageIsDescriptive() throws Exception {
-        for (AuditEvent event : TestCheckSupport.runFileSetCheck(BlankLineAfterCommentCheck.class, "invalid/BlankLineAfterCommentInvalid.java", Map.of("fileExtensions", "java"))) {
+        for (AuditEvent event : TestCheckSupport.runFileSetCheck(
+            BlankLineAfterCommentCheck.class,
+            "layout/invalid/BlankLineAfterCommentInvalid.java",
+            Map.of("fileExtensions", "java"))) {
             assertTrue(event.getMessage().contains("blank line"), "Expected 'blank line' in message, got: " + event.getMessage());
         }
     }

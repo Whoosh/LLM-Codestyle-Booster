@@ -17,12 +17,15 @@ class MethodCallArgumentsOnSameLineCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(MethodCallArgumentsOnSameLineCheck.class, "invalid/MethodCallArgsInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(MethodCallArgumentsOnSameLineCheck.class, "layout/invalid/MethodCallArgsInvalid.java", Map.of());
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 2 mixed-argument violations, got: " + violations.size());
     }
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        assertTrue(TestCheckSupport.runTreeWalkerCheck(MethodCallArgumentsOnSameLineCheck.class, "valid/MethodCallArgsValid.java", Map.of()).isEmpty(), "Expected no violations");
+        assertTrue(
+            TestCheckSupport.runTreeWalkerCheck(
+                MethodCallArgumentsOnSameLineCheck.class, "layout/valid/MethodCallArgsValid.java", Map.of()).isEmpty(),
+            "Expected no violations");
     }
 }

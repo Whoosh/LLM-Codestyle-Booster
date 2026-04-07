@@ -18,37 +18,37 @@ class NoSystemOutInProductionCheckTest {
 
     @Test
     void productionClassWithSystemOutProducesViolations() throws Exception {
-        assertEquals(PRODUCTION_CLASS_VIOLATIONS, runCheck("invalid/NoSystemOutProductionClass.java").size());
+        assertEquals(PRODUCTION_CLASS_VIOLATIONS, runCheck("forbidden/invalid/NoSystemOutProductionClass.java").size());
     }
 
     @Test
     void innerMainClassDoesNotExemptOuterClass() throws Exception {
-        assertEquals(1, runCheck("invalid/NoSystemOutInnerMainTrap.java").size());
+        assertEquals(1, runCheck("forbidden/invalid/NoSystemOutInnerMainTrap.java").size());
     }
 
     @Test
     void mainClassIsExempt() throws Exception {
-        assertTrue(runCheck("valid/NoSystemOutMainClass.java").isEmpty());
+        assertTrue(runCheck("forbidden/valid/NoSystemOutMainClass.java").isEmpty());
     }
 
     @Test
     void testClassIsExempt() throws Exception {
-        assertTrue(runCheck("valid/NoSystemOutTestClass.java").isEmpty());
+        assertTrue(runCheck("forbidden/valid/NoSystemOutTestClass.java").isEmpty());
     }
 
     @Test
     void slowTestClassIsExempt() throws Exception {
-        assertTrue(runCheck("valid/NoSystemOutSlowTestClass.java").isEmpty());
+        assertTrue(runCheck("forbidden/valid/NoSystemOutSlowTestClass.java").isEmpty());
     }
 
     @Test
     void batchPackageIsExempt() throws Exception {
-        assertTrue(runCheck("valid/NoSystemOutBatchPackage.java").isEmpty());
+        assertTrue(runCheck("forbidden/valid/NoSystemOutBatchPackage.java").isEmpty());
     }
 
     @Test
     void productionClassWithoutSystemOutPasses() throws Exception {
-        assertTrue(runCheck("valid/NoSystemOutNoSuchCalls.java").isEmpty());
+        assertTrue(runCheck("forbidden/valid/NoSystemOutNoSuchCalls.java").isEmpty());
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {

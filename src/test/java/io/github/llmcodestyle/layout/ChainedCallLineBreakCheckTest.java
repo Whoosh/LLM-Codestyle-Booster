@@ -19,7 +19,7 @@ class ChainedCallLineBreakCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(ChainedCallLineBreakCheck.class, "invalid/ChainedCallInvalid.java", Map.of("minChainLength", "4"));
+        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(ChainedCallLineBreakCheck.class, "layout/invalid/ChainedCallInvalid.java", Map.of("minChainLength", "4"));
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 2 chained call violations, got: " + violations.size());
     }
 
@@ -28,7 +28,7 @@ class ChainedCallLineBreakCheckTest {
         assertTrue(
             TestCheckSupport.runTreeWalkerCheck(
                 ChainedCallLineBreakCheck.class,
-                "valid/ChainedCallValid.java",
+                "layout/valid/ChainedCallValid.java",
                 Map.of("minChainLength", "4")).isEmpty(),
             "Expected no violations");
     }
@@ -39,7 +39,7 @@ class ChainedCallLineBreakCheckTest {
         assertFalse(
             TestCheckSupport.runTreeWalkerCheck(
                 ChainedCallLineBreakCheck.class,
-                "invalid/ChainedCallInvalid.java",
+                "layout/invalid/ChainedCallInvalid.java",
                 Map.of("minChainLength", MIN_CHAIN_3)).isEmpty(),
             "Lower threshold should produce violations");
     }

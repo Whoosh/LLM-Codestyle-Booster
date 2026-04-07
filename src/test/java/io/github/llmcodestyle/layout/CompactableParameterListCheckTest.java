@@ -21,7 +21,7 @@ class CompactableParameterListCheckTest {
     void invalidCasesProduceViolations() throws Exception {
         List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(
             CompactableParameterListCheck.class,
-            "invalid/CompactableParamInvalid.java",
+            "layout/invalid/CompactableParamInvalid.java",
             Map.of("maxLineLength", "180"));
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 5 compactable parameter violations, got: " + violations.size());
     }
@@ -31,7 +31,7 @@ class CompactableParameterListCheckTest {
         assertTrue(
             TestCheckSupport.runTreeWalkerCheck(
                 CompactableParameterListCheck.class,
-                "valid/CompactableParamValid.java",
+                "layout/valid/CompactableParamValid.java",
                 Map.of("maxLineLength", "180")).isEmpty(),
             "Expected no violations");
     }
@@ -42,7 +42,7 @@ class CompactableParameterListCheckTest {
         assertFalse(
             TestCheckSupport.runTreeWalkerCheck(
                 CompactableParameterListCheck.class,
-                "invalid/CompactableParamInvalid.java",
+                "layout/invalid/CompactableParamInvalid.java",
                 Map.of("maxLineLength", SHORT_MAX_LINE)).isEmpty(),
             "Smaller max line length should produce violations");
     }

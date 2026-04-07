@@ -21,7 +21,7 @@ class UnnecessaryLineWrapCheckTest {
     void invalidCasesProduceViolations() throws Exception {
         List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(
             UnnecessaryLineWrapCheck.class,
-            "invalid/UnnecessaryLineWrapInvalid.java",
+            "layout/invalid/UnnecessaryLineWrapInvalid.java",
             Map.of("maxLineLength", "180"));
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 13 unnecessary wrap violations, got: " + violations.size());
     }
@@ -31,7 +31,7 @@ class UnnecessaryLineWrapCheckTest {
         assertTrue(
             TestCheckSupport.runTreeWalkerCheck(
                 UnnecessaryLineWrapCheck.class,
-                "valid/UnnecessaryLineWrapValid.java",
+                "layout/valid/UnnecessaryLineWrapValid.java",
                 Map.of("maxLineLength", "180")).isEmpty(),
             "Expected no violations");
     }
@@ -42,7 +42,7 @@ class UnnecessaryLineWrapCheckTest {
         assertFalse(
             TestCheckSupport.runTreeWalkerCheck(
                 UnnecessaryLineWrapCheck.class,
-                "invalid/UnnecessaryLineWrapInvalid.java",
+                "layout/invalid/UnnecessaryLineWrapInvalid.java",
                 Map.of("maxLineLength", SHORT_MAX_LINE)).isEmpty(),
             "Smaller max line length should produce violations");
     }

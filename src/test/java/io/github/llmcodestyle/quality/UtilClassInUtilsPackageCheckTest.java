@@ -15,7 +15,7 @@ class UtilClassInUtilsPackageCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(UtilClassInUtilsPackageCheck.class, "invalid/UtilClassInUtilsPackageInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(UtilClassInUtilsPackageCheck.class, "quality/invalid/UtilClassInUtilsPackageInvalid.java", Map.of());
         assertEquals(1, violations.size(), "Expected 1 wrong-package violation, got " + violations.size());
         assertTrue(violations.get(0).getMessage().contains("PhysicsTextUtil"), "Expected class name in message");
     }
@@ -25,7 +25,7 @@ class UtilClassInUtilsPackageCheckTest {
         assertTrue(
             TestCheckSupport.runTreeWalkerCheck(
                 UtilClassInUtilsPackageCheck.class,
-                "valid/UtilClassInUtilsPackageValid.java",
+                "quality/valid/UtilClassInUtilsPackageValid.java",
                 Map.of()).isEmpty(),
             "Expected no violations");
     }

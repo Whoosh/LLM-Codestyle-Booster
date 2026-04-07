@@ -17,7 +17,7 @@ class TestMethodNameCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(TestMethodNameCheck.class, "invalid/TestMethodNameInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(TestMethodNameCheck.class, "quality/invalid/TestMethodNameInvalid.java", Map.of());
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 4 underscore violations in test methods, got " + violations.size());
         for (AuditEvent event : violations) {
             assertTrue(event.getMessage().contains("camelCase"), "Expected camelCase mention in message, got: " + event.getMessage());
@@ -26,6 +26,6 @@ class TestMethodNameCheckTest {
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        assertTrue(TestCheckSupport.runTreeWalkerCheck(TestMethodNameCheck.class, "valid/TestMethodNameValid.java", Map.of()).isEmpty(), "Expected no violations");
+        assertTrue(TestCheckSupport.runTreeWalkerCheck(TestMethodNameCheck.class, "quality/valid/TestMethodNameValid.java", Map.of()).isEmpty(), "Expected no violations");
     }
 }

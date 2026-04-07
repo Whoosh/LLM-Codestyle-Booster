@@ -17,12 +17,12 @@ class UnicodeEscapeCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runFileSetCheck(UnicodeEscapeCheck.class, "invalid/UnicodeEscapeInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupport.runFileSetCheck(UnicodeEscapeCheck.class, "forbidden/invalid/UnicodeEscapeInvalid.java", Map.of());
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 3 unicode escape violations, got: " + violations.size());
     }
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        assertTrue(TestCheckSupport.runFileSetCheck(UnicodeEscapeCheck.class, "valid/UnicodeEscapeValid.java", Map.of()).isEmpty(), "Expected no violations");
+        assertTrue(TestCheckSupport.runFileSetCheck(UnicodeEscapeCheck.class, "forbidden/valid/UnicodeEscapeValid.java", Map.of()).isEmpty(), "Expected no violations");
     }
 }

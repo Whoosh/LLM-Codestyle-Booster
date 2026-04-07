@@ -17,7 +17,7 @@ class ForbiddenGenericCatchCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(ForbiddenGenericCatchCheck.class, "invalid/ForbiddenGenericCatchInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(ForbiddenGenericCatchCheck.class, "forbidden/invalid/ForbiddenGenericCatchInvalid.java", Map.of());
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 6 generic catch violations, got: " + violations.size());
         for (AuditEvent event : violations) {
             assertTrue(event.getMessage().contains("forbidden"), "Unexpected message: " + event.getMessage());
@@ -26,6 +26,9 @@ class ForbiddenGenericCatchCheckTest {
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        assertTrue(TestCheckSupport.runTreeWalkerCheck(ForbiddenGenericCatchCheck.class, "valid/ForbiddenGenericCatchValid.java", Map.of()).isEmpty(), "Expected no violations");
+        assertTrue(
+            TestCheckSupport.runTreeWalkerCheck(
+                ForbiddenGenericCatchCheck.class, "forbidden/valid/ForbiddenGenericCatchValid.java", Map.of()).isEmpty(),
+            "Expected no violations");
     }
 }

@@ -19,13 +19,13 @@ class LongTestLiteralCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(LongTestLiteralCheck.class, "invalid/LongTestLiteralInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(LongTestLiteralCheck.class, "quality/invalid/LongTestLiteralInvalid.java", Map.of());
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 3 long test literal violations, got " + violations.size());
     }
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        assertTrue(TestCheckSupport.runTreeWalkerCheck(LongTestLiteralCheck.class, "valid/LongTestLiteralValid.java", Map.of()).isEmpty(), "Expected no violations");
+        assertTrue(TestCheckSupport.runTreeWalkerCheck(LongTestLiteralCheck.class, "quality/valid/LongTestLiteralValid.java", Map.of()).isEmpty(), "Expected no violations");
     }
 
     @Test
@@ -34,7 +34,7 @@ class LongTestLiteralCheckTest {
         assertFalse(
             TestCheckSupport.runTreeWalkerCheck(
                 LongTestLiteralCheck.class,
-                "invalid/LongTestLiteralInvalid.java",
+                "quality/invalid/LongTestLiteralInvalid.java",
                 Map.of("maxLength", SHORT_MAX)).isEmpty(),
             "Smaller max length should produce violations");
     }

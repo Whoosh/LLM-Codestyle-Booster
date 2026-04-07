@@ -30,7 +30,7 @@ In your project's `pom.xml` or `settings.xml`:
 <repositories>
     <repository>
         <id>github</id>
-        <url>https://maven.pkg.github.com/whoosh-project/llm-codestyle-booster</url>
+        <url>https://maven.pkg.github.com/Whoosh/LLM-Codestyle-Booster</url>
     </repository>
 </repositories>
 ```

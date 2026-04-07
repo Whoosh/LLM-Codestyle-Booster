@@ -14,7 +14,7 @@
         Custom Checkstyle checks + bundled PMD/SpotBugs/Checkstyle configs.
         One dependency brings all code-quality rules to your Maven project.
     </description>
-    <url>https://github.com/whoosh-project/llm-codestyle-booster</url>
+    <url>https://github.com/Whoosh/LLM-Codestyle-Booster</url>
 
     <licenses>
         <license>
@@ -24,16 +24,16 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git://github.com/whoosh-project/llm-codestyle-booster.git</connection>
-        <developerConnection>scm:git:ssh://github.com:whoosh-project/llm-codestyle-booster.git</developerConnection>
-        <url>https://github.com/whoosh-project/llm-codestyle-booster</url>
+        <connection>scm:git:git://github.com/Whoosh/LLM-Codestyle-Booster.git</connection>
+        <developerConnection>scm:git:ssh://github.com:Whoosh/LLM-Codestyle-Booster.git</developerConnection>
+        <url>https://github.com/Whoosh/LLM-Codestyle-Booster</url>
     </scm>
 
     <distributionManagement>
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/whoosh-project/llm-codestyle-booster</url>
+            <url>https://maven.pkg.github.com/Whoosh/LLM-Codestyle-Booster</url>
         </repository>
     </distributionManagement>
 

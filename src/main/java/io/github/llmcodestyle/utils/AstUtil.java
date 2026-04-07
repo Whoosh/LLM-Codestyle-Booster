@@ -125,4 +125,18 @@ public final class AstUtil {
         }
         return last;
     }
+
+    /**
+     * Extracts the simple type name from a definition node that has a TYPE child
+     * (e.g. {@code PARAMETER_DEF}, {@code VARIABLE_DEF}).
+     * Returns empty string if not resolvable.
+     */
+    public static String extractTypeName(DetailAST def) {
+        DetailAST type = def.findFirstToken(TYPE);
+        if (type == null) {
+            return "";
+        }
+        DetailAST ident = type.findFirstToken(IDENT);
+        return ident != null ? ident.getText() : "";
+    }
 }

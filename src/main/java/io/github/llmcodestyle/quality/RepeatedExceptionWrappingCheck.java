@@ -2,6 +2,7 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -114,15 +115,7 @@ public class RepeatedExceptionWrappingCheck extends AbstractCheck {
 
     private static String extractCaughtType(DetailAST catchAst) {
         DetailAST paramDef = catchAst.findFirstToken(PARAMETER_DEF);
-        if (paramDef == null) {
-            return "";
-        }
-        DetailAST type = paramDef.findFirstToken(TYPE);
-        if (type == null) {
-            return "";
-        }
-        DetailAST ident = type.findFirstToken(IDENT);
-        return ident != null ? ident.getText() : "";
+        return paramDef != null ? AstUtil.extractTypeName(paramDef) : "";
     }
 
     private static String extractThrownType(DetailAST slist) {

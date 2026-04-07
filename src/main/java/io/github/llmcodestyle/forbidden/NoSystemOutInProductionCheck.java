@@ -10,7 +10,7 @@ import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_CALL;
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.PACKAGE_DEF;
 
-/** Forbids {@code System.out/err} calls in production source. Exempt: Main/Application classes and batch packages. */
+/** Forbids {@code System.out/err} calls in production source. Exempt: Main/Application/Test classes and batch packages. */
 public class NoSystemOutInProductionCheck extends AbstractCheck {
 
     /** Violation message key. */
@@ -18,6 +18,8 @@ public class NoSystemOutInProductionCheck extends AbstractCheck {
 
     private static final String DOT_STR = "\\.";
     private static final String MAIN_SUFFIX = "Main";
+    private static final String TEST_SUFFIX = "Test";
+    private static final String SLOW_TEST_SUFFIX = "SlowTest";
 
     /** Simple class name for the file being checked. Updated per file. */
     private String simpleClassName = "";
@@ -73,6 +75,9 @@ public class NoSystemOutInProductionCheck extends AbstractCheck {
 
     private boolean isExempt() {
         if (simpleClassName.endsWith(MAIN_SUFFIX) || simpleClassName.startsWith(MAIN_SUFFIX) || simpleClassName.endsWith("Application")) {
+            return true;
+        }
+        if (simpleClassName.endsWith(TEST_SUFFIX) || simpleClassName.endsWith(SLOW_TEST_SUFFIX)) {
             return true;
         }
         for (String segment : pkgName.split(DOT_STR)) {

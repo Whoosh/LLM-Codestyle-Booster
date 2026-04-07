@@ -15,22 +15,23 @@ public class UtilClassInUtilsPackageCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "util.class.wrong.package";
+    private static final int[] TOKENS = {PACKAGE_DEF, CLASS_DEF};
 
     private String currentPackage = "";
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {PACKAGE_DEF, CLASS_DEF};
+        return TOKENS.clone();
     }
 
     @Override

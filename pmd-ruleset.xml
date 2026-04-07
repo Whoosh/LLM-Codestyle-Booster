@@ -56,7 +56,7 @@
     <rule ref="category/java/design.xml/GodClass">
         <properties>
             <property name="violationSuppressXPath"
-                      value="//ClassDeclaration[ends-with(@SimpleName, 'Check')]"/>
+                      value="//ClassDeclaration[ends-with(@SimpleName, 'Check') or ends-with(@SimpleName, 'Util')]"/>
         </properties>
     </rule>
     <rule ref="category/java/design.xml/CyclomaticComplexity">

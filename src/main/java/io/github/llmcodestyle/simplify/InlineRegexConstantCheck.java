@@ -11,21 +11,22 @@ import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 public class InlineRegexConstantCheck extends AbstractCheck {
 
     private static final String MSG_KEY = "inline.regex.constant";
+    private static final int[] TOKENS = {METHOD_CALL};
     private static final int MIN_REGEX_LITERAL_LENGTH = 3;
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {METHOD_CALL};
+        return TOKENS.clone();
     }
 
     @Override

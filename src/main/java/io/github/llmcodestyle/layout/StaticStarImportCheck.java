@@ -24,23 +24,24 @@ public class StaticStarImportCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "static.star.import";
+    private static final int[] TOKENS = {STATIC_IMPORT};
 
     private final List<ImportInfo> explicitImports = new ArrayList<>();
     private final Map<String, List<String>> memberToParents = new HashMap<>();
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {STATIC_IMPORT};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {STATIC_IMPORT};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {STATIC_IMPORT};
+        return TOKENS.clone();
     }
 
     @Override

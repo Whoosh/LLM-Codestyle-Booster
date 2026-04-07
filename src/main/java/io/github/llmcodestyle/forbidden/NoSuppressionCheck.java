@@ -19,20 +19,21 @@ public class NoSuppressionCheck extends AbstractCheck {
      * Violation message key for comment suppressions.
      */
     static final String MSG_COMMENT = "no.suppression.comment";
+    private static final int[] TOKENS = {ANNOTATION};
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {ANNOTATION};
+        return TOKENS.clone();
     }
 
     @Override

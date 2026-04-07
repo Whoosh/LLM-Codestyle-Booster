@@ -15,22 +15,23 @@ public class ConditionalReturnToTernaryCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "conditional.return.to.ternary";
+    private static final int[] TOKENS = {LITERAL_IF};
 
     private static final int MAX_EXPR_DEPTH = 3;
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {LITERAL_IF};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {LITERAL_IF};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {LITERAL_IF};
+        return TOKENS.clone();
     }
 
     @Override

@@ -15,22 +15,23 @@ public class TestClassNamingCheck extends AbstractCheck {
      * Violation message key for classes that don't follow the convention.
      */
     static final String MSG_KEY = "test.class.naming";
+    private static final int[] TOKENS = {CLASS_DEF};
 
     private static final String TEST_KEYWORD = "Test";
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {CLASS_DEF};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {CLASS_DEF};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {CLASS_DEF};
+        return TOKENS.clone();
     }
 
     @Override

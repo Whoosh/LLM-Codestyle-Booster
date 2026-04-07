@@ -15,6 +15,7 @@ public class NoSystemOutInProductionCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "no.system.out.production";
+    private static final int[] TOKENS = {CLASS_DEF, PACKAGE_DEF, METHOD_CALL};
 
     private static final String DOT_STR = "\\.";
     private static final String MAIN_SUFFIX = "Main";
@@ -33,17 +34,17 @@ public class NoSystemOutInProductionCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {CLASS_DEF, PACKAGE_DEF, METHOD_CALL};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {CLASS_DEF, PACKAGE_DEF, METHOD_CALL};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {CLASS_DEF, PACKAGE_DEF, METHOD_CALL};
+        return TOKENS.clone();
     }
 
     @Override
@@ -93,16 +94,12 @@ public class NoSystemOutInProductionCheck extends AbstractCheck {
     }
 
     private static boolean isSystemOutOrErrCall(DetailAST methodCall) {
+        String methodName = AstUtil.extractMethodName(methodCall);
+        if (!"println".equals(methodName) && !"print".equals(methodName) && !"printf".equals(methodName) && !"format".equals(methodName)) {
+            return false;
+        }
         DetailAST dot = methodCall.findFirstToken(DOT);
         if (dot == null) {
-            return false;
-        }
-        DetailAST methodIdent = dot.getLastChild();
-        if (methodIdent == null) {
-            return false;
-        }
-        String methodName = methodIdent.getText();
-        if (!"println".equals(methodName) && !"print".equals(methodName) && !"printf".equals(methodName) && !"format".equals(methodName)) {
             return false;
         }
         DetailAST receiverDot = dot.getFirstChild();

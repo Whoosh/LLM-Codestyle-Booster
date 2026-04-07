@@ -15,20 +15,21 @@ import java.util.Set;
 public class TestOnlyDelegateCheck extends AbstractCheck {
 
     static final String MSG_KEY = "test.only.delegate";
+    private static final int[] TOKENS = {CLASS_DEF, RECORD_DEF};
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {CLASS_DEF, RECORD_DEF};
+        return TOKENS.clone();
     }
 
     @Override

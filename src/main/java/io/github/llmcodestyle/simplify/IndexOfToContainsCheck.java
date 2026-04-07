@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -14,20 +15,21 @@ public class IndexOfToContainsCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "indexof.use.contains";
+    private static final int[] TOKENS = {LT, GE, EQUAL, NOT_EQUAL, GT};
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {LT, GE, EQUAL, NOT_EQUAL, GT};
+        return TOKENS.clone();
     }
 
     @Override
@@ -88,12 +90,7 @@ public class IndexOfToContainsCheck extends AbstractCheck {
     }
 
     private static boolean isIndexOfMethodName(DetailAST methodCall) {
-        DetailAST dot = methodCall.findFirstToken(DOT);
-        if (dot == null) {
-            return false;
-        }
-        DetailAST methodName = dot.getLastChild();
-        return methodName != null && "indexOf".equals(methodName.getText());
+        return "indexOf".equals(AstUtil.extractMethodName(methodCall));
     }
 
     private static boolean isValidIndexOfArgument(DetailAST firstExpr) {

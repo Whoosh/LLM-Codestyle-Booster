@@ -14,20 +14,21 @@ public class MethodCallArgumentsOnSameLineCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "method.call.args.line.consistency";
+    private static final int[] TOKENS = {METHOD_CALL, LITERAL_NEW};
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {METHOD_CALL, LITERAL_NEW};
+        return TOKENS.clone();
     }
 
     @Override

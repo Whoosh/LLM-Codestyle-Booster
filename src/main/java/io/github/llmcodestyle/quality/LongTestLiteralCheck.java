@@ -15,6 +15,7 @@ public class LongTestLiteralCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "long.test.literal";
+    private static final int[] TOKENS = {STRING_LITERAL};
 
     private static final int DEFAULT_MAX_LENGTH = 30;
 
@@ -29,17 +30,17 @@ public class LongTestLiteralCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {STRING_LITERAL};
+        return TOKENS.clone();
     }
 
     @Override

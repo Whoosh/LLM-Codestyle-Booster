@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -18,6 +19,7 @@ public class CollectionsToListOfCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "collections.to.list.of";
+    private static final int[] TOKENS = {METHOD_CALL};
 
     private static final Set<String> REPLACEABLE_METHODS = Set.of("emptyList", "emptySet", "emptyMap", "singletonList", "singleton", "singletonMap");
 
@@ -25,34 +27,28 @@ public class CollectionsToListOfCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {METHOD_CALL};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {METHOD_CALL};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {METHOD_CALL};
+        return TOKENS.clone();
     }
 
     @Override
     public void visitToken(DetailAST ast) {
-        DetailAST dot = ast.findFirstToken(DOT);
-        if (dot == null) {
+        if (!"Collections".equals(AstUtil.extractReceiverName(ast))) {
             return;
         }
-        DetailAST receiver = dot.getFirstChild();
-        DetailAST method = dot.getLastChild();
-        if (receiver == null || method == null || receiver.getType() != IDENT || method.getType() != IDENT) {
+        String methodName = AstUtil.extractMethodName(ast);
+        if (methodName.isEmpty()) {
             return;
         }
-        if (!"Collections".equals(receiver.getText())) {
-            return;
-        }
-        String methodName = method.getText();
 
         if (REPLACEABLE_METHODS.contains(methodName)) {
             log(ast, MSG_KEY, methodName);
@@ -74,15 +70,6 @@ public class CollectionsToListOfCheck extends AbstractCheck {
         if (innerCall == null) {
             return false;
         }
-        DetailAST innerDot = innerCall.findFirstToken(DOT);
-        if (innerDot == null) {
-            return false;
-        }
-        DetailAST innerReceiver = innerDot.getFirstChild();
-        DetailAST innerMethod = innerDot.getLastChild();
-        if (innerReceiver == null || innerMethod == null) {
-            return false;
-        }
-        return "Arrays".equals(innerReceiver.getText()) && "asList".equals(innerMethod.getText());
+        return "Arrays".equals(AstUtil.extractReceiverName(innerCall)) && "asList".equals(AstUtil.extractMethodName(innerCall));
     }
 }

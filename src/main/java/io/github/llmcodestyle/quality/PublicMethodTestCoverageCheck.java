@@ -27,6 +27,7 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "public.method.not.tested";
+    private static final int[] TOKENS = {CLASS_DEF, INTERFACE_DEF, RECORD_DEF, METHOD_DEF};
 
     private static final Set<String> EXEMPT_METHODS = Set.of(
         "toString",
@@ -60,17 +61,17 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {CLASS_DEF, INTERFACE_DEF, RECORD_DEF, METHOD_DEF};
+        return TOKENS.clone();
     }
 
     @Override

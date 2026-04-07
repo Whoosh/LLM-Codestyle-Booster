@@ -20,22 +20,23 @@ public class UnusedPrivateMembersCheck extends AbstractCheck {
      * Violation message key for unused private members.
      */
     static final String MSG_KEY = "unused.private.member";
+    private static final int[] TOKENS = {CLASS_DEF};
 
     private static final Set<String> EXCLUDED_NAMES = Set.of("serialVersionUID");
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {CLASS_DEF};
+        return TOKENS.clone();
     }
 
     @Override

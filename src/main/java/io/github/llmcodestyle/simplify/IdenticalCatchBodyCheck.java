@@ -19,20 +19,21 @@ public class IdenticalCatchBodyCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "identical.catch.body";
+    private static final int[] TOKENS = {LITERAL_TRY};
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {LITERAL_TRY};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {LITERAL_TRY};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {LITERAL_TRY};
+        return TOKENS.clone();
     }
 
     @Override

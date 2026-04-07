@@ -15,20 +15,21 @@ public class StaticFinalFirstCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "static.final.after.instance";
+    private static final int[] TOKENS = {CLASS_DEF, INTERFACE_DEF, ENUM_DEF};
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {CLASS_DEF, INTERFACE_DEF, ENUM_DEF};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {CLASS_DEF, INTERFACE_DEF, ENUM_DEF};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {CLASS_DEF, INTERFACE_DEF, ENUM_DEF};
+        return TOKENS.clone();
     }
 
     @Override

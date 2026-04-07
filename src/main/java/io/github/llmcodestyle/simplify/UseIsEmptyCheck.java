@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -14,20 +15,21 @@ public class UseIsEmptyCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "use.isEmpty";
+    private static final int[] TOKENS = {GT, GE, LT, LE, EQUAL, NOT_EQUAL};
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {GT, GE, LT, LE, EQUAL, NOT_EQUAL};
+        return TOKENS.clone();
     }
 
     @Override
@@ -73,15 +75,7 @@ public class UseIsEmptyCheck extends AbstractCheck {
         if (n == null || n.getType() != METHOD_CALL) {
             return false;
         }
-        DetailAST dot = n.findFirstToken(DOT);
-        if (dot == null) {
-            return false;
-        }
-        DetailAST methodIdent = dot.getLastChild();
-        if (methodIdent == null) {
-            return false;
-        }
-        String name = methodIdent.getText();
+        String name = AstUtil.extractMethodName(n);
         if (!"length".equals(name) && !"size".equals(name)) {
             return false;
         }
@@ -94,12 +88,8 @@ public class UseIsEmptyCheck extends AbstractCheck {
         if (n == null || n.getType() != METHOD_CALL) {
             return "?";
         }
-        DetailAST dot = n.findFirstToken(DOT);
-        if (dot == null) {
-            return "?";
-        }
-        DetailAST methodIdent = dot.getLastChild();
-        return methodIdent != null ? methodIdent.getText() : "?";
+        String name = AstUtil.extractMethodName(n);
+        return name.isEmpty() ? "?" : name;
     }
 
     private static boolean isSmallInt(DetailAST node) {

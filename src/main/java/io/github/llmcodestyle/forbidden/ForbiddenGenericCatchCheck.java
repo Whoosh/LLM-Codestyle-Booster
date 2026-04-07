@@ -14,20 +14,21 @@ public class ForbiddenGenericCatchCheck extends AbstractCheck {
      * Message key for generic catch violations.
      */
     static final String MSG_KEY = "forbidden.generic.catch";
+    private static final int[] TOKENS = {LITERAL_CATCH};
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {LITERAL_CATCH};
+        return TOKENS.clone();
     }
 
     @Override

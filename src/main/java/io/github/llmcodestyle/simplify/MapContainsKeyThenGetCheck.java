@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -15,20 +16,21 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "map.contains.then.get";
+    private static final int[] TOKENS = {LITERAL_IF};
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {LITERAL_IF};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {LITERAL_IF};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {LITERAL_IF};
+        return TOKENS.clone();
     }
 
     @Override
@@ -41,8 +43,8 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
         if (containsCall == null) {
             return;
         }
-        String receiver = extractReceiverText(containsCall);
-        String keyArg = extractFirstArgText(containsCall);
+        String receiver = AstUtil.extractReceiverName(containsCall);
+        String keyArg = AstUtil.extractFirstArgText(containsCall);
         if (receiver.isEmpty() || keyArg.isEmpty()) {
             return;
         }
@@ -65,12 +67,7 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
     }
 
     private static boolean isContainsKeyCall(DetailAST methodCall) {
-        DetailAST dot = methodCall.findFirstToken(DOT);
-        if (dot == null) {
-            return false;
-        }
-        DetailAST methodIdent = dot.getLastChild();
-        return methodIdent != null && "containsKey".equals(methodIdent.getText());
+        return "containsKey".equals(AstUtil.extractMethodName(methodCall));
     }
 
     private static boolean containsGetCallOnSameReceiver(DetailAST ifAst, String receiver, String keyArg) {
@@ -95,39 +92,9 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
     }
 
     private static boolean isGetCallOnReceiver(DetailAST methodCall, String receiver, String keyArg) {
-        DetailAST dot = methodCall.findFirstToken(DOT);
-        if (dot == null) {
+        if (!"get".equals(AstUtil.extractMethodName(methodCall))) {
             return false;
         }
-        DetailAST methodIdent = dot.getLastChild();
-        if (methodIdent == null || !"get".equals(methodIdent.getText())) {
-            return false;
-        }
-        return receiver.equals(extractReceiverText(methodCall)) && keyArg.equals(extractFirstArgText(methodCall));
-    }
-
-    private static String extractReceiverText(DetailAST methodCall) {
-        DetailAST dot = methodCall.findFirstToken(DOT);
-        if (dot == null) {
-            return "";
-        }
-        DetailAST receiver = dot.getFirstChild();
-        if (receiver == null) {
-            return "";
-        }
-        return receiver.getType() == IDENT ? receiver.getText() : "";
-    }
-
-    private static String extractFirstArgText(DetailAST methodCall) {
-        DetailAST elist = methodCall.findFirstToken(ELIST);
-        if (elist == null) {
-            return "";
-        }
-        DetailAST firstExpr = elist.findFirstToken(EXPR);
-        if (firstExpr == null) {
-            return "";
-        }
-        DetailAST ident = firstExpr.findFirstToken(IDENT);
-        return ident != null ? ident.getText() : "";
+        return receiver.equals(AstUtil.extractReceiverName(methodCall)) && keyArg.equals(AstUtil.extractFirstArgText(methodCall));
     }
 }

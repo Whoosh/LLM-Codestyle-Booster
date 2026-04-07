@@ -15,6 +15,7 @@ import java.util.Set;
 public class PureSingleUseLocalVariableCheck extends AbstractCheck {
 
     static final String MSG_KEY = "pure.single.use.local.variable";
+    private static final int[] TOKENS = {SLIST};
 
     private static final Set<String> PURE_METHODS = Set.of(
         "get",
@@ -64,17 +65,17 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {SLIST};
+        return TOKENS.clone();
     }
 
     @Override

@@ -14,20 +14,21 @@ public class ArrayInitSpaceCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "array.init.space";
+    private static final int[] TOKENS = {ARRAY_INIT};
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {ARRAY_INIT};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {ARRAY_INIT};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {ARRAY_INIT};
+        return TOKENS.clone();
     }
 
     @Override

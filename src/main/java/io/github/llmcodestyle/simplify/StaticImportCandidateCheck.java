@@ -19,6 +19,7 @@ public class StaticImportCandidateCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "static.import.candidate";
+    private static final int[] TOKENS = {STATIC_IMPORT, DOT};
 
     private final Map<String, Integer> qualifiedRefs = new HashMap<>();
     private final Set<String> staticImports = new HashSet<>();
@@ -26,17 +27,17 @@ public class StaticImportCandidateCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {STATIC_IMPORT, DOT};
+        return TOKENS.clone();
     }
 
     @Override

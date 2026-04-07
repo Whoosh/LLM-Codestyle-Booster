@@ -20,6 +20,7 @@ public class RepeatedExceptionWrappingCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "repeated.exception.wrapping";
+    private static final int[] TOKENS = {CLASS_DEF};
 
     private static final int DEFAULT_MIN_OCCURRENCES = 3;
 
@@ -41,17 +42,17 @@ public class RepeatedExceptionWrappingCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {CLASS_DEF};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {CLASS_DEF};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {CLASS_DEF};
+        return TOKENS.clone();
     }
 
     @Override

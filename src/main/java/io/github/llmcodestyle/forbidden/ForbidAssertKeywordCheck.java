@@ -11,20 +11,21 @@ import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 public class ForbidAssertKeywordCheck extends AbstractCheck {
 
     static final String MSG_KEY = "forbid.assert.keyword";
+    private static final int[] TOKENS = {LITERAL_ASSERT};
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {LITERAL_ASSERT};
+        return TOKENS.clone();
     }
 
     @Override

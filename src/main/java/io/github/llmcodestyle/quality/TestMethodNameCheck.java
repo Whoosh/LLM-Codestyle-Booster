@@ -15,20 +15,21 @@ public class TestMethodNameCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "test.method.name.camel.case";
+    private static final int[] TOKENS = {METHOD_DEF};
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {METHOD_DEF};
+        return TOKENS.clone();
     }
 
     @Override

@@ -15,6 +15,7 @@ public class CompactableParameterListCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "compactable.parameter.line";
+    private static final int[] TOKENS = {METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF, RECORD_DEF};
 
     private static final int DEFAULT_MAX_LINE_LENGTH = 180;
 
@@ -26,17 +27,17 @@ public class CompactableParameterListCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF, RECORD_DEF};
+        return TOKENS.clone();
     }
 
     @Override

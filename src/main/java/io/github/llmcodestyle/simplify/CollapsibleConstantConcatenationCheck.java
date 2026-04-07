@@ -29,22 +29,23 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
      * Violation message key for consecutive constant/literal runs in method bodies.
      */
     static final String MSG_RUN = "collapsible.constant.run";
+    private static final int[] TOKENS = {CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF};
 
     private static final int MIN_METHOD_RUN_LENGTH = 2;
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF};
+        return TOKENS.clone();
     }
 
     @Override

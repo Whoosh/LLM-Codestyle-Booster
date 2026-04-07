@@ -17,20 +17,21 @@ public class SingleUseLocalVariableCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "single.use.local.variable";
+    private static final int[] TOKENS = {SLIST};
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {SLIST};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {SLIST};
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {SLIST};
+        return TOKENS.clone();
     }
 
     @Override

@@ -12,6 +12,11 @@ import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 public class UnnecessaryLineWrapCheck extends AbstractCheck {
 
     private static final String MSG_KEY = "unnecessary.line.wrap";
+    private static final int[] TOKENS = {
+        METHOD_CALL, METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF, VARIABLE_DEF, RECORD_DEF,
+        LITERAL_IF, RESOURCE, LITERAL_THROW, LITERAL_RETURN,
+        CLASS_DEF, INTERFACE_DEF, ENUM_DEF, LITERAL_TRY,
+    };
     private static final int DEFAULT_MAX_LINE_LENGTH = 180;
     private static final int CHAIN_THRESHOLD = 4;
 
@@ -23,21 +28,17 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getRequiredTokens();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {
-            METHOD_CALL, METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF, VARIABLE_DEF, RECORD_DEF,
-            LITERAL_IF, RESOURCE, LITERAL_THROW, LITERAL_RETURN,
-            CLASS_DEF, INTERFACE_DEF, ENUM_DEF, LITERAL_TRY,
-        };
+        return TOKENS.clone();
     }
 
     @Override

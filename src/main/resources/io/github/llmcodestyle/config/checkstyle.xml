@@ -210,6 +210,7 @@
         <module name="io.github.llmcodestyle.quality.UtilClassInUtilsPackageCheck"/>
         <module name="io.github.llmcodestyle.quality.PublicMethodTestCoverageCheck"/>
         <module name="io.github.llmcodestyle.quality.TestOnlyDelegateCheck"/>
+        <module name="io.github.llmcodestyle.quality.RepeatedExceptionWrappingCheck"/>
 
         <!-- Custom checks: simplify -->
         <module name="io.github.llmcodestyle.simplify.InlineRegexConstantCheck"/>
@@ -219,6 +220,10 @@
         <module name="io.github.llmcodestyle.simplify.CollapsibleConstantConcatenationCheck"/>
         <module name="io.github.llmcodestyle.simplify.SingleUseLocalVariableCheck"/>
         <module name="io.github.llmcodestyle.simplify.PureSingleUseLocalVariableCheck"/>
+        <module name="io.github.llmcodestyle.simplify.IdenticalCatchBodyCheck"/>
+        <module name="io.github.llmcodestyle.simplify.MapContainsKeyThenGetCheck"/>
+        <module name="io.github.llmcodestyle.simplify.CollectionsToListOfCheck"/>
+        <module name="io.github.llmcodestyle.simplify.ConditionalReturnToTernaryCheck"/>
 
         <!-- Miscellaneous -->
         <module name="ArrayTypeStyle"/>

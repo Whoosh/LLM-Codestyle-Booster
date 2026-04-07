@@ -3,8 +3,12 @@ package io.github.llmcodestyle;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 import io.github.llmcodestyle.simplify.CollapsibleConstantConcatenationCheck;
+import io.github.llmcodestyle.simplify.CollectionsToListOfCheck;
+import io.github.llmcodestyle.simplify.ConditionalReturnToTernaryCheck;
+import io.github.llmcodestyle.simplify.IdenticalCatchBodyCheck;
 import io.github.llmcodestyle.simplify.IndexOfToContainsCheck;
 import io.github.llmcodestyle.simplify.InlineRegexConstantCheck;
+import io.github.llmcodestyle.simplify.MapContainsKeyThenGetCheck;
 import io.github.llmcodestyle.simplify.PureSingleUseLocalVariableCheck;
 import io.github.llmcodestyle.simplify.SingleUseLocalVariableCheck;
 import io.github.llmcodestyle.simplify.StaticImportCandidateCheck;
@@ -41,6 +45,14 @@ import static org.junit.jupiter.api.Assertions.*;
  *   <li>{@link StaticImportCandidateCheck} — import style only, zero bytecode difference</li>
  *   <li>{@link UseIsEmptyCheck} — isEmpty() and length()/size() are both O(1);
  *       no asymptotic change, only readability improvement</li>
+ *   <li>{@link IdenticalCatchBodyCheck} — merges identical catch clauses,
+ *       zero runtime impact (control flow only)</li>
+ *   <li>{@link MapContainsKeyThenGetCheck} — replaces double lookup with single,
+ *       actually IMPROVES performance (fewer hash computations)</li>
+ *   <li>{@link CollectionsToListOfCheck} — factory method replacement,
+ *       no asymptotic change (both O(n) for n elements)</li>
+ *   <li>{@link ConditionalReturnToTernaryCheck} — syntactic sugar only,
+ *       zero bytecode difference in return paths</li>
  * </ul>
  */
 class AsymptoticSafetyTest {

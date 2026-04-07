@@ -149,6 +149,11 @@ class CheckstyleConfigConsistencyTest {
     //   StaticImportCandidateCheck — suggests static imports, no conflict with other checks
     //   ArrayInitSpaceCheck — enforces space before '{' in array init, no cross-rule interaction
     //   StaticStarImportCheck — requires wildcard static imports, no cross-rule interaction
+    //   IdenticalCatchBodyCheck — detects identical catch bodies for multi-catch, no cross-rule interaction
+    //   MapContainsKeyThenGetCheck — detects containsKey+get double lookup, no cross-rule interaction
+    //   CollectionsToListOfCheck — detects pre-Java-9 Collections factory methods, no cross-rule interaction
+    //   ConditionalReturnToTernaryCheck — detects if-else with single returns, no cross-rule interaction
+    //   RepeatedExceptionWrappingCheck — detects repeated catch-rethrow patterns, no cross-rule interaction
     private List<AuditEvent> runFullConfig(String resourceFile, boolean testScope) throws Exception {
         if (CHECKSTYLE_XML == null || !Files.exists(CHECKSTYLE_XML)) {
             return List.of();

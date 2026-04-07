@@ -76,4 +76,9 @@
     <Match>
         <Bug pattern="UVA_USE_VAR_ARGS"/>
     </Match>
+
+    <!-- Loop-search pattern is intentional in AST traversal (counting statements) -->
+    <Match>
+        <Bug pattern="SLS_SUSPICIOUS_LOOP_SEARCH"/>
+    </Match>
 </FindBugsFilter>

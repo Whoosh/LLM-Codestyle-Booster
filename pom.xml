@@ -132,7 +132,7 @@
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>${pmd-plugin.version}</version>
                 <configuration>
-                    <minimumTokens>50</minimumTokens>
+                    <minimumTokens>70</minimumTokens>
                     <printFailingErrors>true</printFailingErrors>
                     <linkXRef>false</linkXRef>
                     <rulesets>

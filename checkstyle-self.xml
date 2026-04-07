@@ -37,7 +37,9 @@
         <module name="TypeName"/>
 
         <!-- Imports -->
-        <module name="AvoidStarImport"/>
+        <module name="AvoidStarImport">
+            <property name="allowStaticMemberImports" value="true"/>
+        </module>
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
 

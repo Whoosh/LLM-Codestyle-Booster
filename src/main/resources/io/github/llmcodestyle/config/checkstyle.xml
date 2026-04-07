@@ -189,6 +189,7 @@
         <module name="io.github.llmcodestyle.layout.CompactableParameterListCheck">
             <property name="maxLineLength" value="180"/>
         </module>
+        <module name="io.github.llmcodestyle.layout.ArrayInitSpaceCheck"/>
 
         <!-- Custom checks: forbidden -->
         <module name="io.github.llmcodestyle.forbidden.NoSuppressionCheck"/>
@@ -280,6 +281,11 @@
     <module name="RegexpMultiline">
         <property name="format" value="/\*\*\n\s+\* .+\n\s+\* [^@]"/>
         <property name="message" value="Multi-line javadoc — condense to single line: /** Does X. */"/>
+        <property name="fileExtensions" value="java"/>
+    </module>
+    <module name="RegexpMultiline">
+        <property name="format" value="/\*\*\n\s+\* [^@\n]+\n\s+\*/"/>
+        <property name="message" value="Single-content javadoc should be on one line: /** Does X. */"/>
         <property name="fileExtensions" value="java"/>
     </module>
 </module>

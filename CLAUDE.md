@@ -41,9 +41,12 @@ src/main/resources/io/github/llmcodestyle/
 src/test/
   java/    — one test class per check + integration tests (CheckstyleConfigConsistencyTest, CrossAnalyzerConsistencyTest, AsymptoticSafetyTest)
   resources/
-    valid/    — Java files that must pass all checks
-    invalid/  — Java files that must trigger specific violations
-    coverage/ — test data for PublicMethodTestCoverageCheck
+    forbidden/valid/  forbidden/invalid/  — test data for forbidden checks
+    layout/valid/     layout/invalid/     — test data for layout checks
+    quality/valid/    quality/invalid/    — test data for quality checks
+    simplify/valid/   simplify/invalid/   — test data for simplify checks
+    valid/            — shared cross-cutting fixtures (IdempotencyGolden*, AsymptoticSafetyTraps)
+    coverage/         — test data for PublicMethodTestCoverageCheck
 ```
 
 ## How checks are registered
@@ -59,9 +62,10 @@ When a consumer adds this jar as a Checkstyle dependency, all checks under
 3. Add error messages to the package's `messages.properties` file.
 4. Add the check to `src/main/resources/io/github/llmcodestyle/config/checkstyle.xml`.
 5. Write tests:
-   - Create test input files in `src/test/resources/valid/` and `src/test/resources/invalid/`.
+   - Create test input files in `src/test/resources/<package>/valid/` and `src/test/resources/<package>/invalid/` (e.g. `layout/valid/`, `forbidden/invalid/`).
    - Write a test class using `TestCheckSupport` helper.
-6. Run `mvn verify` — JaCoCo enforces 85% line coverage.
+6. Register in `CheckstyleConfigConsistencyTest.java` comment registry (the `CrossAnalyzerConsistencyTest` enforces this).
+7. Run `mvn verify` — JaCoCo enforces 85% line coverage.
 
 ## Conventions
 

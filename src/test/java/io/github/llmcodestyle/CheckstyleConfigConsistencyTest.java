@@ -148,6 +148,7 @@ class CheckstyleConfigConsistencyTest {
     //   CommentedOutCodeCheck — FileSetCheck scanning comments, independent of AST checks
     //   UtilClassInUtilsPackageCheck — naming convention check, no cross-rule interaction
     //   StaticImportCandidateCheck — suggests static imports, no conflict with other checks
+    //   ArrayInitSpaceCheck — enforces space before '{' in array init, no cross-rule interaction
     private List<AuditEvent> runFullConfig(String resourceFile, boolean testScope) throws Exception {
         if (CHECKSTYLE_XML == null || !Files.exists(CHECKSTYLE_XML)) {
             return List.of();

@@ -92,6 +92,16 @@ class CrossAnalyzerConsistencyTest {
     }
 
     @Test
+    void selfCheckXmlAllowsStaticStarImportsLikeBundledConfig() throws Exception {
+        Path selfXml = Path.of("checkstyle-self.xml");
+        assumeTrue(Files.exists(selfXml), "checkstyle-self.xml not found");
+        assertEquals(
+            readProjectFile("checkstyle.xml").contains("allowStaticMemberImports\" value=\"true\""),
+            Files.readString(selfXml).contains("allowStaticMemberImports\" value=\"true\""),
+            "checkstyle-self.xml and bundled checkstyle.xml must agree on allowStaticMemberImports");
+    }
+
+    @Test
     void everySimplifyCheckCoveredByAsymptoticSafetyTest() throws Exception {
         Path safetyTest = Path.of("src/test/java/io/github/llmcodestyle/AsymptoticSafetyTest.java");
         assumeTrue(Files.exists(safetyTest), "AsymptoticSafetyTest.java not found");

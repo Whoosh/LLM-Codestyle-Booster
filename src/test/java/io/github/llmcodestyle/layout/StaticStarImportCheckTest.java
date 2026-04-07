@@ -27,8 +27,8 @@ class StaticStarImportCheckTest {
     }
 
     @Test
-    void messageIsDescriptive() throws Exception {
-        assertFalse(runCheck(INVALID).isEmpty());
+    void collisionAllowsExplicitImports() throws Exception {
+        assertTrue(runCheck("layout/valid/StaticStarImportCollisionValid.java").isEmpty());
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {

@@ -37,8 +37,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  */
 class CrossAnalyzerConsistencyTest {
 
-    private static final Path BUNDLED_CONFIG =
-        Path.of("src/main/resources/io/github/llmcodestyle/config");
+    private static final Path BUNDLED_CONFIG = Path.of("src/main/resources/io/github/llmcodestyle/config");
 
     @Test
     void spotbugsExcludesUnnecessaryStoreBeforeReturn() throws Exception {

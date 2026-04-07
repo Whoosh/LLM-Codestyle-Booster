@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    name: Build & Verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,3 +22,25 @@ jobs:
 
       - name: Build and verify
         run: mvn verify --batch-mode --no-transfer-progress
+
+  self-check:
+    name: Self-Check (custom rules)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Install jar (skip analysis to break circular dependency)
+        run: >
+          mvn install
+          -DskipTests -Dcheckstyle.skip -Dpmd.skip -Dcpd.skip -Dspotbugs.skip -Djacoco.skip
+          --batch-mode --no-transfer-progress
+
+      - name: Run self-check with custom rules
+        run: mvn verify -Pself-check --batch-mode --no-transfer-progress

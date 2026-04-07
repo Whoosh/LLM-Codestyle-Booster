@@ -14,53 +14,44 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class NoSystemOutInProductionCheckTest {
 
     private static final Map<String, String> NO_PROPS = Map.of();
+    private static final int PRODUCTION_CLASS_VIOLATIONS = 3;
 
     @Test
     void productionClassWithSystemOutProducesViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(
-            NoSystemOutInProductionCheck.class, "invalid/NoSystemOutProductionClass.java", NO_PROPS);
-        assertEquals(3, violations.size());
+        assertEquals(PRODUCTION_CLASS_VIOLATIONS, runCheck("invalid/NoSystemOutProductionClass.java").size());
     }
 
     @Test
     void innerMainClassDoesNotExemptOuterClass() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(
-            NoSystemOutInProductionCheck.class, "invalid/NoSystemOutInnerMainTrap.java", NO_PROPS);
-        assertEquals(1, violations.size());
+        assertEquals(1, runCheck("invalid/NoSystemOutInnerMainTrap.java").size());
     }
 
     @Test
     void mainClassIsExempt() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(
-            NoSystemOutInProductionCheck.class, "valid/NoSystemOutMainClass.java", NO_PROPS);
-        assertTrue(violations.isEmpty());
+        assertTrue(runCheck("valid/NoSystemOutMainClass.java").isEmpty());
     }
 
     @Test
     void testClassIsExempt() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(
-            NoSystemOutInProductionCheck.class, "valid/NoSystemOutTestClass.java", NO_PROPS);
-        assertTrue(violations.isEmpty());
+        assertTrue(runCheck("valid/NoSystemOutTestClass.java").isEmpty());
     }
 
     @Test
     void slowTestClassIsExempt() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(
-            NoSystemOutInProductionCheck.class, "valid/NoSystemOutSlowTestClass.java", NO_PROPS);
-        assertTrue(violations.isEmpty());
+        assertTrue(runCheck("valid/NoSystemOutSlowTestClass.java").isEmpty());
     }
 
     @Test
     void batchPackageIsExempt() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(
-            NoSystemOutInProductionCheck.class, "valid/NoSystemOutBatchPackage.java", NO_PROPS);
-        assertTrue(violations.isEmpty());
+        assertTrue(runCheck("valid/NoSystemOutBatchPackage.java").isEmpty());
     }
 
     @Test
     void productionClassWithoutSystemOutPasses() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(
-            NoSystemOutInProductionCheck.class, "valid/NoSystemOutNoSuchCalls.java", NO_PROPS);
-        assertTrue(violations.isEmpty());
+        assertTrue(runCheck("valid/NoSystemOutNoSuchCalls.java").isEmpty());
+    }
+
+    private static List<AuditEvent> runCheck(String resource) throws Exception {
+        return TestCheckSupport.runTreeWalkerCheck(NoSystemOutInProductionCheck.class, resource, NO_PROPS);
     }
 }

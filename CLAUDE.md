@@ -63,6 +63,10 @@ When a consumer adds this jar as a Checkstyle dependency, all checks under
    - Write a test class using `TestCheckSupport` helper.
 6. Run `mvn verify` — JaCoCo enforces 85% line coverage.
 
+## Conventions
+
+- **Commit messages**: always in English.
+
 ## Key constraints
 
 - **Java 25** — source and target.

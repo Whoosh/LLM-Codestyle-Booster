@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Checkstyle check classes: framework manages lifecycle, suppress fb-contrib noise -->
+
+    <!-- Methods are public for Checkstyle framework invocation -->
+    <Match>
+        <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+    </Match>
+
+    <!-- Checkstyle check classes don't need toString -->
+    <Match>
+        <Bug pattern="IMC_IMMATURE_CLASS_NO_TOSTRING"/>
+    </Match>
+
+    <!-- Field order in check classes is by design -->
+    <Match>
+        <Bug pattern="IMC_IMMATURE_CLASS_WRONG_FIELD_ORDER"/>
+    </Match>
+
+    <!-- Static exception messages are acceptable -->
+    <Match>
+        <Bug pattern="WEM_WEAK_EXCEPTION_MESSAGING"/>
+    </Match>
+
+    <!-- Duplicates PMD complexity checks -->
+    <Match>
+        <Bug pattern="CC_CYCLOMATIC_COMPLEXITY"/>
+    </Match>
+
+    <!-- Store-before-return is a readability preference -->
+    <Match>
+        <Bug pattern="USBR_UNNECESSARY_STORE_BEFORE_RETURN"/>
+    </Match>
+
+    <!-- Expression order optimization — negligible impact -->
+    <Match>
+        <Bug pattern="SEO_SUBOPTIMAL_EXPRESSION_ORDER"/>
+    </Match>
+
+    <!-- False positives for method call redundancy -->
+    <Match>
+        <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
+    </Match>
+
+    <!-- Overly concrete parameter — AST API uses concrete types -->
+    <Match>
+        <Bug pattern="OCP_OVERLY_CONCRETE_PARAMETER"/>
+    </Match>
+
+    <!-- String parsing a field — false positive for regex pattern constants -->
+    <Match>
+        <Bug pattern="STT_STRING_PARSING_A_FIELD"/>
+    </Match>
+
+    <!-- Presize collections — micro-optimization -->
+    <Match>
+        <Bug pattern="PSC_PRESIZE_COLLECTIONS"/>
+    </Match>
+
+    <!-- Class envy — check classes naturally read AST deeply -->
+    <Match>
+        <Bug pattern="CE_CLASS_ENVY"/>
+    </Match>
+
+    <!-- Nullability annotations not used in this project -->
+    <Match>
+        <Bug pattern="AI_ANNOTATION_ISSUES_NEEDS_NULLABLE"/>
+    </Match>
+
+    <!-- Exception softening in test support classes -->
+    <Match>
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
+    </Match>
+
+    <!-- Array as last param: handled by PMD UseVarargs -->
+    <Match>
+        <Bug pattern="UVA_USE_VAR_ARGS"/>
+    </Match>
+</FindBugsFilter>

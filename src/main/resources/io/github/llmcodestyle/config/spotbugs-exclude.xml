@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- ============================================================ -->
+    <!-- Core SpotBugs exclusions                                      -->
+    <!-- ============================================================ -->
+
+    <!-- ============================================================ -->
+    <!-- find-sec-bugs exclusions                                      -->
+    <!-- ============================================================ -->
+
+    <!-- Spring endpoint detection is informational -->
+    <Match>
+        <Bug pattern="SPRING_ENDPOINT"/>
+    </Match>
+
+    <!-- CRLF in logs: suppress if logged values are internal, not user input -->
+    <Match>
+        <Bug pattern="CRLF_INJECTION_LOGS"/>
+    </Match>
+
+    <!-- Modification after validation: no actual validation happening -->
+    <Match>
+        <Bug pattern="MODIFICATION_AFTER_VALIDATION"/>
+    </Match>
+
+    <!-- ============================================================ -->
+    <!-- fb-contrib exclusions                                         -->
+    <!-- ============================================================ -->
+
+    <!-- Methods are public for cross-package test access -->
+    <Match>
+        <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+    </Match>
+
+    <!-- Project does not use nullability annotations -->
+    <Match>
+        <Bug pattern="AI_ANNOTATION_ISSUES_NEEDS_NULLABLE"/>
+    </Match>
+
+    <!-- toString not needed for Spring-managed beans and domain models -->
+    <Match>
+        <Bug pattern="IMC_IMMATURE_CLASS_NO_TOSTRING"/>
+    </Match>
+
+    <!-- Field order in records/DTOs is by design -->
+    <Match>
+        <Bug pattern="IMC_IMMATURE_CLASS_WRONG_FIELD_ORDER"/>
+    </Match>
+
+    <!-- Static exception messages are acceptable -->
+    <Match>
+        <Bug pattern="WEM_WEAK_EXCEPTION_MESSAGING"/>
+    </Match>
+
+    <!-- Class envy in DTO mappers and factory methods is by design -->
+    <Match>
+        <Bug pattern="CE_CLASS_ENVY"/>
+    </Match>
+
+    <!-- Checked-to-unchecked exception conversion is intentional -->
+    <Match>
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
+    </Match>
+
+    <!-- Duplicates PMD complexity checks -->
+    <Match>
+        <Bug pattern="CC_CYCLOMATIC_COMPLEXITY"/>
+    </Match>
+
+    <!-- main() methods throw Exception — acceptable for batch scripts -->
+    <Match>
+        <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION"/>
+    </Match>
+
+    <!-- Array as last param: handled by PMD UseVarargs -->
+    <Match>
+        <Bug pattern="UVA_USE_VAR_ARGS"/>
+    </Match>
+
+    <!-- False positives for method call redundancy -->
+    <Match>
+        <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
+    </Match>
+
+    <!-- Store-before-return is a readability preference -->
+    <Match>
+        <Bug pattern="USBR_UNNECESSARY_STORE_BEFORE_RETURN"/>
+    </Match>
+
+    <!-- String parsing a field — false positive for regex pattern constants -->
+    <Match>
+        <Bug pattern="STT_STRING_PARSING_A_FIELD"/>
+    </Match>
+
+    <!-- Expression order optimization — negligible impact -->
+    <Match>
+        <Bug pattern="SEO_SUBOPTIMAL_EXPRESSION_ORDER"/>
+    </Match>
+
+    <!-- List vs Collection for JdbcTemplate API and internal collections -->
+    <Match>
+        <Bug pattern="OCP_OVERLY_CONCRETE_PARAMETER"/>
+    </Match>
+
+    <!-- Presize collections — micro-optimization, not a bug -->
+    <Match>
+        <Bug pattern="PSC_PRESIZE_COLLECTIONS"/>
+    </Match>
+</FindBugsFilter>

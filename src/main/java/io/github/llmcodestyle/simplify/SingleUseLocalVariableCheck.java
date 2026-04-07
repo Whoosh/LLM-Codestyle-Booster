@@ -1,0 +1,117 @@
+package io.github.llmcodestyle.simplify;
+
+import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.utils.AstSingleUseUtil;
+
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ASSIGN;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.COMPACT_CTOR_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CTOR_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.INSTANCE_INIT;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LAMBDA;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.SLIST;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.STATIC_INIT;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.VARIABLE_DEF;
+
+import java.util.List;
+
+/** Flags local variables assigned once and used exactly once in the immediately following statement. */
+public class SingleUseLocalVariableCheck extends AbstractCheck {
+
+    /** Violation message key. */
+    static final String MSG_KEY = "single.use.local.variable";
+
+    @Override
+    public int[] getDefaultTokens() {
+        return new int[]{SLIST};
+    }
+
+    @Override
+    public int[] getAcceptableTokens() {
+        return new int[]{SLIST};
+    }
+
+    @Override
+    public int[] getRequiredTokens() {
+        return new int[]{SLIST};
+    }
+
+    @Override
+    public void visitToken(DetailAST ast) {
+        if (!isMethodBody(ast)) {
+            return;
+        }
+        checkBlock(ast);
+    }
+
+    private void checkBlock(DetailAST slist) {
+        List<DetailAST> statements = AstSingleUseUtil.collectStatements(slist);
+        for (int i = 0; i < statements.size() - 1; i++) {
+            DetailAST stmt = statements.get(i);
+            if (stmt.getType() != VARIABLE_DEF) {
+                continue;
+            }
+            if (stmt.findFirstToken(ASSIGN) == null) {
+                continue;
+            }
+            DetailAST ident = stmt.findFirstToken(IDENT);
+            if (ident == null) {
+                continue;
+            }
+            String varName = ident.getText();
+            DetailAST nextStmt = statements.get(i + 1);
+
+            int refsInNext = AstSingleUseUtil.countIdent(nextStmt, varName);
+            if (refsInNext == 0) {
+                continue;
+            }
+
+            int totalRefs = 0;
+            for (int j = i + 1; j < statements.size(); j++) {
+                totalRefs += AstSingleUseUtil.countIdent(statements.get(j), varName);
+            }
+
+            if (totalRefs == 1 && refsInNext == 1 && !AstSingleUseUtil.isInsideRepeatingContext(nextStmt, varName) && !isInsideNestedBlock(nextStmt, varName)) {
+                log(stmt.getLineNo(), stmt.getColumnNo(), MSG_KEY, varName);
+            }
+        }
+    }
+
+    private static boolean isInsideNestedBlock(DetailAST statement, String varName) {
+        return containsIdentInNestedBlock(statement, varName, false);
+    }
+
+    private static boolean containsIdentInNestedBlock(DetailAST node, String varName, boolean insideBlock) {
+        if (node.getType() == IDENT && varName.equals(node.getText()) && insideBlock) {
+            return true;
+        }
+        boolean nowInBlock = insideBlock || node.getType() == SLIST;
+        DetailAST child = node.getFirstChild();
+        while (child != null) {
+            if (containsIdentInNestedBlock(child, varName, nowInBlock)) {
+                return true;
+            }
+            child = child.getNextSibling();
+        }
+        return false;
+    }
+
+    private static boolean isMethodBody(DetailAST slist) {
+        DetailAST parent = slist.getParent();
+        if (parent == null) {
+            return false;
+        }
+        int type = parent.getType();
+        return isMethodLikeParent(type) || isControlFlowParent(type);
+    }
+
+    private static boolean isMethodLikeParent(int type) {
+        return type == METHOD_DEF || type == CTOR_DEF || type == COMPACT_CTOR_DEF || type == LAMBDA || type == STATIC_INIT || type == INSTANCE_INIT;
+    }
+
+    private static boolean isControlFlowParent(int type) {
+        return AstSingleUseUtil.isLoopOrCondition(type) || AstSingleUseUtil.isExceptionBlock(type);
+    }
+}

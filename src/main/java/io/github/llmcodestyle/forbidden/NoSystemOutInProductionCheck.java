@@ -3,6 +3,7 @@ package io.github.llmcodestyle.forbidden;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstUtil;
+import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -94,7 +95,7 @@ public class NoSystemOutInProductionCheck extends AbstractCheck {
     }
 
     private static boolean isSystemOutOrErrCall(DetailAST methodCall) {
-        String methodName = AstUtil.extractMethodName(methodCall);
+        String methodName = AstMethodCallUtil.extractMethodName(methodCall);
         if (!"println".equals(methodName) && !"print".equals(methodName) && !"printf".equals(methodName) && !"format".equals(methodName)) {
             return false;
         }

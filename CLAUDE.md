@@ -70,6 +70,8 @@ When a consumer adds this jar as a Checkstyle dependency, all checks under
 ## Conventions
 
 - **Commit messages**: always in English.
+- **No GodClass suppression for Util classes**: if a utility class triggers PMD GodClass, split it into focused classes by responsibility (e.g. `AstUtil` for structure/types, `AstMethodCallUtil` for METHOD_CALL analysis, `AstAnnotationUtil` for annotations, `AstSingleUseUtil` for variable analysis).
+- **Token arrays**: extract `new int[] {...}` from `getDefaultTokens()`/`getAcceptableTokens()`/`getRequiredTokens()` into `private static final int[] TOKENS` and return `TOKENS.clone()`.
 
 ## Key constraints
 

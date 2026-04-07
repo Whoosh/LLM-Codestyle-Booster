@@ -3,6 +3,7 @@ package io.github.llmcodestyle.layout;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstUtil;
+import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -42,7 +43,7 @@ public class ChainedCallLineBreakCheck extends AbstractCheck {
             return;
         }
 
-        int chainLength = AstUtil.countMethodChain(ast);
+        int chainLength = AstMethodCallUtil.countMethodChain(ast);
         if (chainLength < minChainLength) {
             return;
         }

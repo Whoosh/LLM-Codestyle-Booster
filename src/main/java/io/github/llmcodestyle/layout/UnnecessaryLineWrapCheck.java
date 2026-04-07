@@ -3,6 +3,7 @@ package io.github.llmcodestyle.layout;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstUtil;
+import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -132,7 +133,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
 
     private static boolean containsLongChain(DetailAST ast) {
         if (ast.getType() == METHOD_CALL) {
-            return AstUtil.countMethodChain(ast) >= CHAIN_THRESHOLD;
+            return AstMethodCallUtil.countMethodChain(ast) >= CHAIN_THRESHOLD;
         }
         DetailAST child = ast.getFirstChild();
         while (child != null) {

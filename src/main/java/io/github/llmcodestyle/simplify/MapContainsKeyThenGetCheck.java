@@ -2,7 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
+import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -43,8 +43,8 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
         if (containsCall == null) {
             return;
         }
-        String receiver = AstUtil.extractReceiverName(containsCall);
-        String keyArg = AstUtil.extractFirstArgText(containsCall);
+        String receiver = AstMethodCallUtil.extractReceiverName(containsCall);
+        String keyArg = AstMethodCallUtil.extractFirstArgText(containsCall);
         if (receiver.isEmpty() || keyArg.isEmpty()) {
             return;
         }
@@ -67,7 +67,7 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
     }
 
     private static boolean isContainsKeyCall(DetailAST methodCall) {
-        return "containsKey".equals(AstUtil.extractMethodName(methodCall));
+        return "containsKey".equals(AstMethodCallUtil.extractMethodName(methodCall));
     }
 
     private static boolean containsGetCallOnSameReceiver(DetailAST ifAst, String receiver, String keyArg) {
@@ -92,9 +92,9 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
     }
 
     private static boolean isGetCallOnReceiver(DetailAST methodCall, String receiver, String keyArg) {
-        if (!"get".equals(AstUtil.extractMethodName(methodCall))) {
+        if (!"get".equals(AstMethodCallUtil.extractMethodName(methodCall))) {
             return false;
         }
-        return receiver.equals(AstUtil.extractReceiverName(methodCall)) && keyArg.equals(AstUtil.extractFirstArgText(methodCall));
+        return receiver.equals(AstMethodCallUtil.extractReceiverName(methodCall)) && keyArg.equals(AstMethodCallUtil.extractFirstArgText(methodCall));
     }
 }

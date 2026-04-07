@@ -2,7 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
+import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -90,7 +90,7 @@ public class IndexOfToContainsCheck extends AbstractCheck {
     }
 
     private static boolean isIndexOfMethodName(DetailAST methodCall) {
-        return "indexOf".equals(AstUtil.extractMethodName(methodCall));
+        return "indexOf".equals(AstMethodCallUtil.extractMethodName(methodCall));
     }
 
     private static boolean isValidIndexOfArgument(DetailAST firstExpr) {

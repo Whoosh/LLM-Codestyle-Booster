@@ -2,7 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
+import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -42,10 +42,10 @@ public class CollectionsToListOfCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST ast) {
-        if (!"Collections".equals(AstUtil.extractReceiverName(ast))) {
+        if (!"Collections".equals(AstMethodCallUtil.extractReceiverName(ast))) {
             return;
         }
-        String methodName = AstUtil.extractMethodName(ast);
+        String methodName = AstMethodCallUtil.extractMethodName(ast);
         if (methodName.isEmpty()) {
             return;
         }
@@ -70,6 +70,6 @@ public class CollectionsToListOfCheck extends AbstractCheck {
         if (innerCall == null) {
             return false;
         }
-        return "Arrays".equals(AstUtil.extractReceiverName(innerCall)) && "asList".equals(AstUtil.extractMethodName(innerCall));
+        return "Arrays".equals(AstMethodCallUtil.extractReceiverName(innerCall)) && "asList".equals(AstMethodCallUtil.extractMethodName(innerCall));
     }
 }

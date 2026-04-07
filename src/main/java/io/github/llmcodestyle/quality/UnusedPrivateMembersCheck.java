@@ -4,27 +4,21 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ANNOTATION;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CLASS_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ENUM_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.INTERFACE_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_PRIVATE;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.MODIFIERS;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.OBJBLOCK;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RECORD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.VARIABLE_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/** Flags private fields, methods, and inner types that are never referenced in the same source file. Uses name-based reference counting. */
+/**
+ * Flags private fields, methods, and inner types that are never referenced in the same source file. Uses name-based reference counting.
+ */
 public class UnusedPrivateMembersCheck extends AbstractCheck {
 
-    /** Violation message key for unused private members. */
+    /**
+     * Violation message key for unused private members.
+     */
     static final String MSG_KEY = "unused.private.member";
 
     private static final Set<String> EXCLUDED_NAMES = Set.of("serialVersionUID");
@@ -41,7 +35,7 @@ public class UnusedPrivateMembersCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{CLASS_DEF};
+        return new int[] {CLASS_DEF};
     }
 
     @Override

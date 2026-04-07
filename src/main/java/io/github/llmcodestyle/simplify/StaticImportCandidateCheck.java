@@ -3,11 +3,7 @@ package io.github.llmcodestyle.simplify;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DOT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IMPORT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.STAR;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.STATIC_IMPORT;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 import java.util.HashMap;
 import java.util.HashSet;

@@ -11,15 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-/** Shared helper for building Checker instances in custom check tests. */
+/**
+ * Shared helper for building Checker instances in custom check tests.
+ */
 public final class TestCheckSupport {
 
     private TestCheckSupport() {
     }
 
-    /** Run a TreeWalker check against a resource file and return violations. */
+    /**
+     * Run a TreeWalker check against a resource file and return violations.
+     */
     public static List<AuditEvent> runTreeWalkerCheck(Class<?> checkClass, String resourceFile, Map<String, String> props) throws Exception {
         URL resource = TestCheckSupport.class.getClassLoader().getResource(resourceFile);
         assertNotNull(resource, "Test resource not found: " + resourceFile);
@@ -47,7 +51,9 @@ public final class TestCheckSupport {
         return violations;
     }
 
-    /** Run multiple TreeWalker checks simultaneously against a resource file. */
+    /**
+     * Run multiple TreeWalker checks simultaneously against a resource file.
+     */
     public static List<AuditEvent> runMultipleTreeWalkerChecks(Map<String, Map<String, String>> checks, String resourceFile) throws Exception {
         URL resource = TestCheckSupport.class.getClassLoader().getResource(resourceFile);
         assertNotNull(resource, "Test resource not found: " + resourceFile);
@@ -76,7 +82,9 @@ public final class TestCheckSupport {
         return violations;
     }
 
-    /** Run a FileSet check (AbstractFileSetCheck subclass) against a resource file. */
+    /**
+     * Run a FileSet check (AbstractFileSetCheck subclass) against a resource file.
+     */
     public static List<AuditEvent> runFileSetCheck(Class<?> checkClass, String resourceFile, Map<String, String> props) throws Exception {
         URL resource = TestCheckSupport.class.getClassLoader().getResource(resourceFile);
         assertNotNull(resource, "Test resource not found: " + resourceFile);

@@ -5,10 +5,14 @@ import com.puppycrawl.tools.checkstyle.api.FileText;
 
 import java.io.File;
 
-/** Forbids backslash-u Unicode escape sequences in Java source. Use real UTF-8 characters directly; control characters are exempt. */
+/**
+ * Forbids backslash-u Unicode escape sequences in Java source. Use real UTF-8 characters directly; control characters are exempt.
+ */
 public class UnicodeEscapeCheck extends AbstractFileSetCheck {
 
-    /** Violation message key. */
+    /**
+     * Violation message key.
+     */
     static final String MSG_KEY = "unicode.escape.forbidden";
 
     private static final int CONTROL_CHAR_MAX = 0x1F;

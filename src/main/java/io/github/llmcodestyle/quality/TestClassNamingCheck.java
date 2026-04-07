@@ -4,30 +4,33 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CLASS_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Enforces test class naming: top-level classes must end in {@code Test}/{@code SlowTest}, start with {@code Test}/{@code Abstract}, or be inner. */
+/**
+ * Enforces test class naming: top-level classes must end in {@code Test}/{@code SlowTest}, start with {@code Test}/{@code Abstract}, or be inner.
+ */
 public class TestClassNamingCheck extends AbstractCheck {
 
-    /** Violation message key for classes that don't follow the convention. */
+    /**
+     * Violation message key for classes that don't follow the convention.
+     */
     static final String MSG_KEY = "test.class.naming";
 
     private static final String TEST_KEYWORD = "Test";
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[]{CLASS_DEF};
+        return new int[] {CLASS_DEF};
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[]{CLASS_DEF};
+        return new int[] {CLASS_DEF};
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{CLASS_DEF};
+        return new int[] {CLASS_DEF};
     }
 
     @Override

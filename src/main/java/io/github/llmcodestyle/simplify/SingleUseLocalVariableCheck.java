@@ -4,38 +4,33 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstSingleUseUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ASSIGN;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.COMPACT_CTOR_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CTOR_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.INSTANCE_INIT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LAMBDA;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.SLIST;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.STATIC_INIT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.VARIABLE_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 import java.util.List;
 
-/** Flags local variables assigned once and used exactly once in the immediately following statement. */
+/**
+ * Flags local variables assigned once and used exactly once in the immediately following statement.
+ */
 public class SingleUseLocalVariableCheck extends AbstractCheck {
 
-    /** Violation message key. */
+    /**
+     * Violation message key.
+     */
     static final String MSG_KEY = "single.use.local.variable";
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[]{SLIST};
+        return new int[] {SLIST};
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[]{SLIST};
+        return new int[] {SLIST};
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{SLIST};
+        return new int[] {SLIST};
     }
 
     @Override

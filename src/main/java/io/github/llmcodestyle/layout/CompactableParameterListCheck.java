@@ -4,17 +4,16 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.COMPACT_CTOR_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CTOR_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.PARAMETERS;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RECORD_COMPONENTS;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RECORD_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Flags multi-line parameter lists where a continuation line could be packed onto the previous line. */
+/**
+ * Flags multi-line parameter lists where a continuation line could be packed onto the previous line.
+ */
 public class CompactableParameterListCheck extends AbstractCheck {
 
-    /** Violation message key. */
+    /**
+     * Violation message key.
+     */
     static final String MSG_KEY = "compactable.parameter.line";
 
     private static final int DEFAULT_MAX_LINE_LENGTH = 180;
@@ -37,7 +36,7 @@ public class CompactableParameterListCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF, RECORD_DEF};
+        return new int[] {METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF, RECORD_DEF};
     }
 
     @Override

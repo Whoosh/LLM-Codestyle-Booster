@@ -6,38 +6,39 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 /**
- * Ensures a space between {@code ]} and {@code &#123;} in array initializers: {@code int[] {1}} not {@code int[]{1}}.
+ * Requires static imports to use wildcard form.
+ * Flags {@code import static com.foo.Bar.CONST} and requires {@code import static com.foo.Bar.*}.
  */
-public class ArrayInitSpaceCheck extends AbstractCheck {
+public class StaticStarImportCheck extends AbstractCheck {
 
     /**
      * Violation message key.
      */
-    static final String MSG_KEY = "array.init.space";
+    static final String MSG_KEY = "static.star.import";
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {ARRAY_INIT};
+        return new int[] {STATIC_IMPORT};
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {ARRAY_INIT};
+        return new int[] {STATIC_IMPORT};
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[] {ARRAY_INIT};
+        return new int[] {STATIC_IMPORT};
     }
 
     @Override
     public void visitToken(DetailAST ast) {
-        int col = ast.getColumnNo();
-        if (col <= 0) {
+        DetailAST dot = ast.findFirstToken(DOT);
+        if (dot == null) {
             return;
         }
-        String line = getLines()[ast.getLineNo() - 1];
-        if (col < line.length() && line.charAt(col - 1) == ']') {
+        DetailAST lastChild = dot.getLastChild();
+        if (lastChild != null && lastChild.getType() != STAR) {
             log(ast, MSG_KEY);
         }
     }

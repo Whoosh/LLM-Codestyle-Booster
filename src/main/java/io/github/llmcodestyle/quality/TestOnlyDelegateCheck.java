@@ -4,25 +4,14 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstAnnotationUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CLASS_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DOT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.EXPR;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_PRIVATE;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_RETURN;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_CALL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.MODIFIERS;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.OBJBLOCK;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RCURLY;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RECORD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.SEMI;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.SLIST;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
-/** Flags non-private methods whose single-statement body delegates to a private method — a sign the method exists only for test visibility. */
+/**
+ * Flags non-private methods whose single-statement body delegates to a private method — a sign the method exists only for test visibility.
+ */
 public class TestOnlyDelegateCheck extends AbstractCheck {
 
     static final String MSG_KEY = "test.only.delegate";
@@ -39,7 +28,7 @@ public class TestOnlyDelegateCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{CLASS_DEF, RECORD_DEF};
+        return new int[] {CLASS_DEF, RECORD_DEF};
     }
 
     @Override

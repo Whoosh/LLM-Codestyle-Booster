@@ -4,33 +4,14 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstSingleUseUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ASSIGN;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.COMPACT_CTOR_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CTOR_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DEC;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DIV_ASSIGN;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DOT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.EXPR;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.INC;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.INSTANCE_INIT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LAMBDA;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_NEW;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_CALL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.MINUS_ASSIGN;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.PLUS_ASSIGN;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.POST_DEC;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.POST_INC;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.SLIST;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.STAR_ASSIGN;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.STATIC_INIT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.VARIABLE_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 import java.util.List;
 import java.util.Set;
 
-/** Flags local variables with pure initializers that are used exactly once in a later (not immediately next) statement. Complements {@link SingleUseLocalVariableCheck}. */
+/**
+ * Flags local variables with pure initializers that are used exactly once in a later (not immediately next) statement. Complements {@link SingleUseLocalVariableCheck}.
+ */
 public class PureSingleUseLocalVariableCheck extends AbstractCheck {
 
     static final String MSG_KEY = "pure.single.use.local.variable";
@@ -93,7 +74,7 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{SLIST};
+        return new int[] {SLIST};
     }
 
     @Override
@@ -191,7 +172,9 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
         return nameIdent != null ? nameIdent.getText() : "";
     }
 
-    /** Count IDENT uses NOT inside nested SLIST blocks — top-level uses only. */
+    /**
+     * Count IDENT uses NOT inside nested SLIST blocks — top-level uses only.
+     */
     private static int countIdentDirect(DetailAST root, String name) {
         return countIdentExcludingNested(root, name, false);
     }

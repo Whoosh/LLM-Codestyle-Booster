@@ -63,7 +63,9 @@
         <module name="RecordComponentName"/>
 
         <!-- Imports -->
-        <module name="AvoidStarImport"/>
+        <module name="AvoidStarImport">
+            <property name="allowStaticMemberImports" value="true"/>
+        </module>
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
         <module name="IllegalImport"/>
@@ -190,6 +192,7 @@
             <property name="maxLineLength" value="180"/>
         </module>
         <module name="io.github.llmcodestyle.layout.ArrayInitSpaceCheck"/>
+        <module name="io.github.llmcodestyle.layout.StaticStarImportCheck"/>
 
         <!-- Custom checks: forbidden -->
         <module name="io.github.llmcodestyle.forbidden.NoSuppressionCheck"/>
@@ -278,14 +281,8 @@
         <property name="message" value="Blank line should be added at start of the type code block"/>
         <property name="fileExtensions" value="java"/>
     </module>
-    <module name="RegexpMultiline">
-        <property name="format" value="/\*\*\n\s+\* .+\n\s+\* [^@]"/>
-        <property name="message" value="Multi-line javadoc — condense to single line: /** Does X. */"/>
-        <property name="fileExtensions" value="java"/>
-    </module>
-    <module name="RegexpMultiline">
-        <property name="format" value="/\*\*\n\s+\* [^@\n]+\n\s+\*/"/>
-        <property name="message" value="Single-content javadoc should be on one line: /** Does X. */"/>
-        <property name="fileExtensions" value="java"/>
+    <module name="RegexpSingleline">
+        <property name="format" value="/\*\* .+\*/"/>
+        <property name="message" value="Single-line javadoc is forbidden — expand to multi-line: /** \n * text \n */"/>
     </module>
 </module>

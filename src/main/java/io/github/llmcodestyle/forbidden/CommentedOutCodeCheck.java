@@ -11,7 +11,9 @@ import java.util.regex.Pattern;
  */
 public class CommentedOutCodeCheck extends AbstractFileSetCheck {
 
-    /** Violation message key. */
+    /**
+     * Violation message key.
+     */
     static final String MSG_KEY = "commented.out.code";
 
     private static final int DEFAULT_MIN_LINES = 2;

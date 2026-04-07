@@ -3,64 +3,48 @@ package io.github.llmcodestyle.simplify;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ARRAY_INIT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ASSIGN;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CHAR_LITERAL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CLASS_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.COMPACT_CTOR_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CTOR_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ENUM_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.EXPR;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.FINAL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.INTERFACE_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_NEW;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_STATIC;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.MODIFIERS;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.NUM_DOUBLE;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.NUM_FLOAT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.NUM_INT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.NUM_LONG;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.OBJBLOCK;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.PLUS;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RECORD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.SLIST;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.STRING_LITERAL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.VARIABLE_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/** Flags {@code static final} fields whose initializer is a {@code +} expression that can be collapsed into a single literal constant. */
+/**
+ * Flags {@code static final} fields whose initializer is a {@code +} expression that can be collapsed into a single literal constant.
+ */
 public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
 
-    /** Violation message key for scalar field initializers. */
+    /**
+     * Violation message key for scalar field initializers.
+     */
     static final String MSG_KEY = "collapsible.constant.concatenation";
 
-    /** Violation message key for array element concatenations. */
+    /**
+     * Violation message key for array element concatenations.
+     */
     static final String MSG_ARRAY = "collapsible.array.element.concatenation";
 
-    /** Violation message key for consecutive constant/literal runs in method bodies. */
+    /**
+     * Violation message key for consecutive constant/literal runs in method bodies.
+     */
     static final String MSG_RUN = "collapsible.constant.run";
 
     private static final int MIN_METHOD_RUN_LENGTH = 2;
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[]{CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF};
+        return new int[] {CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF};
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[]{CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF};
+        return new int[] {CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF};
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF};
+        return new int[] {CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF};
     }
 
     @Override
@@ -284,7 +268,9 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
         return type == STRING_LITERAL || type == NUM_INT || type == NUM_LONG || type == NUM_FLOAT || type == NUM_DOUBLE || type == CHAR_LITERAL;
     }
 
-    /** Interface fields are implicitly static final even without explicit modifiers. */
+    /**
+     * Interface fields are implicitly static final even without explicit modifiers.
+     */
     private static boolean isEffectivelyStaticFinal(DetailAST variableDef, boolean insideInterface) {
         if (insideInterface) {
             return true;

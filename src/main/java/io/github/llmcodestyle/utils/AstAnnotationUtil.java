@@ -2,18 +2,19 @@ package io.github.llmcodestyle.utils;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ANNOTATION;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DOT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.MODIFIERS;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Utility methods for checking annotations on AST definition nodes. */
+/**
+ * Utility methods for checking annotations on AST definition nodes.
+ */
 public final class AstAnnotationUtil {
 
     private AstAnnotationUtil() {
     }
 
-    /** Returns {@code true} if {@code def} carries an annotation whose simple name equals {@code annotationName}. */
+    /**
+     * Returns {@code true} if {@code def} carries an annotation whose simple name equals {@code annotationName}.
+     */
     public static boolean hasAnnotationNamed(DetailAST def, String annotationName) {
         DetailAST modifiers = def.findFirstToken(MODIFIERS);
         if (modifiers == null) {
@@ -32,7 +33,9 @@ public final class AstAnnotationUtil {
         return false;
     }
 
-    /** Returns {@code true} if {@code def} carries any annotation whose simple name (or qualified last segment) is in {@code annotationNames}. */
+    /**
+     * Returns {@code true} if {@code def} carries any annotation whose simple name (or qualified last segment) is in {@code annotationNames}.
+     */
     public static boolean hasAnyAnnotationNamed(DetailAST def, String... annotationNames) {
         DetailAST modifiers = def.findFirstToken(MODIFIERS);
         if (modifiers == null) {

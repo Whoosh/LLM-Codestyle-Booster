@@ -2,22 +2,19 @@ package io.github.llmcodestyle.utils;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CLASS_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DOT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ENUM_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.INTERFACE_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_CALL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.MODIFIERS;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RECORD_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Shared AST traversal utilities: package names, type nesting, modifiers, and line ranges. */
+/**
+ * Shared AST traversal utilities: package names, type nesting, modifiers, and line ranges.
+ */
 public final class AstUtil {
 
     private AstUtil() {
     }
 
-    /** Extracts the fully-qualified package name string from a {@code PACKAGE_DEF} node. */
+    /**
+     * Extracts the fully-qualified package name string from a {@code PACKAGE_DEF} node.
+     */
     public static String extractPackageName(DetailAST packageDef) {
         StringBuilder sb = new StringBuilder();
         DetailAST child = packageDef.getFirstChild();
@@ -31,7 +28,9 @@ public final class AstUtil {
         return sb.toString();
     }
 
-    /** Recursively appends dotted segments of a qualified name into {@code sb}. */
+    /**
+     * Recursively appends dotted segments of a qualified name into {@code sb}.
+     */
     public static void buildDottedName(DetailAST node, StringBuilder sb) {
         if (node == null) {
             return;
@@ -47,7 +46,9 @@ public final class AstUtil {
         }
     }
 
-    /** Returns {@code true} if {@code classDef} is lexically nested inside another class, interface, or enum. */
+    /**
+     * Returns {@code true} if {@code classDef} is lexically nested inside another class, interface, or enum.
+     */
     public static boolean isInnerClass(DetailAST classDef) {
         DetailAST parent = classDef.getParent();
         while (parent != null) {
@@ -60,7 +61,9 @@ public final class AstUtil {
         return false;
     }
 
-    /** Returns {@code true} if {@code typeDef} is lexically nested inside another class, interface, enum, or record. */
+    /**
+     * Returns {@code true} if {@code typeDef} is lexically nested inside another class, interface, enum, or record.
+     */
     public static boolean isNestedType(DetailAST typeDef) {
         DetailAST parent = typeDef.getParent();
         while (parent != null) {
@@ -73,7 +76,9 @@ public final class AstUtil {
         return false;
     }
 
-    /** Returns the nesting depth of {@code node} relative to enclosing type declarations. A top-level type has depth 0. */
+    /**
+     * Returns the nesting depth of {@code node} relative to enclosing type declarations. A top-level type has depth 0.
+     */
     public static int typeNestingDepth(DetailAST node) {
         int depth = 0;
         DetailAST parent = node.getParent();
@@ -87,7 +92,9 @@ public final class AstUtil {
         return depth;
     }
 
-    /** Returns {@code true} if the definition node {@code def} has a MODIFIERS child containing {@code modifierType}. */
+    /**
+     * Returns {@code true} if the definition node {@code def} has a MODIFIERS child containing {@code modifierType}.
+     */
     public static boolean hasModifier(DetailAST def, int modifierType) {
         DetailAST modifiers = def.findFirstToken(MODIFIERS);
         if (modifiers == null) {
@@ -103,7 +110,9 @@ public final class AstUtil {
         return false;
     }
 
-    /** Returns the highest line number in the entire subtree rooted at {@code ast}. */
+    /**
+     * Returns the highest line number in the entire subtree rooted at {@code ast}.
+     */
     public static int findLastLine(DetailAST ast) {
         int last = ast.getLineNo();
         DetailAST child = ast.getFirstChild();
@@ -117,7 +126,9 @@ public final class AstUtil {
         return last;
     }
 
-    /** Counts the number of chained method calls rooted at {@code methodCall} (e.g. {@code a.b().c().d()} has chain length 3). */
+    /**
+     * Counts the number of chained method calls rooted at {@code methodCall} (e.g. {@code a.b().c().d()} has chain length 3).
+     */
     public static int countMethodChain(DetailAST methodCall) {
         int count = 1;
         DetailAST dot = methodCall.findFirstToken(DOT);

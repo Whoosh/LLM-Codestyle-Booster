@@ -13,7 +13,7 @@ import io.github.llmcodestyle.simplify.UseIsEmptyCheck;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Verifies that our checks do not suggest fixes that would worsen asymptotic complexity.

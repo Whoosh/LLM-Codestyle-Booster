@@ -4,35 +4,31 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CLASS_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CTOR_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ENUM_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.FINAL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.INTERFACE_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_STATIC;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.OBJBLOCK;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.VARIABLE_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Ensures {@code static final} fields are declared before instance fields and constructors. */
+/**
+ * Ensures {@code static final} fields are declared before instance fields and constructors.
+ */
 public class StaticFinalFirstCheck extends AbstractCheck {
 
-    /** Violation message key. */
+    /**
+     * Violation message key.
+     */
     static final String MSG_KEY = "static.final.after.instance";
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[]{CLASS_DEF, INTERFACE_DEF, ENUM_DEF};
+        return new int[] {CLASS_DEF, INTERFACE_DEF, ENUM_DEF};
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[]{CLASS_DEF, INTERFACE_DEF, ENUM_DEF};
+        return new int[] {CLASS_DEF, INTERFACE_DEF, ENUM_DEF};
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{CLASS_DEF, INTERFACE_DEF, ENUM_DEF};
+        return new int[] {CLASS_DEF, INTERFACE_DEF, ENUM_DEF};
     }
 
     @Override

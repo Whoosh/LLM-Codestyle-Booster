@@ -4,14 +4,16 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CLASS_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.PACKAGE_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Enforces that classes named {@code *Util} or {@code *Utils} reside in a package whose last segment is {@code utils}. */
+/**
+ * Enforces that classes named {@code *Util} or {@code *Utils} reside in a package whose last segment is {@code utils}.
+ */
 public class UtilClassInUtilsPackageCheck extends AbstractCheck {
 
-    /** Violation message key. */
+    /**
+     * Violation message key.
+     */
     static final String MSG_KEY = "util.class.wrong.package";
 
     private String currentPackage = "";
@@ -28,7 +30,7 @@ public class UtilClassInUtilsPackageCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{PACKAGE_DEF, CLASS_DEF};
+        return new int[] {PACKAGE_DEF, CLASS_DEF};
     }
 
     @Override

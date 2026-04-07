@@ -4,31 +4,11 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ANNOTATION;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CLASS_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.COMPACT_CTOR_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CTOR_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ENUM_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.INTERFACE_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_IF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_RETURN;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_THROW;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_TRY;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_CALL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.MODIFIERS;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.OBJBLOCK;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RECORD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RESOURCE;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RESOURCE_SPECIFICATION;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RPAREN;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.SEMI;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.SLIST;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.TYPE;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.VARIABLE_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Flags statements split across multiple lines that would fit on a single line within the max length. */
+/**
+ * Flags statements split across multiple lines that would fit on a single line within the max length.
+ */
 public class UnnecessaryLineWrapCheck extends AbstractCheck {
 
     private static final String MSG_KEY = "unnecessary.line.wrap";
@@ -53,7 +33,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{
+        return new int[] {
             METHOD_CALL, METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF, VARIABLE_DEF, RECORD_DEF,
             LITERAL_IF, RESOURCE, LITERAL_THROW, LITERAL_RETURN,
             CLASS_DEF, INTERFACE_DEF, ENUM_DEF, LITERAL_TRY,

@@ -10,20 +10,20 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ArrayInitSpaceCheckTest {
+class StaticStarImportCheckTest {
 
     private static final Map<String, String> NO_PROPS = Map.of();
-    private static final String INVALID = "layout/invalid/ArrayInitSpaceInvalid.java";
+    private static final String INVALID = "layout/invalid/StaticStarImportInvalid.java";
     private static final int EXPECTED_VIOLATIONS = 3;
 
     @Test
-    void arrayInitWithoutSpaceProducesViolations() throws Exception {
+    void explicitStaticImportsProduceViolations() throws Exception {
         assertEquals(EXPECTED_VIOLATIONS, runCheck(INVALID).size());
     }
 
     @Test
-    void arrayInitWithSpaceProducesNoViolations() throws Exception {
-        assertTrue(runCheck("layout/valid/ArrayInitSpaceValid.java").isEmpty());
+    void starStaticImportsProduceNoViolations() throws Exception {
+        assertTrue(runCheck("layout/valid/StaticStarImportValid.java").isEmpty());
     }
 
     @Test
@@ -32,6 +32,6 @@ class ArrayInitSpaceCheckTest {
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {
-        return TestCheckSupport.runTreeWalkerCheck(ArrayInitSpaceCheck.class, resource, NO_PROPS);
+        return TestCheckSupport.runTreeWalkerCheck(StaticStarImportCheck.class, resource, NO_PROPS);
     }
 }

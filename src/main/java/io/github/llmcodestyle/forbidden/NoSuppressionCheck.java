@@ -3,16 +3,21 @@ package io.github.llmcodestyle.forbidden;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ANNOTATION;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Forbids suppression annotations and inline suppression comments. Catches {@code @SuppressWarnings}, {@code @SuppressFBWarnings}, and NOPMD/CHECKSTYLE:OFF comments. */
+/**
+ * Forbids suppression annotations and inline suppression comments. Catches {@code @SuppressWarnings}, {@code @SuppressFBWarnings}, and NOPMD/CHECKSTYLE:OFF comments.
+ */
 public class NoSuppressionCheck extends AbstractCheck {
 
-    /** Violation message key for annotation suppressions. */
+    /**
+     * Violation message key for annotation suppressions.
+     */
     static final String MSG_ANNOTATION = "no.suppression.annotation";
 
-    /** Violation message key for comment suppressions. */
+    /**
+     * Violation message key for comment suppressions.
+     */
     static final String MSG_COMMENT = "no.suppression.comment";
 
     @Override
@@ -27,7 +32,7 @@ public class NoSuppressionCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{ANNOTATION};
+        return new int[] {ANNOTATION};
     }
 
     @Override

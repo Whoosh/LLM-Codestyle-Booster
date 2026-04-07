@@ -3,18 +3,11 @@ package io.github.llmcodestyle.simplify;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CTOR_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DOT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ELIST;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.EXPR;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_CALL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.OBJBLOCK;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.STRING_LITERAL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.VARIABLE_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Flags inline regex string literals in methods that should be extracted to static final Pattern constants. */
+/**
+ * Flags inline regex string literals in methods that should be extracted to static final Pattern constants.
+ */
 public class InlineRegexConstantCheck extends AbstractCheck {
 
     private static final String MSG_KEY = "inline.regex.constant";
@@ -32,7 +25,7 @@ public class InlineRegexConstantCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{METHOD_CALL};
+        return new int[] {METHOD_CALL};
     }
 
     @Override

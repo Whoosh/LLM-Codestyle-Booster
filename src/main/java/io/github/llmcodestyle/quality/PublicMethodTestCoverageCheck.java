@@ -4,20 +4,8 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ABSTRACT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CLASS_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.INTERFACE_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_DEFAULT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_PRIVATE;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_PROTECTED;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.PARAMETER_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.PARAMETERS;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RECORD_COMPONENT_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RECORD_COMPONENTS;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.RECORD_DEF;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static java.nio.charset.StandardCharsets.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,10 +18,14 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Flags public and package-private methods in production classes that are not referenced in the corresponding test class. */
+/**
+ * Flags public and package-private methods in production classes that are not referenced in the corresponding test class.
+ */
 public class PublicMethodTestCoverageCheck extends AbstractCheck {
 
-    /** Violation message key. */
+    /**
+     * Violation message key.
+     */
     static final String MSG_KEY = "public.method.not.tested";
 
     private static final Set<String> EXEMPT_METHODS = Set.of(
@@ -78,7 +70,7 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{CLASS_DEF, INTERFACE_DEF, RECORD_DEF, METHOD_DEF};
+        return new int[] {CLASS_DEF, INTERFACE_DEF, RECORD_DEF, METHOD_DEF};
     }
 
     @Override
@@ -137,7 +129,9 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
         }
     }
 
-    /** Context-aware method coverage check. Returns true if the method appears to be called on an instance of this class. */
+    /**
+     * Context-aware method coverage check. Returns true if the method appears to be called on an instance of this class.
+     */
     private static boolean isMethodCovered(String testContent, String className, String methodName, Set<String> instanceVars) {
         String call = methodName + "(";
         if (testContent.contains(className + "." + call)) {
@@ -154,7 +148,9 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
         return testContent.contains("new " + className + "(") && testContent.contains("." + call);
     }
 
-    /** Finds variable names declared with the given class type in test content. */
+    /**
+     * Finds variable names declared with the given class type in test content.
+     */
     private static Set<String> findInstanceVariables(String testContent, String className) {
         Set<String> vars = new HashSet<>();
         Matcher m1 = Pattern.compile("\\b" + Pattern.quote(className) + "\\s+(\\w+)").matcher(testContent);

@@ -5,9 +5,11 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
-/** Shared AuditListener for custom check tests. Collects errors into a list. */
+/**
+ * Shared AuditListener for custom check tests. Collects errors into a list.
+ */
 public final class TestAuditListener implements AuditListener {
 
     private final List<AuditEvent> violations;

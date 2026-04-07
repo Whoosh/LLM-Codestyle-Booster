@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Verifies that the full checkstyle.xml configuration is internally consistent.
@@ -149,6 +148,7 @@ class CheckstyleConfigConsistencyTest {
     //   UtilClassInUtilsPackageCheck — naming convention check, no cross-rule interaction
     //   StaticImportCandidateCheck — suggests static imports, no conflict with other checks
     //   ArrayInitSpaceCheck — enforces space before '{' in array init, no cross-rule interaction
+    //   StaticStarImportCheck — requires wildcard static imports, no cross-rule interaction
     private List<AuditEvent> runFullConfig(String resourceFile, boolean testScope) throws Exception {
         if (CHECKSTYLE_XML == null || !Files.exists(CHECKSTYLE_XML)) {
             return List.of();

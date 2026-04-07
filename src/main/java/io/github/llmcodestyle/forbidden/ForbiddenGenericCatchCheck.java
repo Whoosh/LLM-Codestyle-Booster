@@ -3,17 +3,16 @@ package io.github.llmcodestyle.forbidden;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.BOR;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DOT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_CATCH;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.PARAMETER_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.TYPE;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Forbids catching {@code Exception}, {@code Throwable}, or {@code RuntimeException}. Runs alongside PMD's rule for defence-in-depth. */
+/**
+ * Forbids catching {@code Exception}, {@code Throwable}, or {@code RuntimeException}. Runs alongside PMD's rule for defence-in-depth.
+ */
 public class ForbiddenGenericCatchCheck extends AbstractCheck {
 
-    /** Message key for generic catch violations. */
+    /**
+     * Message key for generic catch violations.
+     */
     static final String MSG_KEY = "forbidden.generic.catch";
 
     @Override
@@ -28,7 +27,7 @@ public class ForbiddenGenericCatchCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{LITERAL_CATCH};
+        return new int[] {LITERAL_CATCH};
     }
 
     @Override

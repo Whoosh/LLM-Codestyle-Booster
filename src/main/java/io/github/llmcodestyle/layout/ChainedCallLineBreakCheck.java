@@ -4,10 +4,11 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DOT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_CALL;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Flags chained method calls (4+ dots) that are all on the same line. */
+/**
+ * Flags chained method calls (4+ dots) that are all on the same line.
+ */
 public class ChainedCallLineBreakCheck extends AbstractCheck {
 
     private static final String MSG_KEY = "chained.call.line.break";

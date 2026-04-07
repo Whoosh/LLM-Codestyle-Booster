@@ -4,16 +4,16 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CLASS_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DOT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_CALL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.PACKAGE_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Forbids {@code System.out/err} calls in production source. Exempt: Main/Application/Test classes and batch packages. */
+/**
+ * Forbids {@code System.out/err} calls in production source. Exempt: Main/Application/Test classes and batch packages.
+ */
 public class NoSystemOutInProductionCheck extends AbstractCheck {
 
-    /** Violation message key. */
+    /**
+     * Violation message key.
+     */
     static final String MSG_KEY = "no.system.out.production";
 
     private static final String DOT_STR = "\\.";
@@ -21,25 +21,29 @@ public class NoSystemOutInProductionCheck extends AbstractCheck {
     private static final String TEST_SUFFIX = "Test";
     private static final String SLOW_TEST_SUFFIX = "SlowTest";
 
-    /** Simple class name for the file being checked. Updated per file. */
+    /**
+     * Simple class name for the file being checked. Updated per file.
+     */
     private String simpleClassName = "";
 
-    /** Package name for the file being checked. */
+    /**
+     * Package name for the file being checked.
+     */
     private String pkgName = "";
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[]{CLASS_DEF, PACKAGE_DEF, METHOD_CALL};
+        return new int[] {CLASS_DEF, PACKAGE_DEF, METHOD_CALL};
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[]{CLASS_DEF, PACKAGE_DEF, METHOD_CALL};
+        return new int[] {CLASS_DEF, PACKAGE_DEF, METHOD_CALL};
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{CLASS_DEF, PACKAGE_DEF, METHOD_CALL};
+        return new int[] {CLASS_DEF, PACKAGE_DEF, METHOD_CALL};
     }
 
     @Override

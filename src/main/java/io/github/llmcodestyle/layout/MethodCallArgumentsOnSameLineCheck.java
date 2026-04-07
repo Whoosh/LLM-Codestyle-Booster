@@ -3,15 +3,16 @@ package io.github.llmcodestyle.layout;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ELIST;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.EXPR;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_NEW;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_CALL;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Enforces consistency in multi-line method call argument formatting. All args must be on one line or one-per-line — mixed format is forbidden. */
+/**
+ * Enforces consistency in multi-line method call argument formatting. All args must be on one line or one-per-line — mixed format is forbidden.
+ */
 public class MethodCallArgumentsOnSameLineCheck extends AbstractCheck {
 
-    /** Violation message key. */
+    /**
+     * Violation message key.
+     */
     static final String MSG_KEY = "method.call.args.line.consistency";
 
     @Override
@@ -26,7 +27,7 @@ public class MethodCallArgumentsOnSameLineCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{METHOD_CALL, LITERAL_NEW};
+        return new int[] {METHOD_CALL, LITERAL_NEW};
     }
 
     @Override

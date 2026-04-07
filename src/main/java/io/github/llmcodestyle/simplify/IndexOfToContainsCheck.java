@@ -3,26 +3,16 @@ package io.github.llmcodestyle.simplify;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CHAR_LITERAL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DOT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ELIST;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.EQUAL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.EXPR;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.GE;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.GT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_CALL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.NOT_EQUAL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.NUM_INT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.UNARY_MINUS;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 /**
  * Flags {@code indexOf} comparisons that should use {@code contains} instead.
  */
 public class IndexOfToContainsCheck extends AbstractCheck {
 
-    /** Violation message key. */
+    /**
+     * Violation message key.
+     */
     static final String MSG_KEY = "indexof.use.contains";
 
     @Override
@@ -37,7 +27,7 @@ public class IndexOfToContainsCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{LT, GE, EQUAL, NOT_EQUAL, GT};
+        return new int[] {LT, GE, EQUAL, NOT_EQUAL, GT};
     }
 
     @Override

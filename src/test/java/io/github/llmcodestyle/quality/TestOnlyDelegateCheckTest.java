@@ -7,8 +7,7 @@ import io.github.llmcodestyle.TestCheckSupport;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TestOnlyDelegateCheckTest {
 

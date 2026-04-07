@@ -21,9 +21,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.nio.file.FileVisitResult.CONTINUE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static java.nio.file.FileVisitResult.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PublicMethodTestCoverageCheckTest {
 

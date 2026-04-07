@@ -4,30 +4,25 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstAnnotationUtil;
 
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ANNOTATION;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.CLASS_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.DOT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.ELIST;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.EXPR;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.IDENT;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LAMBDA;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_CALL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.METHOD_DEF;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.OBJBLOCK;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.STRING_LITERAL;
-import static com.puppycrawl.tools.checkstyle.api.TokenTypes.VARIABLE_DEF;
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
-/** Flags long string literals in test method bodies. Strings longer than {@code maxLength} (default 30) should be extracted to resources. */
+/**
+ * Flags long string literals in test method bodies. Strings longer than {@code maxLength} (default 30) should be extracted to resources.
+ */
 public class LongTestLiteralCheck extends AbstractCheck {
 
-    /** Violation message key. */
+    /**
+     * Violation message key.
+     */
     static final String MSG_KEY = "long.test.literal";
 
     private static final int DEFAULT_MAX_LENGTH = 30;
 
     private int maxLength = DEFAULT_MAX_LENGTH;
 
-    /** Set the maximum allowed string literal length. */
+    /**
+     * Set the maximum allowed string literal length.
+     */
     public void setMaxLength(int maxLength) {
         this.maxLength = maxLength;
     }
@@ -44,7 +39,7 @@ public class LongTestLiteralCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return new int[]{STRING_LITERAL};
+        return new int[] {STRING_LITERAL};
     }
 
     @Override

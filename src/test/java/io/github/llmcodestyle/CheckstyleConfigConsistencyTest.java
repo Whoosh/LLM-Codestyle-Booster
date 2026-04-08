@@ -123,6 +123,58 @@ class CheckstyleConfigConsistencyTest {
         assertEquals(0, wrapOnChain, "4+ chain broken across lines must not trigger UnnecessaryLineWrap: " + format(violations));
     }
 
+    @Test
+    void multipleChainTypesDoNotTriggerUnnecessaryWrap() throws Exception {
+        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+            Map.of(
+                UnnecessaryLineWrapCheck.class.getName(), Map.of("maxLineLength", "180"),
+                "io.github.llmcodestyle.layout.ChainedCallLineBreakCheck", Map.of("minChainLength", "4")),
+            "valid/IdempotencyGoldenMain.java");
+        long wrapViolations = violations.stream().filter(e -> e.getMessage().contains("Unnecessary line wrap")).count();
+        long chainViolations = violations.stream().filter(e -> e.getMessage().contains("Chained method calls")).count();
+        assertEquals(0, wrapViolations, "No chain should trigger UnnecessaryLineWrap: " + format(violations));
+        assertEquals(0, chainViolations, "No chain should trigger ChainedCallLineBreak: " + format(violations));
+    }
+
+    @Test
+    void shortChainOnOneLineDoesNotTriggerChainedCallBreak() throws Exception {
+        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+            Map.of("io.github.llmcodestyle.layout.ChainedCallLineBreakCheck", Map.of("minChainLength", "4")),
+            "valid/IdempotencyGoldenMain.java");
+        long chainViolations = violations.stream().filter(e -> e.getMessage().contains("Chained method calls")).count();
+        assertEquals(0, chainViolations, "3-call chain on one line must not trigger ChainedCallLineBreak: " + format(violations));
+    }
+
+    @Test
+    void methodCallArgsAndUnnecessaryWrapDoNotConflict() throws Exception {
+        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+            Map.of(
+                "io.github.llmcodestyle.layout.MethodCallArgumentsOnSameLineCheck", Map.of(),
+                UnnecessaryLineWrapCheck.class.getName(), Map.of("maxLineLength", "180")),
+            "valid/IdempotencyGoldenMain.java");
+        assertEquals(0, violations.size(), "MethodCallArguments and UnnecessaryLineWrap must not conflict: " + format(violations));
+    }
+
+    @Test
+    void singleUseVarAndChainedCallDoNotConflict() throws Exception {
+        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+            Map.of(
+                "io.github.llmcodestyle.simplify.SingleUseLocalVariableCheck", Map.of(),
+                "io.github.llmcodestyle.layout.ChainedCallLineBreakCheck", Map.of("minChainLength", "4")),
+            "valid/IdempotencyGoldenMain.java");
+        assertEquals(0, violations.size(), "SingleUseLocalVariable and ChainedCallLineBreak must not conflict: " + format(violations));
+    }
+
+    @Test
+    void compactableParamsAndMethodCallArgsDoNotConflict() throws Exception {
+        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+            Map.of(
+                "io.github.llmcodestyle.layout.CompactableParameterListCheck", Map.of("maxLineLength", "180"),
+                "io.github.llmcodestyle.layout.MethodCallArgumentsOnSameLineCheck", Map.of()),
+            "valid/IdempotencyGoldenMain.java");
+        assertEquals(0, violations.size(), "CompactableParameterList and MethodCallArguments must not conflict: " + format(violations));
+    }
+
     private static int findChainedResultLine() {
         try {
             java.net.URL resource = CheckstyleConfigConsistencyTest.class.getClassLoader().getResource("valid/IdempotencyGoldenMain.java");

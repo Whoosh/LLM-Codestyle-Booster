@@ -1,6 +1,6 @@
 # LLM Codestyle Booster
 
-One dependency that brings **25 custom Checkstyle checks** + fully configured **Checkstyle**, **PMD**, and **SpotBugs** rulesets to your Maven project.
+One dependency that brings **34 custom Checkstyle checks** + fully configured **Checkstyle**, **PMD**, and **SpotBugs** rulesets to your Maven project.
 
 Designed for teams that want strict, opinionated static analysis out of the box, with easy per-project overrides.
 
@@ -9,12 +9,12 @@ Designed for teams that want strict, opinionated static analysis out of the box,
 | Category | Checks | Examples |
 |----------|--------|---------|
 | **Forbidden** | 6 | No `System.out` in production, no `@SuppressWarnings`, no generic `catch(Exception)`, no commented-out code |
-| **Layout** | 6 | Chained calls must break after 4+ dots, unnecessary line wraps, compactable parameter lists |
-| **Quality** | 8 | Test method naming (camelCase), public method test coverage, unused private members, util class packaging |
-| **Simplify** | 7 | `indexOf` &rarr; `contains`, `size() == 0` &rarr; `isEmpty()`, inline regex &rarr; `Pattern` constant, single-use variable inlining |
+| **Layout** | 8 | Chained calls must break after 4+ dots, unnecessary line wraps, compactable parameter lists, array init spacing, static star imports |
+| **Quality** | 9 | Test method naming (camelCase), public method test coverage, unused private members, util class packaging, duplicate regex constants |
+| **Simplify** | 11 | `indexOf` &rarr; `contains`, `size() == 0` &rarr; `isEmpty()`, inline regex &rarr; `Pattern` constant, single-use variable inlining, identical catch bodies, `containsKey` + `get` &rarr; single lookup |
 
 Plus bundled configs:
-- **Checkstyle** &mdash; full config with all 25 custom checks + standard built-in checks
+- **Checkstyle** &mdash; full config with all 34 custom checks + standard built-in checks
 - **PMD** &mdash; paranoid-mode ruleset (all categories, strict thresholds)
 - **SpotBugs** &mdash; max effort, low threshold, with fb-contrib and findsecbugs plugins
 
@@ -311,6 +311,8 @@ To use **both** bundled and local exclusions, list them comma-separated:
 | `CompactableParameterListCheck` | Flags multi-line parameter lists where continuation fits on previous line |
 | `MethodCallArgumentsOnSameLineCheck` | Arguments: all-on-one-line or one-per-line, no mixed |
 | `StaticFinalFirstCheck` | `static final` fields must be declared before instance fields and constructors |
+| `ArrayInitSpaceCheck` | Requires a space between `]` and `{` in array initializers |
+| `StaticStarImportCheck` | Requires wildcard (`*`) static imports unless name collision exists |
 | `UnnecessaryLineWrapCheck` | Flags statements split across lines that fit within max line length |
 
 ### Quality
@@ -324,6 +326,8 @@ To use **both** bundled and local exclusions, list them comma-separated:
 | `TestOnlyDelegateCheck` | Flags non-private methods that only delegate to a private method |
 | `UnusedPrivateMembersCheck` | Flags private fields/methods/types never referenced |
 | `UtilClassInUtilsPackageCheck` | `*Util` / `*Utils` classes must live in a `utils` package |
+| `RepeatedExceptionWrappingCheck` | Flags 3+ catch blocks with identical catch-and-rethrow wrapping pattern |
+| `DuplicateRegexConstantCheck` | Flags duplicate regex constants (`String`/`Pattern`) across classes in a module |
 
 ### Simplify
 
@@ -336,6 +340,10 @@ To use **both** bundled and local exclusions, list them comma-separated:
 | `SingleUseLocalVariableCheck` | Variable assigned once and used once in immediately following statement |
 | `StaticImportCandidateCheck` | Suggests static imports for frequently used `ClassName.CONSTANT` references |
 | `UseIsEmptyCheck` | `size() == 0` / `length() > 0` &rarr; `isEmpty()` / `!isEmpty()` |
+| `IdenticalCatchBodyCheck` | Flags catch blocks with identical bodies that can be merged via multi-catch |
+| `MapContainsKeyThenGetCheck` | `if (map.containsKey(k)) map.get(k)` &rarr; single `getOrDefault`/`computeIfAbsent` |
+| `CollectionsToListOfCheck` | `Collections.emptyList()` / `unmodifiableList(Arrays.asList(...))` &rarr; `List.of(...)` |
+| `ConditionalReturnToTernaryCheck` | `if-else` with single return in each branch &rarr; ternary return |
 
 ---
 

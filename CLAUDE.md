@@ -22,14 +22,14 @@ mvn verify -Pself-check
 ```
 src/main/java/io/github/llmcodestyle/
   forbidden/   — checks that ban dangerous patterns (System.out, assert, generic catch, suppressions, commented-out code, unicode escapes)
-  layout/      — formatting rules (line wrap, chained calls, parameter lists, static-final order, blank lines after comments)
-  quality/     — code quality & test hygiene (test naming, coverage, unused members, util packaging, long literals, test-only delegates)
-  simplify/    — simplification suggestions (indexOf→contains, isEmpty, inline regex, single-use vars, collapsible concatenation, static import candidates)
-  utils/       — shared AST utilities (AstUtil, AstAnnotationUtil, AstSingleUseUtil)
+  layout/      — formatting rules (line wrap, chained calls, parameter lists, static-final order, blank lines after comments, array init spacing, static star imports)
+  quality/     — code quality & test hygiene (test naming, coverage, unused members, util packaging, long literals, test-only delegates, repeated exception wrapping, duplicate regex constants)
+  simplify/    — simplification suggestions (indexOf→contains, isEmpty, inline regex, single-use vars, collapsible concatenation, static import candidates, identical catch bodies, containsKey+get, Collections→List.of, conditional return→ternary)
+  utils/       — shared AST utilities (AstUtil, AstMethodCallUtil, AstAnnotationUtil, AstSingleUseUtil)
 
 src/main/resources/io/github/llmcodestyle/
   config/
-    checkstyle.xml          — full Checkstyle config with all 25 custom + built-in checks
+    checkstyle.xml          — full Checkstyle config with all 34 custom + built-in checks
     pmd-ruleset.xml         — paranoid-mode PMD 7 ruleset
     spotbugs-exclude.xml    — SpotBugs/fb-contrib/findsecbugs exclusions
   packagenames.xml          — registers io.github.llmcodestyle for Checkstyle module lookup

@@ -83,10 +83,9 @@ public class CommentedOutCodeCheck extends AbstractFileSetCheck {
 
     private static boolean isTextComment(String stripped) {
         String content = stripped.substring(2).strip();
-        if (content.isEmpty()) {
-            return true;
-        }
-        if (content.startsWith("TODO") || content.startsWith("FIXME") || content.startsWith("NOTE") || content.startsWith("HACK") || content.startsWith("XXX")) {
+        if (content.isEmpty() || content.startsWith("TODO") || content.startsWith("FIXME")
+            || content.startsWith("NOTE") || content.startsWith("HACK")
+            || content.startsWith("XXX")) {
             return true;
         }
         return SEPARATOR_PATTERN.matcher(content).matches();

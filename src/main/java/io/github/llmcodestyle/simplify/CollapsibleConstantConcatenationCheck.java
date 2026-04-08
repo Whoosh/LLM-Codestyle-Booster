@@ -170,7 +170,7 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
         if (node.getType() == PLUS) {
             DetailAST left = node.getFirstChild();
             DetailAST right = left != null ? left.getNextSibling() : null;
-            return left != null && right != null && allLeavesCollapsible(left, literalConstants) && allLeavesCollapsible(right, literalConstants);
+            return allLeavesCollapsible(left, literalConstants) && allLeavesCollapsible(right, literalConstants);
         }
         if (node.getType() == EXPR) {
             return allLeavesCollapsible(node.getFirstChild(), literalConstants);

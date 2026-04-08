@@ -175,6 +175,22 @@ class CheckstyleConfigConsistencyTest {
         assertEquals(0, violations.size(), "CompactableParameterList and MethodCallArguments must not conflict: " + format(violations));
     }
 
+    @Test
+    void stressTestChainPatternsProduceNoLayoutConflicts() throws Exception {
+        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+            Map.of(
+                UnnecessaryLineWrapCheck.class.getName(), Map.of("maxLineLength", "180"),
+                "io.github.llmcodestyle.layout.ChainedCallLineBreakCheck", Map.of("minChainLength", "4"),
+                "io.github.llmcodestyle.layout.MethodCallArgumentsOnSameLineCheck", Map.of()),
+            "valid/ChainStressTest.java");
+        long wrapViolations = violations.stream().filter(e -> e.getMessage().contains("Unnecessary line wrap")).count();
+        long chainViolations = violations.stream().filter(e -> e.getMessage().contains("Chained method calls")).count();
+        long argViolations = violations.stream().filter(e -> e.getMessage().contains("mixed line layout")).count();
+        assertEquals(0, wrapViolations, "Stress test: no UnnecessaryLineWrap violations expected");
+        assertEquals(0, chainViolations, "Stress test: no ChainedCallLineBreak violations expected");
+        assertEquals(0, argViolations, "Stress test: no MethodCallArguments violations expected");
+    }
+
     private static int findChainedResultLine() {
         try {
             java.net.URL resource = CheckstyleConfigConsistencyTest.class.getClassLoader().getResource("valid/IdempotencyGoldenMain.java");

@@ -86,8 +86,7 @@ public final class TestCheckSupport {
      * Run a TreeWalker check against multiple resource files in a single Checker run.
      * The check instance is shared across files, enabling cross-file state detection.
      */
-    public static List<AuditEvent> runTreeWalkerCheckMultiFile(
-        Class<?> checkClass, List<String> resourceFiles, Map<String, String> props) throws Exception {
+    public static List<AuditEvent> runTreeWalkerCheckMultiFile(Class<?> checkClass, List<String> resourceFiles, Map<String, String> props) throws Exception {
 
         List<File> files = new ArrayList<>();
         for (String resourceFile : resourceFiles) {

@@ -37,9 +37,7 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
      * Requires the escape sequence NOT to be followed by an alphanumeric char,
      * which filters out false positives like {@code "C:\\data"}.
      */
-    private static final Pattern REGEX_INDICATOR = Pattern.compile(
-        "\\\\\\\\[dDwWsS](?![a-zA-Z0-9])"
-    );
+    private static final Pattern REGEX_INDICATOR = Pattern.compile("\\\\\\\\[dDwWsS](?![a-zA-Z0-9])");
 
     private static final String PATTERN_TYPE = "Pattern";
     private static final String UNKNOWN = "<unknown>";
@@ -67,8 +65,7 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
             return;
         }
 
-        String typeName = AstUtil.extractTypeName(ast);
-        String regexValue = extractRegexValue(ast, typeName);
+        String regexValue = extractRegexValue(ast, AstUtil.extractTypeName(ast));
         if (regexValue == null) {
             return;
         }
@@ -91,8 +88,7 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
     }
 
     private static boolean isStaticFinal(DetailAST variableDef) {
-        return AstUtil.hasModifier(variableDef, LITERAL_STATIC)
-            && AstUtil.hasModifier(variableDef, FINAL);
+        return AstUtil.hasModifier(variableDef, LITERAL_STATIC) && AstUtil.hasModifier(variableDef, FINAL);
     }
 
     private static String extractRegexValue(DetailAST variableDef, String typeName) {
@@ -167,8 +163,7 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
         DetailAST parent = ast.getParent();
         while (parent != null) {
             int type = parent.getType();
-            if (type == CLASS_DEF || type == RECORD_DEF
-                || type == ENUM_DEF || type == INTERFACE_DEF) {
+            if (type == CLASS_DEF || type == RECORD_DEF || type == ENUM_DEF || type == INTERFACE_DEF) {
                 DetailAST ident = parent.findFirstToken(IDENT);
                 if (ident != null) {
                     return ident.getText();

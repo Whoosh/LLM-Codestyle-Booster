@@ -34,6 +34,15 @@ public class IdempotencyGoldenMain {
         }
     }
 
+    // ChainedCallLineBreak vs UnnecessaryLineWrap: 4+ chain broken across lines
+    // must NOT trigger UnnecessaryLineWrap even though the joined form fits in 180 chars.
+    String chainedResult() {
+        return CONSTANT.codePoints()
+            .mapToObj(Character::toString)
+            .toList()
+            .toString();
+    }
+
     // Setter keeps 'field' from being flagged as unused by UnusedPrivateMembers
     void setField(String value) {
         this.field = value;

@@ -112,6 +112,35 @@ class CheckstyleConfigConsistencyTest {
             "Comment placement must satisfy CommentsIndentation and BlankLineAfterComment: " + format(violations) + format(blankLineViolations));
     }
 
+    @Test
+    void chainedCallBrokenAcrossLinesDoesNotTriggerUnnecessaryWrap() throws Exception {
+        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+            Map.of(
+                UnnecessaryLineWrapCheck.class.getName(), Map.of("maxLineLength", "180"),
+                "io.github.llmcodestyle.layout.ChainedCallLineBreakCheck", Map.of("minChainLength", "4")),
+            "valid/IdempotencyGoldenMain.java");
+        long wrapOnChain = violations.stream().filter(e -> e.getMessage().contains("Unnecessary line wrap")).filter(e -> e.getLine() >= findChainedResultLine()).count();
+        assertEquals(0, wrapOnChain, "4+ chain broken across lines must not trigger UnnecessaryLineWrap: " + format(violations));
+    }
+
+    private static int findChainedResultLine() {
+        try {
+            java.net.URL resource = CheckstyleConfigConsistencyTest.class.getClassLoader().getResource("valid/IdempotencyGoldenMain.java");
+            if (resource == null) {
+                return Integer.MAX_VALUE;
+            }
+            List<String> lines = Files.readAllLines(Path.of(resource.toURI()));
+            for (int i = 0; i < lines.size(); i++) {
+                if (lines.get(i).contains("chainedResult")) {
+                    return i + 1;
+                }
+            }
+        } catch (IllegalArgumentException | java.io.IOException | java.net.URISyntaxException ignored) {
+            // fall through
+        }
+        return Integer.MAX_VALUE;
+    }
+
     // Custom check registry — every *Check class must appear here.
     // CrossAnalyzerConsistencyTest.everyCustomCheckParticipatesToConsistencyTest
     // scans this file for class names and fails if any are missing.

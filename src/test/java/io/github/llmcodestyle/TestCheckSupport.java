@@ -83,6 +83,43 @@ public final class TestCheckSupport {
     }
 
     /**
+     * Run a TreeWalker check against multiple resource files in a single Checker run.
+     * The check instance is shared across files, enabling cross-file state detection.
+     */
+    public static List<AuditEvent> runTreeWalkerCheckMultiFile(
+        Class<?> checkClass, List<String> resourceFiles, Map<String, String> props) throws Exception {
+
+        List<File> files = new ArrayList<>();
+        for (String resourceFile : resourceFiles) {
+            URL resource = TestCheckSupport.class.getClassLoader().getResource(resourceFile);
+            assertNotNull(resource, "Test resource not found: " + resourceFile);
+            files.add(new File(resource.toURI()));
+        }
+
+        DefaultConfiguration checkConfig = new DefaultConfiguration(checkClass.getName());
+        for (Map.Entry<String, String> entry : props.entrySet()) {
+            checkConfig.addProperty(entry.getKey(), entry.getValue());
+        }
+
+        DefaultConfiguration twConfig = new DefaultConfiguration(TreeWalker.class.getName());
+        twConfig.addChild(checkConfig);
+
+        DefaultConfiguration rootConfig = new DefaultConfiguration("root");
+        rootConfig.addProperty("charset", "UTF-8");
+        rootConfig.addChild(twConfig);
+
+        Checker checker = new Checker();
+        checker.setModuleClassLoader(TestCheckSupport.class.getClassLoader());
+        checker.configure(rootConfig);
+
+        List<AuditEvent> violations = new ArrayList<>();
+        checker.addListener(new TestAuditListener(violations));
+        checker.process(files);
+        checker.destroy();
+        return violations;
+    }
+
+    /**
      * Run a FileSet check (AbstractFileSetCheck subclass) against a resource file.
      */
     public static List<AuditEvent> runFileSetCheck(Class<?> checkClass, String resourceFile, Map<String, String> props) throws Exception {

@@ -67,7 +67,7 @@ class CheckstyleConfigConsistencyTest {
             "valid/IdempotencyGoldenMain.java");
         long wrapViolations = violations.stream()
             .filter(e -> e.getMessage().contains("Unnecessary line wrap"))
-            .filter(e -> isNearAnnotation(e))
+            .filter(CheckstyleConfigConsistencyTest::isNearAnnotation)
             .count();
         assertEquals(0, wrapViolations, "AnnotationLocation fix must not trigger UnnecessaryLineWrap (found " + wrapViolations + "): " + format(violations));
     }
@@ -154,6 +154,7 @@ class CheckstyleConfigConsistencyTest {
     //   CollectionsToListOfCheck — detects pre-Java-9 Collections factory methods, no cross-rule interaction
     //   ConditionalReturnToTernaryCheck — detects if-else with single returns, no cross-rule interaction
     //   RepeatedExceptionWrappingCheck — detects repeated catch-rethrow patterns, no cross-rule interaction
+    //   DuplicateRegexConstantCheck — detects duplicate regex constants across files, no cross-rule interaction
     private List<AuditEvent> runFullConfig(String resourceFile, boolean testScope) throws Exception {
         if (CHECKSTYLE_XML == null || !Files.exists(CHECKSTYLE_XML)) {
             return List.of();

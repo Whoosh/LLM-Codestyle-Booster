@@ -18,6 +18,7 @@ import io.github.llmcodestyle.simplify.RedundantConstantAliasCheck;
 import io.github.llmcodestyle.simplify.SingleUseLocalVariableCheck;
 import io.github.llmcodestyle.simplify.SplitDeclarationAssignmentCheck;
 import io.github.llmcodestyle.simplify.StaticImportCandidateCheck;
+import io.github.llmcodestyle.simplify.TrivialSingleUsePrivateMethodCheck;
 import io.github.llmcodestyle.simplify.UseIsEmptyCheck;
 
 import java.util.List;
@@ -71,6 +72,9 @@ import static org.junit.jupiter.api.Assertions.*;
  *       return of the condition, identical control flow</li>
  *   <li>{@link RedundantConstantAliasCheck} — flags useless static final aliases and
  *       same-class duplicate Pattern.compile, replacing two field reads with one</li>
+ *   <li>{@link TrivialSingleUsePrivateMethodCheck} — inlines a method called from one site;
+ *       executes its body the same number of times before and after, parameter usage cap
+ *       prevents argument-expression duplication</li>
  * </ul>
  */
 class AsymptoticSafetyTest {

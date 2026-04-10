@@ -74,6 +74,8 @@
                 <version>3.14.0</version>
                 <configuration>
                     <parameters>true</parameters>
+                    <showDeprecation>true</showDeprecation>
+                    <failOnWarning>true</failOnWarning>
                 </configuration>
             </plugin>
 

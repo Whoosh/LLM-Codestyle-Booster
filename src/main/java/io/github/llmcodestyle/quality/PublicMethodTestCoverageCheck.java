@@ -82,7 +82,7 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
         isInterface = false;
         className = "";
 
-        String fileName = getFileContents().getFileName();
+        String fileName = getFilePath();
         isTestFile = fileName.contains(TEST_SOURCE_MARKER) || fileName.endsWith(TEST_SUFFIX) || fileName.endsWith(SLOW_TEST_SUFFIX);
     }
 
@@ -112,7 +112,7 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
         if (isTestFile || methods.isEmpty() || className.isEmpty()) {
             return;
         }
-        String testContent = readTestFiles(getFileContents().getFileName());
+        String testContent = readTestFiles(getFilePath());
         if (testContent == null) {
             return;
         }

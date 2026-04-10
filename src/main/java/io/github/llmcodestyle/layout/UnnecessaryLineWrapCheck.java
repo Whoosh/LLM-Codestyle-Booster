@@ -73,7 +73,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
         }
     }
 
-    private int computeFirstLine(DetailAST ast) {
+    private static int computeFirstLine(DetailAST ast) {
         int type = ast.getType();
         if (type == METHOD_DEF || type == CTOR_DEF || type == COMPACT_CTOR_DEF || type == RECORD_DEF || type == VARIABLE_DEF || type == RESOURCE) {
             DetailAST typeToken = ast.findFirstToken(TYPE);
@@ -106,7 +106,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
         return ident != null ? ident.getLineNo() : def.getLineNo();
     }
 
-    private int computeLastLine(DetailAST ast) {
+    private static int computeLastLine(DetailAST ast) {
         int type = ast.getType();
 
         if (type == METHOD_DEF || type == CTOR_DEF || type == COMPACT_CTOR_DEF) {
@@ -172,7 +172,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
         return firstLine >= lastLine || buildCombinedLine(firstLine, lastLine).length() <= maxLineLength;
     }
 
-    private int findSignatureLastLine(DetailAST def) {
+    private static int findSignatureLastLine(DetailAST def) {
         DetailAST slist = def.findFirstToken(SLIST);
         if (slist != null) {
             return slist.getLineNo();
@@ -184,7 +184,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
         return AstUtil.findLastLine(def);
     }
 
-    private boolean isNestedInCheckedParent(DetailAST ast) {
+    private static boolean isNestedInCheckedParent(DetailAST ast) {
         DetailAST parent = ast.getParent();
         while (parent != null) {
             int parentType = parent.getType();

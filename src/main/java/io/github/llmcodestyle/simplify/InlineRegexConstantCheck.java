@@ -47,7 +47,7 @@ public class InlineRegexConstantCheck extends AbstractCheck {
         }
     }
 
-    private boolean isInsideMethodBody(DetailAST ast) {
+    private static boolean isInsideMethodBody(DetailAST ast) {
         DetailAST parent = ast.getParent();
         while (parent != null) {
             if (parent.getType() == METHOD_DEF || parent.getType() == CTOR_DEF) {

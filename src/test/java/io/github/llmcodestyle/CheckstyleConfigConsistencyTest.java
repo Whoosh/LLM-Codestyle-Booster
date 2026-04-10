@@ -226,56 +226,9 @@ class CheckstyleConfigConsistencyTest {
         return MAX_VALUE;
     }
 
-    // Custom check registry — every *Check class must appear here.
-    // CrossAnalyzerConsistencyTest.everyCustomCheckParticipatesToConsistencyTest
-    // scans this file for class names and fails if any are missing.
-    //
-    // Checks exercised via golden files (full checkstyle.xml run):
-    //   UnnecessaryLineWrapCheck — golden files test annotation-vs-wrap conflict
-    //   ForbidAssertKeywordCheck — golden files verify if/throw pattern satisfies LeftCurly
-    //   BlankLineAfterCommentCheck — golden files verify comment-above-code pattern
-    //   SingleUseLocalVariableCheck — golden files have no single-use vars
-    //   PureSingleUseLocalVariableCheck — golden files have no deferred single-use vars
-    //   CompactableParameterListCheck — golden files have no multi-line params that fit
-    //   StaticFinalFirstCheck — golden files have static finals before instance fields
-    //   CollapsibleConstantConcatenationCheck — golden files have no collapsible concatenations
-    //   NoSuppressionCheck — golden files have no @SuppressWarnings
-    //   InlineRegexConstantCheck — golden files have no inline regex in method bodies
-    //   IndexOfToContainsCheck — golden files have no indexOf comparisons
-    //   UseIsEmptyCheck — golden files have no length()/size() vs 0 comparisons
-    //   UnusedPrivateMembersCheck — golden files have no unused private members
-    //   MethodCallArgumentsOnSameLineCheck — golden files have consistent arg layout
-    //   ChainedCallLineBreakCheck — golden files have no long chains on one line
-    //
-    // Checks active only for specific scope (exercised via golden files with path filtering):
-    //   NoSystemOutInProductionCheck — suppressed in test scope, active in main golden file
-    //   TestClassNamingCheck — suppressed in main scope, active in test golden file
-    //   LongTestLiteralCheck — suppressed in main scope, active in test golden file
-    //   TestMethodNameCheck — active in test golden file (camelCase @Test methods)
-    //   PublicMethodTestCoverageCheck — requires filesystem test files, skips silently in golden test
-    //   TestOnlyDelegateCheck — golden files have no thin delegates to private methods
-    //
-    // Checks that don't interact with other rules (no known conflicts):
-    //   ForbiddenGenericCatchCheck — flags catch(Exception), no cross-rule interaction
-    //   UnicodeEscapeCheck — FileSetCheck scanning raw content, independent of AST checks
-    //   CommentedOutCodeCheck — FileSetCheck scanning comments, independent of AST checks
-    //   UtilClassInUtilsPackageCheck — naming convention check, no cross-rule interaction
-    //   StaticImportCandidateCheck — suggests static imports, no conflict with other checks
-    //   ArrayInitSpaceCheck — enforces space before '{' in array init, no cross-rule interaction
-    //   StaticStarImportCheck — requires wildcard static imports, no cross-rule interaction
-    //   IdenticalCatchBodyCheck — detects identical catch bodies for multi-catch, no cross-rule interaction
-    //   MapContainsKeyThenGetCheck — detects containsKey+get double lookup, no cross-rule interaction
-    //   CollectionsToListOfCheck — detects pre-Java-9 Collections factory methods, no cross-rule interaction
-    //   ConditionalReturnToTernaryCheck — detects if-else with single returns, no cross-rule interaction
-    //   RepeatedExceptionWrappingCheck — detects repeated catch-rethrow patterns, no cross-rule interaction
-    //   DuplicateRegexConstantCheck — detects duplicate regex constants across files, no cross-rule interaction
-    //   SpringBootMainVisibilityCheck — enforces public static void main on @SpringBootApplication, no cross-rule interaction
-    //   UnrelatedNestedRecordCheck — flags nested records that don't reference outer type, no cross-rule interaction
-    //   CollapsibleGuardClauseCheck — collapses guard + if into a single boolean expression, no cross-rule interaction
-    //   CollapsibleNestedIfCheck — collapses nested ifs into a single conditional, no cross-rule interaction
-    //   BooleanFromConditionCheck — collapses boolean literal init + if-flip to direct assignment, no cross-rule interaction
-    //   SplitDeclarationAssignmentCheck — merges declaration with later unconditional assignment, no cross-rule interaction
-    //   IfReturnBooleanLiteralCheck — collapses if-return-literal pair to a single return of the condition, no cross-rule interaction
+    // Custom check registry lives in src/test/resources/custom-checks-registry.txt —
+    // CrossAnalyzerConsistencyTest.everyCustomCheckParticipatesToConsistencyTest scans it
+    // for class names and fails if any *Check class is missing from the registry.
     private List<AuditEvent> runFullConfig(String resourceFile, boolean testScope) throws Exception {
         if (CHECKSTYLE_XML == null || !Files.exists(CHECKSTYLE_XML)) {
             return List.of();

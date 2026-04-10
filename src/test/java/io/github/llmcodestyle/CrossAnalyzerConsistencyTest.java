@@ -139,9 +139,9 @@ class CrossAnalyzerConsistencyTest {
     @Test
     void everyCustomCheckParticipatesToConsistencyTest() throws Exception {
         List<String> checkNames = findAllCheckClassNames();
-        String consistencyTest = Files.readString(Path.of("src/test/java/io/github/llmcodestyle/CheckstyleConfigConsistencyTest.java"));
-        List<String> notCovered = checkNames.stream().filter(name -> !consistencyTest.contains(name)).toList();
-        assertTrue(notCovered.isEmpty(), "Custom checks not referenced in CheckstyleConfigConsistencyTest: " + notCovered);
+        String registry = Files.readString(Path.of("src/test/resources/custom-checks-registry.txt"));
+        List<String> notCovered = checkNames.stream().filter(name -> !registry.contains(name)).toList();
+        assertTrue(notCovered.isEmpty(), "Custom checks missing from custom-checks-registry.txt: " + notCovered);
     }
 
     private static List<String> findAllCheckClassNames() throws IOException {

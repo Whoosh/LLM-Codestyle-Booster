@@ -35,6 +35,35 @@ public final class AstQueryUtil {
     }
 
     /**
+     * Structural AST equality: same token type, same text, same ordered children.
+     * Ignores line/column positions. Safe on {@code null}: two {@code null}s are equal,
+     * a {@code null} and a node are not.
+     */
+    public static boolean structurallyEqual(DetailAST a, DetailAST b) {
+        if (a == null || b == null) {
+            return a == null && b == null;
+        }
+        if (a.getType() != b.getType()) {
+            return false;
+        }
+        String ta = a.getText();
+        String tb = b.getText();
+        if (ta == null ? tb != null : !ta.equals(tb)) {
+            return false;
+        }
+        DetailAST ca = a.getFirstChild();
+        DetailAST cb = b.getFirstChild();
+        while (ca != null && cb != null) {
+            if (!structurallyEqual(ca, cb)) {
+                return false;
+            }
+            ca = ca.getNextSibling();
+            cb = cb.getNextSibling();
+        }
+        return ca == null && cb == null;
+    }
+
+    /**
      * Walks a chain of {@code findFirstToken} calls starting from {@code start},
      * returning the text of the terminal node. Returns an empty string if any
      * intermediate lookup returns {@code null}, short-circuiting safely.

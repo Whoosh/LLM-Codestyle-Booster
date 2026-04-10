@@ -33,6 +33,13 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
 
     private static final int MIN_METHOD_RUN_LENGTH = 2;
 
+    /**
+     * Maximum line length matching the project's LineLength rule. The check skips suggestions
+     * whose merged literal would exceed this width — joining would just create a different
+     * (LineLength) violation.
+     */
+    private static final int MAX_LINE_LENGTH = 180;
+
     @Override
     public int[] getDefaultTokens() {
         return TOKENS.clone();
@@ -129,10 +136,40 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
     }
 
     private void checkScalarPlus(DetailAST varDef, DetailAST plus, Set<String> literalConstants) {
-        if (allLeavesCollapsible(plus, literalConstants)) {
+        if (allLeavesCollapsible(plus, literalConstants) && mergedLiteralWouldFitOnLine(varDef, plus)) {
             DetailAST ident = varDef.findFirstToken(IDENT);
             log(varDef.getLineNo(), varDef.getColumnNo(), MSG_KEY, ident != null ? ident.getText() : "?", countLeaves(plus));
         }
+    }
+
+    private boolean mergedLiteralWouldFitOnLine(DetailAST varDef, DetailAST plus) {
+        int contentLength = computeMergedStringContentLength(plus);
+        return contentLength < 0 || declarationPrefixLength(varDef) + 2 + contentLength + 1 <= MAX_LINE_LENGTH;
+    }
+
+    private int declarationPrefixLength(DetailAST varDef) {
+        int eqIdx = getLines()[varDef.getLineNo() - 1].indexOf('=');
+        return eqIdx < 0 ? varDef.getColumnNo() : eqIdx + 2;
+    }
+
+    private static int computeMergedStringContentLength(DetailAST node) {
+        if (node == null) {
+            return 0;
+        }
+        int type = node.getType();
+        if (type == STRING_LITERAL) {
+            return Math.max(0, node.getText().length() - 2);
+        }
+        if (type == EXPR) {
+            return computeMergedStringContentLength(node.getFirstChild());
+        }
+        if (type != PLUS) {
+            return -1;
+        }
+        DetailAST left = node.getFirstChild();
+        int leftLen = computeMergedStringContentLength(left);
+        int rightLen = computeMergedStringContentLength(left == null ? null : left.getNextSibling());
+        return leftLen < 0 || rightLen < 0 ? -1 : leftLen + rightLen;
     }
 
     private void checkArrayInit(DetailAST varDef, DetailAST arrayInit, Set<String> literalConstants) {

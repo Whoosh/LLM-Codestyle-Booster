@@ -23,13 +23,13 @@ mvn verify -Pself-check
 src/main/java/io/github/llmcodestyle/
   forbidden/   — checks that ban dangerous patterns (System.out, assert, generic catch, suppressions, commented-out code, unicode escapes)
   layout/      — formatting rules (line wrap, chained calls, parameter lists, static-final order, blank lines after comments, array init spacing, static star imports)
-  quality/     — code quality & test hygiene (test naming, coverage, unused members, util packaging, long literals, test-only delegates, repeated exception wrapping, duplicate regex constants, Spring Boot main visibility, unrelated nested records)
-  simplify/    — simplification suggestions (indexOf→contains, isEmpty, inline regex, single-use vars, collapsible concatenation, static import candidates, identical catch bodies, containsKey+get, Collections→List.of, conditional return→ternary, collapsible guard clauses, collapsible nested ifs, boolean-from-condition, split decl/assign, if-return boolean literal, redundant constant alias)
+  quality/     — code quality & test hygiene (test naming, coverage, unused members, util packaging, util-class naming, long literals, test-only delegates, repeated exception wrapping, duplicate regex constants, Spring Boot main visibility, unrelated nested records, may-be-static methods)
+  simplify/    — simplification suggestions (indexOf→contains, isEmpty, inline regex, single-use vars, collapsible concatenation, static import candidates, identical catch bodies, containsKey+get, Collections→List.of, conditional return→ternary, collapsible guard clauses, collapsible nested ifs, boolean-from-condition, split decl/assign, if-return boolean literal, redundant constant alias, trivial single-use private methods, commons-lang3 string constants)
   utils/       — shared AST utilities (AstUtil, AstMethodCallUtil, AstAnnotationUtil, AstSingleUseUtil)
 
 src/main/resources/io/github/llmcodestyle/
   config/
-    checkstyle.xml          — full Checkstyle config with all 42 custom + built-in checks
+    checkstyle.xml          — full Checkstyle config with all 47 custom + built-in checks
     pmd-ruleset.xml         — paranoid-mode PMD 7 ruleset
     spotbugs-exclude.xml    — SpotBugs/fb-contrib/findsecbugs exclusions
   packagenames.xml          — registers io.github.llmcodestyle for Checkstyle module lookup

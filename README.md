@@ -1,6 +1,6 @@
 # LLM Codestyle Booster
 
-One dependency that brings **42 custom Checkstyle checks** + fully configured **Checkstyle**, **PMD**, and **SpotBugs** rulesets to your Maven project.
+One dependency that brings **47 custom Checkstyle checks** + fully configured **Checkstyle**, **PMD**, and **SpotBugs** rulesets to your Maven project.
 
 Designed for teams that want strict, opinionated static analysis out of the box, with easy per-project overrides.
 
@@ -10,11 +10,11 @@ Designed for teams that want strict, opinionated static analysis out of the box,
 |----------|--------|---------|
 | **Forbidden** | 6 | No `System.out` in production, no `@SuppressWarnings`, no generic `catch(Exception)`, no commented-out code |
 | **Layout** | 8 | Chained calls must break after 4+ dots, unnecessary line wraps, compactable parameter lists, array init spacing, static star imports |
-| **Quality** | 11 | Test method naming, public method test coverage, unused private members, util class packaging, duplicate regex constants, Spring Boot main visibility, unrelated nested records |
-| **Simplify** | 17 | `indexOf` &rarr; `contains`, `size() == 0` &rarr; `isEmpty()`, inline regex &rarr; `Pattern` constant, single-use variable inlining, identical catch bodies, `containsKey` + `get` &rarr; single lookup, collapsible guard clauses, nested ifs, boolean-from-condition, split decl/assign, if-return literal, redundant constant alias |
+| **Quality** | 13 | Test method naming, public method test coverage, unused private members, util class packaging & naming, may-be-static methods, duplicate regex constants, Spring Boot main visibility, unrelated nested records |
+| **Simplify** | 19 | `indexOf` &rarr; `contains`, `size() == 0` &rarr; `isEmpty()`, inline regex &rarr; `Pattern` constant, single-use variable inlining, identical catch bodies, `containsKey` + `get` &rarr; single lookup, collapsible guard clauses, nested ifs, boolean-from-condition, split decl/assign, if-return literal, redundant constant alias, trivial single-use private methods, commons-lang3 string constants |
 
 Plus bundled configs:
-- **Checkstyle** &mdash; full config with all 42 custom checks + standard built-in checks
+- **Checkstyle** &mdash; full config with all 47 custom checks + standard built-in checks
 - **PMD** &mdash; paranoid-mode ruleset (all categories, strict thresholds)
 - **SpotBugs** &mdash; max effort, low threshold, with fb-contrib and findsecbugs plugins
 
@@ -330,6 +330,8 @@ To use **both** bundled and local exclusions, list them comma-separated:
 | `DuplicateRegexConstantCheck` | Flags duplicate regex constants (`String`/`Pattern`) across classes in a module |
 | `SpringBootMainVisibilityCheck` | Enforces `public static void main(String[])` on `@SpringBootApplication` classes |
 | `UnrelatedNestedRecordCheck` | Flags nested records that don't reference the enclosing type — move to a `pojos` package |
+| `MethodMayBeStaticCheck` | Flags `private` instance methods whose body never touches `this`/`super` or any instance member — add the `static` modifier |
+| `UtilClassNamingCheck` | All-static-public classes must end in `*Util`/`*Utils`; `*Constants` classes must not declare any public method |
 
 ### Simplify
 
@@ -352,6 +354,8 @@ To use **both** bundled and local exclusions, list them comma-separated:
 | `SplitDeclarationAssignmentCheck` | `int x; ...; x = 5;` with no use/branch between &rarr; merge into single declaration |
 | `IfReturnBooleanLiteralCheck` | `if(c) return true; return false;` &rarr; `return c;` (no-else fall-through form) |
 | `RedundantConstantAliasCheck` | Flags `static final A = B` aliases and same-class duplicate `Pattern.compile()` of the same regex |
+| `TrivialSingleUsePrivateMethodCheck` | Flags `private` one-statement methods called from exactly one site — inline them; spares stream chains and methods that reuse a parameter |
+| `CommonsLang3StringConstantCheck` | Flags `static final String` constants whose value matches `StringUtils.EMPTY` / `SPACE` / `LF` / `CR` from Apache Commons Lang3 |
 
 ---
 

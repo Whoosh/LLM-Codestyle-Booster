@@ -4,6 +4,7 @@ import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 
 import java.io.File;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -47,6 +48,8 @@ public class CommentedOutCodeCheck extends AbstractFileSetCheck {
 
     private static final Pattern SEPARATOR_PATTERN = Pattern.compile("[-=]{3,}.*");
 
+    private static final Set<String> TEXT_COMMENT_TAGS = Set.of("TODO", "FIXME", "NOTE", "HACK", "XXX");
+
     private int minConsecutiveLines = DEFAULT_MIN_LINES;
 
     public void setMinConsecutiveLines(int minConsecutiveLines) {
@@ -83,9 +86,7 @@ public class CommentedOutCodeCheck extends AbstractFileSetCheck {
 
     private static boolean isTextComment(String stripped) {
         String content = stripped.substring(2).strip();
-        if (content.isEmpty() || content.startsWith("TODO") || content.startsWith("FIXME")
-            || content.startsWith("NOTE") || content.startsWith("HACK")
-            || content.startsWith("XXX")) {
+        if (content.isEmpty() || TEXT_COMMENT_TAGS.stream().anyMatch(content::startsWith)) {
             return true;
         }
         return SEPARATOR_PATTERN.matcher(content).matches();

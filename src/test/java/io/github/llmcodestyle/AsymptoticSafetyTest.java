@@ -4,6 +4,7 @@ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 import io.github.llmcodestyle.simplify.BooleanFromConditionCheck;
 import io.github.llmcodestyle.simplify.CollapsibleConstantConcatenationCheck;
+import io.github.llmcodestyle.simplify.CollapsibleConsecutiveIfCheck;
 import io.github.llmcodestyle.simplify.CommonsLang3StringConstantCheck;
 import io.github.llmcodestyle.simplify.CollapsibleGuardClauseCheck;
 import io.github.llmcodestyle.simplify.CollapsibleNestedIfCheck;
@@ -21,6 +22,7 @@ import io.github.llmcodestyle.simplify.SplitDeclarationAssignmentCheck;
 import io.github.llmcodestyle.simplify.StaticImportCandidateCheck;
 import io.github.llmcodestyle.simplify.TrivialSingleUsePrivateMethodCheck;
 import io.github.llmcodestyle.simplify.UseIsEmptyCheck;
+import io.github.llmcodestyle.quality.DuplicateMethodBodyCheck;
 import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 
 import java.util.List;
@@ -79,6 +81,13 @@ import static org.junit.jupiter.api.Assertions.*;
  *       prevents argument-expression duplication</li>
  *   <li>{@link CommonsLang3StringConstantCheck} — only renames a static final constant
  *       to its library equivalent, no runtime semantics change</li>
+ *   <li>{@link CollapsibleConsecutiveIfCheck} — the fix merges conditions with {@code ||};
+ *       short-circuit evaluation preserves the exact number of condition evaluations
+ *       (first true → stop). Only single-statement terminating bodies are flagged, so the
+ *       body cannot be executed more than once by the merged form — identical semantics</li>
+ *   <li>{@link DuplicateMethodBodyCheck} — reporting duplicate bodies does not suggest any
+ *       runtime change. The check itself runs in O(total source AST nodes) with a per-method
+ *       body cap ({@code maxBodyNodes}, default 400) to bound the hash-key size</li>
  * </ul>
  */
 class AsymptoticSafetyTest {

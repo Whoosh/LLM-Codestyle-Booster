@@ -53,3 +53,5 @@ TrivialSingleUsePrivateMethodCheck — flags private one-statement methods calle
 MethodMayBeStaticCheck — flags private instance methods that never reference this/super or instance state, no cross-rule interaction
 UtilClassNamingCheck — flags all-static-public classes that aren't *Util/*Utils and *Constants classes with public methods, no cross-rule interaction
 CommonsLang3StringConstantCheck — flags static final String constants whose value duplicates Apache Commons Lang3 StringUtils.* equivalents, no cross-rule interaction
+CollapsibleConsecutiveIfCheck — flags consecutive if statements with structurally identical terminating bodies that can be merged via ||, no cross-rule interaction
+DuplicateMethodBodyCheck — flags methods with structurally identical bodies after normalizing param/local names (cross-file), no cross-rule interaction

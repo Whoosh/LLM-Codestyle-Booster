@@ -252,6 +252,8 @@ class CheckstyleConfigConsistencyTest {
     //   ConditionalReturnToTernaryCheck — detects if-else with single returns, no cross-rule interaction
     //   RepeatedExceptionWrappingCheck — detects repeated catch-rethrow patterns, no cross-rule interaction
     //   DuplicateRegexConstantCheck — detects duplicate regex constants across files, no cross-rule interaction
+    //   SpringBootMainVisibilityCheck — enforces public static void main on @SpringBootApplication, no cross-rule interaction
+    //   UnrelatedNestedRecordCheck — flags nested records that don't reference outer type, no cross-rule interaction
     private List<AuditEvent> runFullConfig(String resourceFile, boolean testScope) throws Exception {
         if (CHECKSTYLE_XML == null || !Files.exists(CHECKSTYLE_XML)) {
             return List.of();

@@ -117,6 +117,17 @@ public class IdempotencyGoldenMain {
         return CONSTANT.strip().trim().toLowerCase();
     }
 
+    // Array initializer: 'new T[] {a, b, c}' (space between ] and { per ArrayInitSpace,
+    // no inner spaces). Must NOT trigger WhitespaceAround vs NoWhitespaceAfter ping-pong.
+    String firstSample() {
+        for (String sample : new String[] {"alpha.txt", "beta.txt", "gamma.txt"}) {
+            if (sample.startsWith("a")) {
+                return sample;
+            }
+        }
+        return CONSTANT;
+    }
+
     // Setter keeps 'field' from being flagged as unused by UnusedPrivateMembers
     void setField(String value) {
         this.field = value;

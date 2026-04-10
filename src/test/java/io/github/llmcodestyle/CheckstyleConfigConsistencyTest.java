@@ -41,6 +41,19 @@ class CheckstyleConfigConsistencyTest {
     private static final String LEFT_CURLY_CHECK = "com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck";
     private static final String NEED_BRACES_CHECK = "com.puppycrawl.tools.checkstyle.checks.blocks.NeedBracesCheck";
     private static final String COMMENTS_INDENT_CHECK = "com.puppycrawl.tools.checkstyle.checks.indentation.CommentsIndentationCheck";
+    private static final String WHITESPACE_AROUND_CHECK = "com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck";
+    private static final String NO_WS_AFTER_CHECK = "com.puppycrawl.tools.checkstyle.checks.whitespace.NoWhitespaceAfterCheck";
+    /**
+     * WhitespaceAround default tokens minus ARRAY_INIT — kept in sync with checkstyle.xml.
+     */
+    private static final String WS_AROUND_TOKENS_NO_ARRAY_INIT =
+        "ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR, BXOR_ASSIGN, "
+            + "COLON, DIV, DIV_ASSIGN, DO_WHILE, EQUAL, GE, GT, LAMBDA, LAND, LCURLY, LE, "
+            + "LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, "
+            + "LITERAL_RETURN, LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, "
+            + "LOR, LT, MINUS, MINUS_ASSIGN, MOD, MOD_ASSIGN, NOT_EQUAL, PLUS, PLUS_ASSIGN, "
+            + "QUESTION, RCURLY, SL, SLIST, SL_ASSIGN, SR, SR_ASSIGN, STAR, STAR_ASSIGN, "
+            + "LITERAL_ASSERT, TYPE_EXTENSION_AND";
 
     @TempDir
     Path tempDir;
@@ -176,6 +189,18 @@ class CheckstyleConfigConsistencyTest {
                 Map.of()),
             "valid/IdempotencyGoldenMain.java");
         assertEquals(0, violations.size(), "CompactableParameterList and MethodCallArguments must not conflict: " + format(violations));
+    }
+
+    @Test
+    void arrayInitWhitespaceChecksDoNotPingPong() throws Exception {
+        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+            Map.of(
+                WHITESPACE_AROUND_CHECK,
+                Map.of("tokens", WS_AROUND_TOKENS_NO_ARRAY_INIT),
+                NO_WS_AFTER_CHECK,
+                Map.of()),
+            "valid/IdempotencyGoldenMain.java");
+        assertEquals(0, violations.size(), "WhitespaceAround (ARRAY_INIT excluded) and NoWhitespaceAfter must not conflict on array init: " + format(violations));
     }
 
     @Test

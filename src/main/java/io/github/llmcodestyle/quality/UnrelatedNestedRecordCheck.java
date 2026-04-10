@@ -2,6 +2,7 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -82,13 +83,13 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
         if (objblock != null) {
             addDirectFieldAndMethodNames(objblock, names);
         }
-        addRecordComponentNames(outerType.findFirstToken(RECORD_COMPONENTS), names);
+        AstUtil.collectRecordComponentNames(outerType, names);
         return names;
     }
 
     private static Set<String> collectRecordOwnNames(DetailAST recordDef) {
         Set<String> names = new HashSet<>();
-        addRecordComponentNames(recordDef.findFirstToken(RECORD_COMPONENTS), names);
+        AstUtil.collectRecordComponentNames(recordDef, names);
         DetailAST objblock = recordDef.findFirstToken(OBJBLOCK);
         if (objblock != null) {
             collectDeclaredNames(objblock, names);
@@ -101,17 +102,6 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
             int type = child.getType();
             if (type == VARIABLE_DEF || type == METHOD_DEF) {
                 addIdentTo(child, names);
-            }
-        }
-    }
-
-    private static void addRecordComponentNames(DetailAST recordComponents, Set<String> names) {
-        if (recordComponents == null) {
-            return;
-        }
-        for (DetailAST comp = recordComponents.getFirstChild(); comp != null; comp = comp.getNextSibling()) {
-            if (comp.getType() == RECORD_COMPONENT_DEF) {
-                addIdentTo(comp, names);
             }
         }
     }

@@ -50,3 +50,4 @@ SplitDeclarationAssignmentCheck — merges declaration with later unconditional 
 IfReturnBooleanLiteralCheck — collapses if-return-literal pair to a single return of the condition, no cross-rule interaction
 RedundantConstantAliasCheck — flags static final aliases and same-class duplicate Pattern.compile, no cross-rule interaction
 TrivialSingleUsePrivateMethodCheck — flags private one-statement methods called from exactly one site, no cross-rule interaction
+MethodMayBeStaticCheck — flags private instance methods that never reference this/super or instance state, no cross-rule interaction

@@ -218,6 +218,7 @@
         <module name="io.github.llmcodestyle.quality.DuplicateRegexConstantCheck"/>
         <module name="io.github.llmcodestyle.quality.SpringBootMainVisibilityCheck"/>
         <module name="io.github.llmcodestyle.quality.UnrelatedNestedRecordCheck"/>
+        <module name="io.github.llmcodestyle.quality.MethodMayBeStaticCheck"/>
 
         <!-- Custom checks: simplify -->
         <module name="io.github.llmcodestyle.simplify.InlineRegexConstantCheck"/>

@@ -4,6 +4,8 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
+import java.util.Set;
+
 /**
  * Shared AST traversal utilities: package names, type nesting, modifiers, and line ranges.
  */
@@ -124,6 +126,25 @@ public final class AstUtil {
             child = child.getNextSibling();
         }
         return last;
+    }
+
+    /**
+     * Adds the names of all {@code RECORD_COMPONENT_DEF} children of {@code recordDef}
+     * into {@code names}. No-op if {@code recordDef} is not a record or has no components.
+     */
+    public static void collectRecordComponentNames(DetailAST recordDef, Set<String> names) {
+        DetailAST components = recordDef.findFirstToken(RECORD_COMPONENTS);
+        if (components == null) {
+            return;
+        }
+        for (DetailAST comp = components.getFirstChild(); comp != null; comp = comp.getNextSibling()) {
+            if (comp.getType() == RECORD_COMPONENT_DEF) {
+                DetailAST ident = comp.findFirstToken(IDENT);
+                if (ident != null) {
+                    names.add(ident.getText());
+                }
+            }
+        }
     }
 
     /**

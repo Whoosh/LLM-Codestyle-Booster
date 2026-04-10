@@ -25,11 +25,11 @@ src/main/java/io/github/llmcodestyle/
   layout/      — formatting rules (line wrap, chained calls, parameter lists, static-final order, blank lines after comments, array init spacing, static star imports)
   quality/     — code quality & test hygiene (test naming, coverage, unused members, util packaging, util-class naming, long literals, test-only delegates, repeated exception wrapping, duplicate regex constants, Spring Boot main visibility, unrelated nested records, may-be-static methods, duplicate method bodies)
   simplify/    — simplification suggestions (indexOf→contains, isEmpty, inline regex, single-use vars, collapsible concatenation, static import candidates, identical catch bodies, containsKey+get, Collections→List.of, conditional return→ternary, collapsible guard clauses, collapsible nested ifs, collapsible consecutive ifs, boolean-from-condition, split decl/assign, if-return boolean literal, redundant constant alias, trivial single-use private methods, commons-lang3 string constants)
-  utils/       — shared AST utilities (AstUtil, AstMethodCallUtil, AstAnnotationUtil, AstSingleUseUtil, AstQueryUtil)
+  utils/       — shared AST utilities (AstUtil, AstMethodCallUtil, AstAnnotationUtil, AstSingleUseUtil, AstQueryUtil) + shared Set constants (TYPE_DECL_TOKENS, CLASS_LIKE_TYPES) on AstUtil
 
 src/main/resources/io/github/llmcodestyle/
   config/
-    checkstyle.xml          — full Checkstyle config with all 49 custom + built-in checks
+    checkstyle.xml          — full Checkstyle config with all 50 custom + built-in checks
     pmd-ruleset.xml         — paranoid-mode PMD 7 ruleset
     spotbugs-exclude.xml    — SpotBugs/fb-contrib/findsecbugs exclusions
   packagenames.xml          — registers io.github.llmcodestyle for Checkstyle module lookup

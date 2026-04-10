@@ -2,11 +2,11 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstAnnotationUtil;
-import io.github.llmcodestyle.utils.AstSingleUseUtil;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
+import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,7 +92,7 @@ public class TrivialSingleUsePrivateMethodCheck extends AbstractCheck {
                 continue;
             }
             DetailAST methodDef = entry.getValue();
-            if (AstSingleUseUtil.countIdent(objBlock, name) - AstSingleUseUtil.countIdent(methodDef, name) == 1) {
+            if (countIdent(objBlock, name) - countIdent(methodDef, name) == 1) {
                 DetailAST ident = methodDef.findFirstToken(IDENT);
                 log(methodDef.getLineNo(), methodDef.getColumnNo(), MSG_KEY, ident != null ? ident.getText() : "?");
             }
@@ -111,10 +111,10 @@ public class TrivialSingleUsePrivateMethodCheck extends AbstractCheck {
     }
 
     private static boolean isBareUnannotatedPrivate(DetailAST methodDef) {
-        return AstUtil.hasModifier(methodDef, LITERAL_PRIVATE)
-            && !AstUtil.hasModifier(methodDef, ABSTRACT)
-            && !AstUtil.hasModifier(methodDef, LITERAL_NATIVE)
-            && !AstAnnotationUtil.hasAnnotationNamed(methodDef, "Override")
+        return hasModifier(methodDef, LITERAL_PRIVATE)
+            && !hasModifier(methodDef, ABSTRACT)
+            && !hasModifier(methodDef, LITERAL_NATIVE)
+            && !hasAnnotationNamed(methodDef, "Override")
             && !hasAnyAnnotation(methodDef)
             && methodDef.findFirstToken(TYPE_PARAMETERS) == null;
     }
@@ -171,7 +171,7 @@ public class TrivialSingleUsePrivateMethodCheck extends AbstractCheck {
             if (ident == null) {
                 continue;
             }
-            if (AstSingleUseUtil.countIdent(slist, ident.getText()) > 1) {
+            if (countIdent(slist, ident.getText()) > 1) {
                 return false;
             }
         }

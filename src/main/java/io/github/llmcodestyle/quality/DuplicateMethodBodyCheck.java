@@ -2,11 +2,11 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 import io.github.llmcodestyle.pojos.DuplicateMethodOccurrence;
-import io.github.llmcodestyle.utils.AstSingleUseUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static com.puppycrawl.tools.checkstyle.utils.TokenUtil.*;
+import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -110,7 +110,7 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
             return;
         }
         DetailAST slist = methodDef.findFirstToken(SLIST);
-        if (slist == null || AstSingleUseUtil.collectStatements(slist).size() < minStatements || countNodes(slist) > maxBodyNodes) {
+        if (slist == null || collectStatements(slist).size() < minStatements || countNodes(slist) > maxBodyNodes) {
             return;
         }
 
@@ -227,7 +227,7 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
         } else if (LITERAL_TOKENS.contains(type)) {
             sb.append(node.getText());
         } else {
-            sb.append(TokenUtil.getTokenName(type));
+            sb.append(getTokenName(type));
         }
         sb.append('|');
         for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {

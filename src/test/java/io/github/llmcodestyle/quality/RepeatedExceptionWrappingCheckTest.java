@@ -1,12 +1,12 @@
 package io.github.llmcodestyle.quality;
 
-import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
+import static io.github.llmcodestyle.utils.TestCheckSupportUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RepeatedExceptionWrappingCheckTest {
@@ -27,13 +27,10 @@ class RepeatedExceptionWrappingCheckTest {
     @Test
     void higherThresholdSuppressesViolations() throws Exception {
         new RepeatedExceptionWrappingCheck().setMinOccurrences(1);
-        assertTrue(TestCheckSupportUtil.runTreeWalkerCheck(
-            RepeatedExceptionWrappingCheck.class,
-            "quality/invalid/RepeatedExceptionWrappingInvalid.java",
-            Map.of("minOccurrences", "4")).isEmpty());
+        assertTrue(runTreeWalkerCheck(RepeatedExceptionWrappingCheck.class, "quality/invalid/RepeatedExceptionWrappingInvalid.java", Map.of("minOccurrences", "4")).isEmpty());
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {
-        return TestCheckSupportUtil.runTreeWalkerCheck(RepeatedExceptionWrappingCheck.class, resource, NO_PROPS);
+        return runTreeWalkerCheck(RepeatedExceptionWrappingCheck.class, resource, NO_PROPS);
     }
 }

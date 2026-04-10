@@ -1,13 +1,12 @@
 package io.github.llmcodestyle.quality;
 
-import io.github.llmcodestyle.utils.TestCheckSupportUtil;
-
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
+import static io.github.llmcodestyle.utils.TestCheckSupportUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UnusedPrivateMembersCheckTest {
@@ -16,15 +15,12 @@ class UnusedPrivateMembersCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/invalid/UnusedPrivateMembersInvalid.java", Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/invalid/UnusedPrivateMembersInvalid.java", Map.of());
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 2 unused private member violations, got: " + violations.size());
     }
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        assertTrue(
-            TestCheckSupportUtil.runTreeWalkerCheck(
-                UnusedPrivateMembersCheck.class, "quality/valid/UnusedPrivateMembersValid.java", Map.of()).isEmpty(),
-            "Expected no violations");
+        assertTrue(runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/valid/UnusedPrivateMembersValid.java", Map.of()).isEmpty(), "Expected no violations");
     }
 }

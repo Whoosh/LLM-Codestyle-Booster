@@ -2,9 +2,9 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 /**
  * Enforces naming conventions for two adjacent kinds of static-only classes:
@@ -63,7 +63,7 @@ public class UtilClassNamingCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST classDef) {
-        if (AstUtil.hasModifier(classDef, ABSTRACT) || isNonStaticNestedClass(classDef)) {
+        if (hasModifier(classDef, ABSTRACT) || isNonStaticNestedClass(classDef)) {
             return;
         }
         DetailAST nameIdent = classDef.findFirstToken(IDENT);
@@ -85,7 +85,7 @@ public class UtilClassNamingCheck extends AbstractCheck {
     }
 
     private static boolean isNonStaticNestedClass(DetailAST classDef) {
-        return AstUtil.isNestedType(classDef) && !AstUtil.hasModifier(classDef, LITERAL_STATIC);
+        return isNestedType(classDef) && !hasModifier(classDef, LITERAL_STATIC);
     }
 
     private void countMethods(DetailAST objBlock) {
@@ -97,10 +97,10 @@ public class UtilClassNamingCheck extends AbstractCheck {
                 continue;
             }
             totalMethods++;
-            if (AstUtil.hasModifier(child, LITERAL_STATIC)) {
+            if (hasModifier(child, LITERAL_STATIC)) {
                 staticMethods++;
             }
-            if (AstUtil.hasModifier(child, LITERAL_PUBLIC)) {
+            if (hasModifier(child, LITERAL_PUBLIC)) {
                 publicMethods++;
             }
         }

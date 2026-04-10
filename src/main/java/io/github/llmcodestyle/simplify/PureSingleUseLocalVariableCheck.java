@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstSingleUseUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
 import java.util.List;
 import java.util.Set;
@@ -86,7 +86,7 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
         if (!isEligibleBlock(ast)) {
             return;
         }
-        analyzeStatements(AstSingleUseUtil.collectStatements(ast));
+        analyzeStatements(collectStatements(ast));
     }
 
     private void analyzeStatements(List<DetailAST> statements) {
@@ -116,7 +116,7 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
 
         int totalUses = 0;
         for (int j = idx + 1; j < statements.size(); j++) {
-            totalUses += AstSingleUseUtil.countIdent(statements.get(j), varName);
+            totalUses += countIdent(statements.get(j), varName);
         }
         if (totalUses != 1 || isUsedInRepeatingContextFrom(statements, idx + 1, varName)) {
             return;
@@ -179,7 +179,7 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
 
     private static boolean isUsedInRepeatingContextFrom(List<DetailAST> statements, int startIdx, String varName) {
         for (int j = startIdx; j < statements.size(); j++) {
-            if (AstSingleUseUtil.isInsideRepeatingContext(statements.get(j), varName)) {
+            if (isInsideRepeatingContext(statements.get(j), varName)) {
                 return true;
             }
         }
@@ -196,6 +196,6 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
     }
 
     private static boolean isFlowBlock(int type) {
-        return AstSingleUseUtil.isLoopOrCondition(type) || AstSingleUseUtil.isExceptionBlock(type);
+        return isLoopOrCondition(type) || isExceptionBlock(type);
     }
 }

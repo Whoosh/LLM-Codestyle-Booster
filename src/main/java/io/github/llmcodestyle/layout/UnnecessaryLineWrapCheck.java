@@ -2,10 +2,10 @@ package io.github.llmcodestyle.layout;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
-import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.Set;
 
@@ -130,7 +130,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
 
         if (CONTAINER_OR_RECORD_DEFS.contains(type)) {
             DetailAST objBlock = ast.findFirstToken(OBJBLOCK);
-            return objBlock != null ? objBlock.getLineNo() : AstUtil.findLastLine(ast);
+            return objBlock != null ? objBlock.getLineNo() : findLastLine(ast);
         }
 
         if (type == LITERAL_TRY) {
@@ -138,12 +138,12 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
             return slist != null ? slist.getLineNo() : ast.getLineNo();
         }
 
-        return AstUtil.findLastLine(ast);
+        return findLastLine(ast);
     }
 
     private static boolean containsLongChain(DetailAST ast) {
         if (ast.getType() == METHOD_CALL) {
-            return AstMethodCallUtil.countMethodChain(ast) >= CHAIN_THRESHOLD;
+            return countMethodChain(ast) >= CHAIN_THRESHOLD;
         }
         DetailAST child = ast.getFirstChild();
         while (child != null) {
@@ -191,7 +191,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
         if (semi != null) {
             return semi.getLineNo();
         }
-        return AstUtil.findLastLine(def);
+        return findLastLine(def);
     }
 
     private static boolean isNestedInCheckedParent(DetailAST ast) {

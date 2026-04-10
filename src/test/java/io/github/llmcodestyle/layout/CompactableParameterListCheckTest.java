@@ -1,13 +1,12 @@
 package io.github.llmcodestyle.layout;
 
-import io.github.llmcodestyle.utils.TestCheckSupportUtil;
-
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
+import static io.github.llmcodestyle.utils.TestCheckSupportUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CompactableParameterListCheckTest {
@@ -17,17 +16,14 @@ class CompactableParameterListCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(
-            CompactableParameterListCheck.class,
-            "layout/invalid/CompactableParamInvalid.java",
-            Map.of("maxLineLength", "180"));
+        List<AuditEvent> violations = runTreeWalkerCheck(CompactableParameterListCheck.class, "layout/invalid/CompactableParamInvalid.java", Map.of("maxLineLength", "180"));
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 5 compactable parameter violations, got: " + violations.size());
     }
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
         assertTrue(
-            TestCheckSupportUtil.runTreeWalkerCheck(
+            runTreeWalkerCheck(
                 CompactableParameterListCheck.class,
                 "layout/valid/CompactableParamValid.java",
                 Map.of("maxLineLength", "180")).isEmpty(),
@@ -38,7 +34,7 @@ class CompactableParameterListCheckTest {
     void setMaxLineLengthAffectsThreshold() throws Exception {
         new CompactableParameterListCheck().setMaxLineLength(Integer.parseInt(SHORT_MAX_LINE));
         assertFalse(
-            TestCheckSupportUtil.runTreeWalkerCheck(
+            runTreeWalkerCheck(
                 CompactableParameterListCheck.class,
                 "layout/invalid/CompactableParamInvalid.java",
                 Map.of("maxLineLength", SHORT_MAX_LINE)).isEmpty(),

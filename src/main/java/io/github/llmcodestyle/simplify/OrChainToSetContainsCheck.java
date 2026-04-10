@@ -2,10 +2,10 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstMethodCallUtil;
-import io.github.llmcodestyle.utils.AstQueryUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,7 +109,7 @@ public class OrChainToSetContainsCheck extends AbstractCheck {
             }
             if (canonicalLhs == null) {
                 canonicalLhs = lhs;
-            } else if (!AstQueryUtil.structurallyEqual(canonicalLhs, lhs)) {
+            } else if (!structurallyEqual(canonicalLhs, lhs)) {
                 return null;
             }
         }
@@ -170,10 +170,10 @@ public class OrChainToSetContainsCheck extends AbstractCheck {
     private static String detectEqualsCallChain(List<DetailAST> operands) {
         String receiverName = null;
         for (DetailAST op : operands) {
-            if (op.getType() != METHOD_CALL || !"equals".equals(AstMethodCallUtil.extractMethodName(op))) {
+            if (op.getType() != METHOD_CALL || !"equals".equals(extractMethodName(op))) {
                 return null;
             }
-            String receiver = AstMethodCallUtil.extractReceiverName(op);
+            String receiver = extractReceiverName(op);
             if (receiver.isEmpty() || !isSingleStringLiteralArg(op)) {
                 return null;
             }

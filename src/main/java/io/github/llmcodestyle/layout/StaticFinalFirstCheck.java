@@ -2,9 +2,9 @@ package io.github.llmcodestyle.layout;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 /**
  * Ensures {@code static final} fields are declared before instance fields and constructors.
@@ -51,7 +51,7 @@ public class StaticFinalFirstCheck extends AbstractCheck {
                         DetailAST ident = child.findFirstToken(IDENT);
                         log(child.getLineNo(), child.getColumnNo(), MSG_KEY, ident != null ? ident.getText() : "?");
                     }
-                } else if (!AstUtil.hasModifier(child, LITERAL_STATIC)) {
+                } else if (!hasModifier(child, LITERAL_STATIC)) {
                     seenInstanceFieldOrCtor = true;
                 }
             } else if (child.getType() == CTOR_DEF) {
@@ -62,6 +62,6 @@ public class StaticFinalFirstCheck extends AbstractCheck {
     }
 
     private static boolean isStaticFinal(DetailAST variableDef) {
-        return AstUtil.hasModifier(variableDef, LITERAL_STATIC) && AstUtil.hasModifier(variableDef, FINAL);
+        return hasModifier(variableDef, LITERAL_STATIC) && hasModifier(variableDef, FINAL);
     }
 }

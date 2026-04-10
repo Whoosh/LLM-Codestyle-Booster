@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstQueryUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 
 /**
  * Detects if-else blocks where both branches are a single {@code return} of a simple expression.
@@ -37,7 +37,7 @@ public class ConditionalReturnToTernaryCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST ifAst) {
-        if (AstQueryUtil.isElseIf(ifAst)) {
+        if (isElseIf(ifAst)) {
             return;
         }
         DetailAST elseAst = ifAst.findFirstToken(LITERAL_ELSE);

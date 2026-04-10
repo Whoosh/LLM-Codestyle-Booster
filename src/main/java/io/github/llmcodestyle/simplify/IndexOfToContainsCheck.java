@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
 
 import java.util.Set;
 
@@ -68,7 +68,7 @@ public class IndexOfToContainsCheck extends AbstractCheck {
             return false;
         }
         DetailAST node = expr.getType() == EXPR ? expr.getFirstChild() : expr;
-        if (node == null || node.getType() != METHOD_CALL || !"indexOf".equals(AstMethodCallUtil.extractMethodName(node))) {
+        if (node == null || node.getType() != METHOD_CALL || !"indexOf".equals(extractMethodName(node))) {
             return false;
         }
         DetailAST elist = node.findFirstToken(ELIST);

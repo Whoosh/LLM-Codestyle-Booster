@@ -3,6 +3,7 @@ package io.github.llmcodestyle.utils;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 
 /**
  * Shared utilities for analysing {@code METHOD_CALL} AST nodes:
@@ -45,7 +46,7 @@ public final class AstMethodCallUtil {
      * Returns empty string if no arguments or first arg is not a simple IDENT.
      */
     public static String extractFirstArgText(DetailAST methodCall) {
-        return AstQueryUtil.findFirstTextInChain(methodCall, ELIST, EXPR, IDENT);
+        return findFirstTextInChain(methodCall, ELIST, EXPR, IDENT);
     }
 
     /**

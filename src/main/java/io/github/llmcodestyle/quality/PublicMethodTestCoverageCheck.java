@@ -3,9 +3,9 @@ package io.github.llmcodestyle.quality;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.pojos.MethodInfo;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.io.IOException;
@@ -93,15 +93,15 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
             return;
         }
         int type = ast.getType();
-        if (TOP_LEVEL_DECL_TOKENS.contains(type) && AstUtil.typeNestingDepth(ast) == 0) {
+        if (TOP_LEVEL_DECL_TOKENS.contains(type) && typeNestingDepth(ast) == 0) {
             DetailAST ident = ast.findFirstToken(IDENT);
             if (ident != null && className.isEmpty()) {
                 className = ident.getText();
             }
         }
-        if (type == INTERFACE_DEF && AstUtil.typeNestingDepth(ast) == 0) {
+        if (type == INTERFACE_DEF && typeNestingDepth(ast) == 0) {
             isInterface = true;
-        } else if (type == RECORD_DEF && AstUtil.typeNestingDepth(ast) == 0) {
+        } else if (type == RECORD_DEF && typeNestingDepth(ast) == 0) {
             collectRecordComponents(ast);
         } else if (type == METHOD_DEF) {
             collectMethodIfEligible(ast);
@@ -183,11 +183,11 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
     }
 
     private boolean isIneligibleByModifiers(DetailAST methodDef) {
-        return AstUtil.typeNestingDepth(methodDef) > 1
-            || AstUtil.hasModifier(methodDef, ABSTRACT)
-            || isInterface && !AstUtil.hasModifier(methodDef, LITERAL_DEFAULT)
-            || AstUtil.hasModifier(methodDef, LITERAL_PRIVATE)
-            || AstUtil.hasModifier(methodDef, LITERAL_PROTECTED);
+        return typeNestingDepth(methodDef) > 1
+            || hasModifier(methodDef, ABSTRACT)
+            || isInterface && !hasModifier(methodDef, LITERAL_DEFAULT)
+            || hasModifier(methodDef, LITERAL_PRIVATE)
+            || hasModifier(methodDef, LITERAL_PROTECTED);
     }
 
     private boolean isIneligibleByName(String name, DetailAST methodDef) {

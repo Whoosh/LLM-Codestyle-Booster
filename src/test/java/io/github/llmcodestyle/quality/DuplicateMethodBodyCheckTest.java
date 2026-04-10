@@ -1,12 +1,12 @@
 package io.github.llmcodestyle.quality;
 
-import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
+import static io.github.llmcodestyle.utils.TestCheckSupportUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DuplicateMethodBodyCheckTest {
@@ -82,16 +82,16 @@ class DuplicateMethodBodyCheckTest {
 
     @Test
     void tunedThresholdsRespected() throws Exception {
-        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(DuplicateMethodBodyCheck.class, INVALID_A, LOOSER_PROPS);
+        List<AuditEvent> violations = runTreeWalkerCheck(DuplicateMethodBodyCheck.class, INVALID_A, LOOSER_PROPS);
         assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("walkBorNode")), "2-statement methods skipped: " + format(violations));
     }
 
     private static List<AuditEvent> runSingle(String resource) throws Exception {
-        return TestCheckSupportUtil.runTreeWalkerCheck(DuplicateMethodBodyCheck.class, resource, NO_PROPS);
+        return runTreeWalkerCheck(DuplicateMethodBodyCheck.class, resource, NO_PROPS);
     }
 
     private static List<AuditEvent> runMulti(String... resources) throws Exception {
-        return TestCheckSupportUtil.runTreeWalkerCheckMultiFile(DuplicateMethodBodyCheck.class, List.of(resources), NO_PROPS);
+        return runTreeWalkerCheckMultiFile(DuplicateMethodBodyCheck.class, List.of(resources), NO_PROPS);
     }
 
     private static String format(List<AuditEvent> events) {

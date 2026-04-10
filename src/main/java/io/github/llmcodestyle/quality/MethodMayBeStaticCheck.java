@@ -2,11 +2,11 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstAnnotationUtil;
-import io.github.llmcodestyle.utils.AstQueryUtil;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -93,33 +93,30 @@ public class MethodMayBeStaticCheck extends AbstractCheck {
     private static boolean isNonStaticNestedClass(DetailAST typeDef) {
         // Records, enums, interfaces, and nested classes inside them are implicitly static
         // — only a CLASS_DEF can be a non-static inner class.
-        return AstUtil.isNestedType(typeDef) && typeDef.getType() == CLASS_DEF && !AstUtil.hasModifier(typeDef, LITERAL_STATIC);
+        return isNestedType(typeDef) && typeDef.getType() == CLASS_DEF && !hasModifier(typeDef, LITERAL_STATIC);
     }
 
     private static boolean isCandidate(DetailAST methodDef) {
-        if (!AstUtil.hasModifier(methodDef, LITERAL_PRIVATE)
-            || AstUtil.hasModifier(methodDef, LITERAL_STATIC)
-            || AstUtil.hasModifier(methodDef, ABSTRACT)
-            || AstUtil.hasModifier(methodDef, LITERAL_NATIVE)) {
+        if (!hasModifier(methodDef, LITERAL_PRIVATE) || hasModifier(methodDef, LITERAL_STATIC) || hasModifier(methodDef, ABSTRACT) || hasModifier(methodDef, LITERAL_NATIVE)) {
             return false;
         }
-        return !AstAnnotationUtil.hasAnnotationNamed(methodDef, "Override");
+        return !hasAnnotationNamed(methodDef, "Override");
     }
 
     private void collectScope(DetailAST typeDef, DetailAST objBlock) {
         for (DetailAST child = objBlock.getFirstChild(); child != null; child = child.getNextSibling()) {
             int type = child.getType();
-            if (type == VARIABLE_DEF && !AstUtil.hasModifier(child, LITERAL_STATIC)) {
-                AstQueryUtil.addIdentTo(child, instanceFields);
+            if (type == VARIABLE_DEF && !hasModifier(child, LITERAL_STATIC)) {
+                addIdentTo(child, instanceFields);
             } else if (type == METHOD_DEF) {
-                AstQueryUtil.addIdentTo(child, declaredMethods);
-                if (!AstUtil.hasModifier(child, LITERAL_STATIC)) {
-                    AstQueryUtil.addIdentTo(child, instanceMethods);
+                addIdentTo(child, declaredMethods);
+                if (!hasModifier(child, LITERAL_STATIC)) {
+                    addIdentTo(child, instanceMethods);
                 }
             }
         }
         if (typeDef.getType() == RECORD_DEF) {
-            AstUtil.collectRecordComponentNames(typeDef, instanceFields);
+            collectRecordComponentNames(typeDef, instanceFields);
         }
     }
 

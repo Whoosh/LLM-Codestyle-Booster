@@ -1,13 +1,12 @@
 package io.github.llmcodestyle.forbidden;
 
-import io.github.llmcodestyle.utils.TestCheckSupportUtil;
-
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
+import static io.github.llmcodestyle.utils.TestCheckSupportUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CommentedOutCodeCheckTest {
@@ -18,17 +17,14 @@ class CommentedOutCodeCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupportUtil.runFileSetCheck(
-            CommentedOutCodeCheck.class,
-            "forbidden/invalid/CommentedOutCodeInvalid.java",
-            Map.of("minConsecutiveLines", MIN_LINES_2));
+        List<AuditEvent> violations = runFileSetCheck(CommentedOutCodeCheck.class, "forbidden/invalid/CommentedOutCodeInvalid.java", Map.of("minConsecutiveLines", MIN_LINES_2));
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 3 commented-out code blocks, got: " + violations.size());
     }
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
         assertTrue(
-            TestCheckSupportUtil.runFileSetCheck(
+            runFileSetCheck(
                 CommentedOutCodeCheck.class,
                 "forbidden/valid/CommentedOutCodeValid.java",
                 Map.of("minConsecutiveLines", MIN_LINES_2)).isEmpty(),
@@ -39,7 +35,7 @@ class CommentedOutCodeCheckTest {
     void setMinConsecutiveLinesAffectsThreshold() throws Exception {
         new CommentedOutCodeCheck().setMinConsecutiveLines(Integer.parseInt(MIN_LINES_3));
         assertTrue(
-            TestCheckSupportUtil.runFileSetCheck(
+            runFileSetCheck(
                 CommentedOutCodeCheck.class,
                 "forbidden/invalid/CommentedOutCodeInvalid.java",
                 Map.of("minConsecutiveLines", MIN_LINES_3)).size() <= EXPECTED_VIOLATIONS,

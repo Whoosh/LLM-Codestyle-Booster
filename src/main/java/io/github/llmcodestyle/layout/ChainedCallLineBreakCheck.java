@@ -2,10 +2,10 @@ package io.github.llmcodestyle.layout;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
-import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 /**
  * Flags chained method calls (4+ dots) that are all on the same line.
@@ -43,13 +43,13 @@ public class ChainedCallLineBreakCheck extends AbstractCheck {
             return;
         }
 
-        int chainLength = AstMethodCallUtil.countMethodChain(ast);
+        int chainLength = countMethodChain(ast);
         if (chainLength < minChainLength) {
             return;
         }
 
         int firstLine = findFirstLine(ast);
-        if (firstLine == AstUtil.findLastLine(ast)) {
+        if (firstLine == findLastLine(ast)) {
             log(firstLine, MSG_KEY, chainLength);
         }
     }

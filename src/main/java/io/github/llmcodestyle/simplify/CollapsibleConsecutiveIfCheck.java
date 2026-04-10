@@ -2,10 +2,10 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstQueryUtil;
-import io.github.llmcodestyle.utils.AstSingleUseUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
+import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
 import java.util.List;
 import java.util.Set;
@@ -55,13 +55,13 @@ public class CollapsibleConsecutiveIfCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST slist) {
-        List<DetailAST> statements = AstSingleUseUtil.collectStatements(slist);
+        List<DetailAST> statements = collectStatements(slist);
         for (int i = 1; i < statements.size(); i++) {
             DetailAST prev = statements.get(i - 1);
             DetailAST current = statements.get(i);
             DetailAST prevBody = extractTerminatingBody(prev);
             DetailAST currentBody = extractTerminatingBody(current);
-            if (prevBody != null && currentBody != null && AstQueryUtil.structurallyEqual(prevBody, currentBody)) {
+            if (prevBody != null && currentBody != null && structurallyEqual(prevBody, currentBody)) {
                 log(current.getLineNo(), current.getColumnNo(), MSG_KEY, prev.getLineNo());
             }
         }
@@ -73,7 +73,7 @@ public class CollapsibleConsecutiveIfCheck extends AbstractCheck {
      * not a single terminating control-flow statement.
      */
     private static DetailAST extractTerminatingBody(DetailAST stmt) {
-        if (stmt.getType() != LITERAL_IF || stmt.findFirstToken(LITERAL_ELSE) != null || AstQueryUtil.isElseIf(stmt)) {
+        if (stmt.getType() != LITERAL_IF || stmt.findFirstToken(LITERAL_ELSE) != null || isElseIf(stmt)) {
             return null;
         }
         DetailAST rparen = stmt.findFirstToken(RPAREN);
@@ -97,7 +97,7 @@ public class CollapsibleConsecutiveIfCheck extends AbstractCheck {
         if (body.getType() != SLIST) {
             return body;
         }
-        List<DetailAST> inner = AstSingleUseUtil.collectStatements(body);
+        List<DetailAST> inner = collectStatements(body);
         return inner.size() == 1 ? inner.get(0) : null;
     }
 

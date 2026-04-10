@@ -2,9 +2,9 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstQueryUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.HashSet;
@@ -99,7 +99,7 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
         for (DetailAST child = objblock.getFirstChild(); child != null; child = child.getNextSibling()) {
             int type = child.getType();
             if (type == VARIABLE_DEF || type == METHOD_DEF) {
-                AstQueryUtil.addIdentTo(child, names);
+                addIdentTo(child, names);
             }
         }
     }
@@ -107,7 +107,7 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
     private static void collectDeclaredNames(DetailAST node, Set<String> names) {
         for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (DECL_NAME_TOKENS.contains(child.getType())) {
-                AstQueryUtil.addIdentTo(child, names);
+                addIdentTo(child, names);
             }
             collectDeclaredNames(child, names);
         }

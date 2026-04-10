@@ -2,9 +2,9 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 /**
  * Enforces that classes named {@code *Util} or {@code *Utils} reside in a package whose last segment is {@code utils}.
@@ -42,14 +42,14 @@ public class UtilClassInUtilsPackageCheck extends AbstractCheck {
     @Override
     public void visitToken(DetailAST ast) {
         if (ast.getType() == PACKAGE_DEF) {
-            currentPackage = AstUtil.extractPackageName(ast);
+            currentPackage = extractPackageName(ast);
         } else if (ast.getType() == CLASS_DEF) {
             checkClassPlacement(ast);
         }
     }
 
     private void checkClassPlacement(DetailAST classDef) {
-        if (AstUtil.isInnerClass(classDef)) {
+        if (isInnerClass(classDef)) {
             return;
         }
         DetailAST ident = classDef.findFirstToken(IDENT);

@@ -2,10 +2,10 @@ package io.github.llmcodestyle.forbidden;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
-import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 /**
  * Forbids {@code System.out/err} calls in production source. Exempt: Main/Application/Test classes and batch packages.
@@ -57,9 +57,9 @@ public class NoSystemOutInProductionCheck extends AbstractCheck {
     @Override
     public void visitToken(DetailAST ast) {
         if (ast.getType() == PACKAGE_DEF) {
-            pkgName = AstUtil.extractPackageName(ast);
+            pkgName = extractPackageName(ast);
         } else if (ast.getType() == CLASS_DEF) {
-            if (!AstUtil.isInnerClass(ast)) {
+            if (!isInnerClass(ast)) {
                 DetailAST ident = ast.findFirstToken(IDENT);
                 if (ident != null) {
                     simpleClassName = ident.getText();
@@ -97,7 +97,7 @@ public class NoSystemOutInProductionCheck extends AbstractCheck {
     }
 
     private static boolean isSystemOutOrErrCall(DetailAST methodCall) {
-        String methodName = AstMethodCallUtil.extractMethodName(methodCall);
+        String methodName = extractMethodName(methodCall);
         if (!"println".equals(methodName) && !"print".equals(methodName) && !"printf".equals(methodName) && !"format".equals(methodName)) {
             return false;
         }

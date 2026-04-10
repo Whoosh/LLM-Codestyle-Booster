@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstSingleUseUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
 import java.util.List;
 import java.util.Set;
@@ -48,7 +48,7 @@ public class CollapsibleGuardClauseCheck extends AbstractCheck {
         if (!isMethodOrCtorBody(slist)) {
             return;
         }
-        List<DetailAST> stmts = AstSingleUseUtil.collectStatements(slist);
+        List<DetailAST> stmts = collectStatements(slist);
         if (stmts.size() != 2) {
             return;
         }
@@ -80,7 +80,7 @@ public class CollapsibleGuardClauseCheck extends AbstractCheck {
         if (body.getType() != SLIST) {
             return false;
         }
-        List<DetailAST> innerStmts = AstSingleUseUtil.collectStatements(body);
+        List<DetailAST> innerStmts = collectStatements(body);
         if (innerStmts.size() != 1) {
             return false;
         }

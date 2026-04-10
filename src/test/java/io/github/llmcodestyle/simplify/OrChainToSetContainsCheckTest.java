@@ -1,12 +1,12 @@
 package io.github.llmcodestyle.simplify;
 
-import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
+import static io.github.llmcodestyle.utils.TestCheckSupportUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OrChainToSetContainsCheckTest {
@@ -27,7 +27,7 @@ class OrChainToSetContainsCheckTest {
     @Test
     void thresholdIsConfigurable() throws Exception {
         assertFalse(
-            TestCheckSupportUtil.runTreeWalkerCheck(OrChainToSetContainsCheck.class, "simplify/valid/OrChainToSetContainsValid.java", Map.of("minOperands", "2")).isEmpty(),
+            runTreeWalkerCheck(OrChainToSetContainsCheck.class, "simplify/valid/OrChainToSetContainsValid.java", Map.of("minOperands", "2")).isEmpty(),
             "minOperands=2 should flag 2-operand chains that are normally skipped");
     }
 
@@ -39,6 +39,6 @@ class OrChainToSetContainsCheckTest {
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {
-        return TestCheckSupportUtil.runTreeWalkerCheck(OrChainToSetContainsCheck.class, resource, NO_PROPS);
+        return runTreeWalkerCheck(OrChainToSetContainsCheck.class, resource, NO_PROPS);
     }
 }

@@ -2,9 +2,9 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstAnnotationUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
 
 /**
  * Enforces camelCase naming for test methods annotated with JUnit/Jupiter test annotations. Runs alongside built-in MethodName check for targeted test guidance.
@@ -34,7 +34,7 @@ public class TestMethodNameCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST ast) {
-        if (!AstAnnotationUtil.hasAnyAnnotationNamed(ast, "Test", "ParameterizedTest", "RepeatedTest", "TestFactory")) {
+        if (!hasAnyAnnotationNamed(ast, "Test", "ParameterizedTest", "RepeatedTest", "TestFactory")) {
             return;
         }
         DetailAST ident = ast.findFirstToken(IDENT);

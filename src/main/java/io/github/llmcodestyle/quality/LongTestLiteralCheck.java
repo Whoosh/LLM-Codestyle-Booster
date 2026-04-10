@@ -2,9 +2,9 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstAnnotationUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
 
 /**
  * Flags long string literals in test method bodies. Strings longer than {@code maxLength} (default 30) should be extracted to resources.
@@ -60,7 +60,7 @@ public class LongTestLiteralCheck extends AbstractCheck {
         DetailAST parent = ast.getParent();
         while (parent != null) {
             if (parent.getType() == METHOD_DEF) {
-                return AstAnnotationUtil.hasAnyAnnotationNamed(parent, "Test", "ParameterizedTest", "RepeatedTest", "TestFactory", "MethodSource");
+                return hasAnyAnnotationNamed(parent, "Test", "ParameterizedTest", "RepeatedTest", "TestFactory", "MethodSource");
             }
             parent = parent.getParent();
         }

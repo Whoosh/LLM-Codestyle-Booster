@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.Map;
 
@@ -75,10 +75,10 @@ public class CommonsLang3StringConstantCheck extends AbstractCheck {
 
     private static boolean isStaticFinalStringField(DetailAST varDef) {
         DetailAST parent = varDef.getParent();
-        if (parent == null || parent.getType() != OBJBLOCK || !AstUtil.hasModifier(varDef, LITERAL_STATIC) || !AstUtil.hasModifier(varDef, FINAL)) {
+        if (parent == null || parent.getType() != OBJBLOCK || !hasModifier(varDef, LITERAL_STATIC) || !hasModifier(varDef, FINAL)) {
             return false;
         }
-        return "String".equals(AstUtil.extractTypeName(varDef));
+        return "String".equals(extractTypeName(varDef));
     }
 
     private static String stringLiteralInitText(DetailAST varDef) {

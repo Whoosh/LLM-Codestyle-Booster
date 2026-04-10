@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstSingleUseUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
 import java.util.List;
 
@@ -91,7 +91,7 @@ public class IfReturnBooleanLiteralCheck extends AbstractCheck {
         if (body.getType() != SLIST) {
             return 0;
         }
-        List<DetailAST> innerStmts = AstSingleUseUtil.collectStatements(body);
+        List<DetailAST> innerStmts = collectStatements(body);
         if (innerStmts.size() != 1) {
             return 0;
         }

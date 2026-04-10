@@ -137,12 +137,7 @@ public class StaticImportCandidateCheck extends AbstractCheck {
         }
         String className = left.getText();
         String memberName = right.getText();
-        if (className.isEmpty() || !Character.isUpperCase(className.charAt(0))) {
-            return;
-        }
-        boolean isConstant = isUpperCaseConstant(memberName);
-        boolean isUtilMethodCall = isUtilClassName(className) && isInsideMethodCall(dot);
-        if (!isConstant && !isUtilMethodCall) {
+        if (className.isEmpty() || !Character.isUpperCase(className.charAt(0)) || !(isUpperCaseConstant(memberName) || isUtilClassName(className) && isInsideMethodCall(dot))) {
             return;
         }
         String key = className + "." + memberName;

@@ -1,12 +1,12 @@
 package io.github.llmcodestyle.quality;
 
-import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
+import static io.github.llmcodestyle.utils.TestCheckSupportUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UtilClassNamingCheckTest {
@@ -25,6 +25,6 @@ class UtilClassNamingCheckTest {
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {
-        return TestCheckSupportUtil.runTreeWalkerCheck(UtilClassNamingCheck.class, resource, NO_PROPS);
+        return runTreeWalkerCheck(UtilClassNamingCheck.class, resource, NO_PROPS);
     }
 }

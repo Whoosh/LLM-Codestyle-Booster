@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
 
 import java.util.Set;
 
@@ -71,7 +71,7 @@ public class UseIsEmptyCheck extends AbstractCheck {
         if (n == null || n.getType() != METHOD_CALL) {
             return false;
         }
-        String name = AstMethodCallUtil.extractMethodName(n);
+        String name = extractMethodName(n);
         if (!"length".equals(name) && !"size".equals(name)) {
             return false;
         }
@@ -84,7 +84,7 @@ public class UseIsEmptyCheck extends AbstractCheck {
         if (n == null || n.getType() != METHOD_CALL) {
             return "?";
         }
-        String name = AstMethodCallUtil.extractMethodName(n);
+        String name = extractMethodName(n);
         return name.isEmpty() ? "?" : name;
     }
 

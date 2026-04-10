@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstSingleUseUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class BooleanFromConditionCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST slist) {
-        List<DetailAST> stmts = AstSingleUseUtil.collectStatements(slist);
+        List<DetailAST> stmts = collectStatements(slist);
         for (int i = 0; i < stmts.size() - 1; i++) {
             DetailAST decl = stmts.get(i);
             String varName = booleanLiteralVarName(decl);
@@ -109,7 +109,7 @@ public class BooleanFromConditionCheck extends AbstractCheck {
         if (body.getType() != SLIST) {
             return null;
         }
-        List<DetailAST> innerStmts = AstSingleUseUtil.collectStatements(body);
+        List<DetailAST> innerStmts = collectStatements(body);
         return innerStmts.size() == 1 ? innerStmts.get(0) : null;
     }
 

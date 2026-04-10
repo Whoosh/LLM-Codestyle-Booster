@@ -24,11 +24,11 @@ import io.github.llmcodestyle.simplify.StaticImportCandidateCheck;
 import io.github.llmcodestyle.simplify.TrivialSingleUsePrivateMethodCheck;
 import io.github.llmcodestyle.simplify.UseIsEmptyCheck;
 import io.github.llmcodestyle.quality.DuplicateMethodBodyCheck;
-import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 
 import java.util.List;
 import java.util.Map;
 
+import static io.github.llmcodestyle.utils.TestCheckSupportUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -101,19 +101,19 @@ class AsymptoticSafetyTest {
 
     @Test
     void singleUseCheckDoesNotFlagLoopCachedVariables() throws Exception {
-        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(SingleUseLocalVariableCheck.class, TRAPS_FILE, Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(SingleUseLocalVariableCheck.class, TRAPS_FILE, Map.of());
         assertTrue(violations.isEmpty(), "SingleUseLocalVariableCheck must not flag loop-cached variables (" + violations.size() + " violations): " + format(violations));
     }
 
     @Test
     void pureSingleUseCheckDoesNotFlagLoopCachedVariables() throws Exception {
-        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, TRAPS_FILE, Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, TRAPS_FILE, Map.of());
         assertTrue(violations.isEmpty(), "PureSingleUseLocalVariableCheck must not flag loop-cached variables (" + violations.size() + " violations): " + format(violations));
     }
 
     @Test
     void bothChecksTogetherProduceZeroOnTraps() throws Exception {
-        List<AuditEvent> violations = TestCheckSupportUtil.runMultipleTreeWalkerChecks(
+        List<AuditEvent> violations = runMultipleTreeWalkerChecks(
             Map.of(
                 SingleUseLocalVariableCheck.class.getName(),
                 Map.of(),

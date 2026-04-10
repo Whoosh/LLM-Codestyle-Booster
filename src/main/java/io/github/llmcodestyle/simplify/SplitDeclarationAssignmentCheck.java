@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstSingleUseUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
 import java.util.List;
 import java.util.Set;
@@ -59,7 +59,7 @@ public class SplitDeclarationAssignmentCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST slist) {
-        List<DetailAST> stmts = AstSingleUseUtil.collectStatements(slist);
+        List<DetailAST> stmts = collectStatements(slist);
         for (int i = 0; i < stmts.size(); i++) {
             DetailAST stmt = stmts.get(i);
             String varName = uninitializedVarName(stmt);
@@ -89,7 +89,7 @@ public class SplitDeclarationAssignmentCheck extends AbstractCheck {
             if (isPlainAssignmentTo(candidate, varName)) {
                 return true;
             }
-            if (AstSingleUseUtil.countIdent(candidate, varName) > 0) {
+            if (countIdent(candidate, varName) > 0) {
                 return false;
             }
         }

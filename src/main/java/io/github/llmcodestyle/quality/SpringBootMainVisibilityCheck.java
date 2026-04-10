@@ -2,10 +2,10 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstAnnotationUtil;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 /**
  * Enforces that {@code @SpringBootApplication} classes declare a {@code public static void main(String[])}.
@@ -50,7 +50,7 @@ public class SpringBootMainVisibilityCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST classDef) {
-        if (!AstAnnotationUtil.hasAnnotationNamed(classDef, SPRING_BOOT_APPLICATION)) {
+        if (!hasAnnotationNamed(classDef, SPRING_BOOT_APPLICATION)) {
             return;
         }
         DetailAST classBody = classDef.findFirstToken(OBJBLOCK);
@@ -64,10 +64,10 @@ public class SpringBootMainVisibilityCheck extends AbstractCheck {
             log(classDef.getLineNo(), classDef.getColumnNo(), MSG_MISSING, className);
             return;
         }
-        if (!AstUtil.hasModifier(mainMethod, LITERAL_STATIC)) {
+        if (!hasModifier(mainMethod, LITERAL_STATIC)) {
             log(mainMethod.getLineNo(), mainMethod.getColumnNo(), MSG_NOT_STATIC, className);
         }
-        if (!AstUtil.hasModifier(mainMethod, LITERAL_PUBLIC)) {
+        if (!hasModifier(mainMethod, LITERAL_PUBLIC)) {
             log(mainMethod.getLineNo(), mainMethod.getColumnNo(), MSG_NOT_PUBLIC, className);
         }
     }

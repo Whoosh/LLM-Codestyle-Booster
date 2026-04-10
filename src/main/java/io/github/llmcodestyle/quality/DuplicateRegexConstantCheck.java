@@ -129,8 +129,7 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
         }
         DetailAST target = dot.getFirstChild();
         DetailAST method = dot.getLastChild();
-        return target != null && PATTERN_TYPE.equals(target.getText())
-            && method != null && "compile".equals(method.getText());
+        return target != null && PATTERN_TYPE.equals(target.getText()) && method != null && "compile".equals(method.getText());
     }
 
     private static String extractConstName(DetailAST variableDef) {

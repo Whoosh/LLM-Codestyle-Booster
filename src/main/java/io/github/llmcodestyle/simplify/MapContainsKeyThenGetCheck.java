@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
 
 /**
  * Detects {@code if (map.containsKey(key)) ... map.get(key)} pattern.
@@ -43,8 +43,8 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
         if (containsCall == null) {
             return;
         }
-        String receiver = AstMethodCallUtil.extractReceiverName(containsCall);
-        String keyArg = AstMethodCallUtil.extractFirstArgText(containsCall);
+        String receiver = extractReceiverName(containsCall);
+        String keyArg = extractFirstArgText(containsCall);
         if (receiver.isEmpty() || keyArg.isEmpty()) {
             return;
         }
@@ -54,7 +54,7 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
     }
 
     private static DetailAST findContainsKeyCall(DetailAST node) {
-        if (node.getType() == METHOD_CALL && "containsKey".equals(AstMethodCallUtil.extractMethodName(node))) {
+        if (node.getType() == METHOD_CALL && "containsKey".equals(extractMethodName(node))) {
             return node;
         }
         for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
@@ -88,9 +88,9 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
     }
 
     private static boolean isGetCallOnReceiver(DetailAST methodCall, String receiver, String keyArg) {
-        if (!"get".equals(AstMethodCallUtil.extractMethodName(methodCall))) {
+        if (!"get".equals(extractMethodName(methodCall))) {
             return false;
         }
-        return receiver.equals(AstMethodCallUtil.extractReceiverName(methodCall)) && keyArg.equals(AstMethodCallUtil.extractFirstArgText(methodCall));
+        return receiver.equals(extractReceiverName(methodCall)) && keyArg.equals(extractFirstArgText(methodCall));
     }
 }

@@ -2,9 +2,9 @@ package io.github.llmcodestyle.layout;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 /**
  * Flags multi-line parameter lists where a continuation line could be packed onto the previous line.
@@ -50,7 +50,7 @@ public class CompactableParameterListCheck extends AbstractCheck {
             return;
         }
         int firstLine = params.getLineNo();
-        int lastLine = AstUtil.findLastLine(params);
+        int lastLine = findLastLine(params);
         if (firstLine >= lastLine) {
             return;
         }

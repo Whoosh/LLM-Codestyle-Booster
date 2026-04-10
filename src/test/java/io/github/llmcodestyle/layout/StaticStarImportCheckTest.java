@@ -1,13 +1,12 @@
 package io.github.llmcodestyle.layout;
 
-import io.github.llmcodestyle.utils.TestCheckSupportUtil;
-
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
+import static io.github.llmcodestyle.utils.TestCheckSupportUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StaticStarImportCheckTest {
@@ -32,6 +31,6 @@ class StaticStarImportCheckTest {
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {
-        return TestCheckSupportUtil.runTreeWalkerCheck(StaticStarImportCheck.class, resource, NO_PROPS);
+        return runTreeWalkerCheck(StaticStarImportCheck.class, resource, NO_PROPS);
     }
 }

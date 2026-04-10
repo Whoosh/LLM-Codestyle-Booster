@@ -2,10 +2,10 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstAnnotationUtil;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +47,7 @@ public class TestOnlyDelegateCheck extends AbstractCheck {
 
         DetailAST child = objBlock.getFirstChild();
         while (child != null) {
-            if (child.getType() == METHOD_DEF && !AstUtil.hasModifier(child, LITERAL_PRIVATE) && !AstAnnotationUtil.hasAnnotationNamed(child, "Override")) {
+            if (child.getType() == METHOD_DEF && !hasModifier(child, LITERAL_PRIVATE) && !hasAnnotationNamed(child, "Override")) {
                 checkForThinDelegate(child, privateMethods);
             }
             child = child.getNextSibling();
@@ -130,7 +130,7 @@ public class TestOnlyDelegateCheck extends AbstractCheck {
         Set<String> names = new HashSet<>();
         DetailAST child = objBlock.getFirstChild();
         while (child != null) {
-            if (child.getType() == METHOD_DEF && AstUtil.hasModifier(child, LITERAL_PRIVATE)) {
+            if (child.getType() == METHOD_DEF && hasModifier(child, LITERAL_PRIVATE)) {
                 DetailAST ident = child.findFirstToken(IDENT);
                 if (ident != null) {
                     names.add(ident.getText());

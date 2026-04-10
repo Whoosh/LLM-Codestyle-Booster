@@ -2,9 +2,9 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 /**
  * Enforces test class naming: top-level classes must end in {@code Test}/{@code SlowTest}, start with {@code Test}/{@code Abstract}, or be inner.
@@ -36,7 +36,7 @@ public class TestClassNamingCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST ast) {
-        if (AstUtil.isInnerClass(ast)) {
+        if (isInnerClass(ast)) {
             return;
         }
         DetailAST ident = ast.findFirstToken(IDENT);

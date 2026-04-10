@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstSingleUseUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
 import java.util.List;
 import java.util.Set;
@@ -45,7 +45,7 @@ public class SingleUseLocalVariableCheck extends AbstractCheck {
     }
 
     private void checkBlock(DetailAST slist) {
-        List<DetailAST> statements = AstSingleUseUtil.collectStatements(slist);
+        List<DetailAST> statements = collectStatements(slist);
         for (int i = 0; i < statements.size() - 1; i++) {
             DetailAST stmt = statements.get(i);
             if (stmt.getType() != VARIABLE_DEF || stmt.findFirstToken(ASSIGN) == null) {
@@ -58,17 +58,17 @@ public class SingleUseLocalVariableCheck extends AbstractCheck {
             String varName = ident.getText();
             DetailAST nextStmt = statements.get(i + 1);
 
-            int refsInNext = AstSingleUseUtil.countIdent(nextStmt, varName);
+            int refsInNext = countIdent(nextStmt, varName);
             if (refsInNext == 0) {
                 continue;
             }
 
             int totalRefs = 0;
             for (int j = i + 1; j < statements.size(); j++) {
-                totalRefs += AstSingleUseUtil.countIdent(statements.get(j), varName);
+                totalRefs += countIdent(statements.get(j), varName);
             }
 
-            if (totalRefs == 1 && refsInNext == 1 && !AstSingleUseUtil.isInsideRepeatingContext(nextStmt, varName) && !containsIdentInNestedBlock(nextStmt, varName, false)) {
+            if (totalRefs == 1 && refsInNext == 1 && !isInsideRepeatingContext(nextStmt, varName) && !containsIdentInNestedBlock(nextStmt, varName, false)) {
                 log(stmt.getLineNo(), stmt.getColumnNo(), MSG_KEY, varName);
             }
         }
@@ -99,6 +99,6 @@ public class SingleUseLocalVariableCheck extends AbstractCheck {
     }
 
     private static boolean isControlFlowParent(int type) {
-        return AstSingleUseUtil.isLoopOrCondition(type) || AstSingleUseUtil.isExceptionBlock(type);
+        return isLoopOrCondition(type) || isExceptionBlock(type);
     }
 }

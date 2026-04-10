@@ -51,7 +51,7 @@ public class BooleanFromConditionCheck extends AbstractCheck {
         for (int i = 0; i < stmts.size() - 1; i++) {
             DetailAST decl = stmts.get(i);
             String varName = booleanLiteralVarName(decl);
-            if (varName != null && isFlipAssignmentIf(stmts.get(i + 1), varName, oppositeLiteral(decl))) {
+            if (varName != null && isFlipAssignmentIf(stmts.get(i + 1), varName, literalKindOfInit(decl) == LITERAL_TRUE ? LITERAL_FALSE : LITERAL_TRUE)) {
                 log(decl.getLineNo(), decl.getColumnNo(), MSG_KEY, varName);
             }
         }
@@ -88,10 +88,6 @@ public class BooleanFromConditionCheck extends AbstractCheck {
         }
         DetailAST expr = assign.findFirstToken(EXPR);
         return expr == null ? null : expr.getFirstChild();
-    }
-
-    private static int oppositeLiteral(DetailAST decl) {
-        return literalKindOfInit(decl) == LITERAL_TRUE ? LITERAL_FALSE : LITERAL_TRUE;
     }
 
     private static boolean isFlipAssignmentIf(DetailAST stmt, String varName, int expectedLiteralType) {

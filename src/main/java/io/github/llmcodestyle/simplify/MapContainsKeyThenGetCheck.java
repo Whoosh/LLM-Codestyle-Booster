@@ -54,7 +54,7 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
     }
 
     private static DetailAST findContainsKeyCall(DetailAST node) {
-        if (node.getType() == METHOD_CALL && isContainsKeyCall(node)) {
+        if (node.getType() == METHOD_CALL && "containsKey".equals(AstMethodCallUtil.extractMethodName(node))) {
             return node;
         }
         for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
@@ -64,10 +64,6 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
             }
         }
         return null;
-    }
-
-    private static boolean isContainsKeyCall(DetailAST methodCall) {
-        return "containsKey".equals(AstMethodCallUtil.extractMethodName(methodCall));
     }
 
     private static boolean containsGetCallOnSameReceiver(DetailAST ifAst, String receiver, String keyArg) {

@@ -60,11 +60,7 @@ public class IndexOfToContainsCheck extends AbstractCheck {
     }
 
     private static boolean isValidComparisonReversed(int opType, DetailAST literal) {
-        return isZeroComparisonReversed(opType, literal) || isMinusOneComparisonReversed(opType, literal);
-    }
-
-    private static boolean isZeroComparisonReversed(int opType, DetailAST literal) {
-        return isZero(literal) && opType == GT;
+        return isZero(literal) && opType == GT || isMinusOneComparisonReversed(opType, literal);
     }
 
     private static boolean isMinusOneComparisonReversed(int opType, DetailAST literal) {
@@ -79,7 +75,7 @@ public class IndexOfToContainsCheck extends AbstractCheck {
         if (node == null || node.getType() != METHOD_CALL) {
             return false;
         }
-        if (!isIndexOfMethodName(node)) {
+        if (!"indexOf".equals(AstMethodCallUtil.extractMethodName(node))) {
             return false;
         }
         DetailAST elist = node.findFirstToken(ELIST);
@@ -87,10 +83,6 @@ public class IndexOfToContainsCheck extends AbstractCheck {
             return false;
         }
         return isValidIndexOfArgument(elist.findFirstToken(EXPR));
-    }
-
-    private static boolean isIndexOfMethodName(DetailAST methodCall) {
-        return "indexOf".equals(AstMethodCallUtil.extractMethodName(methodCall));
     }
 
     private static boolean isValidIndexOfArgument(DetailAST firstExpr) {

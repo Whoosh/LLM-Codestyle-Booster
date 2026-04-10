@@ -43,7 +43,7 @@ public class ConditionalReturnToTernaryCheck extends AbstractCheck {
         if (elseAst == null) {
             return;
         }
-        if (hasElseIf(elseAst)) {
+        if (elseAst.findFirstToken(LITERAL_IF) != null) {
             return;
         }
         DetailAST ifReturn = findSingleReturn(ifAst.findFirstToken(SLIST));
@@ -59,10 +59,6 @@ public class ConditionalReturnToTernaryCheck extends AbstractCheck {
     private static boolean isElseIf(DetailAST ifAst) {
         DetailAST parent = ifAst.getParent();
         return parent != null && parent.getType() == LITERAL_ELSE;
-    }
-
-    private static boolean hasElseIf(DetailAST elseAst) {
-        return elseAst.findFirstToken(LITERAL_IF) != null;
     }
 
     private static DetailAST findSingleReturn(DetailAST slist) {

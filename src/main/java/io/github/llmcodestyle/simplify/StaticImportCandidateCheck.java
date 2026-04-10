@@ -79,13 +79,6 @@ public class StaticImportCandidateCheck extends AbstractCheck {
         }
     }
 
-    private String findWinner(String constantName) {
-        return collectCandidates(constantName).entrySet().stream()
-            .max(Map.Entry.comparingByValue())
-            .map(Map.Entry::getKey)
-            .orElse(null);
-    }
-
     private Map<String, Integer> collectCandidates(String constantName) {
         Map<String, Integer> result = new HashMap<>();
         for (Map.Entry<String, Integer> entry : qualifiedRefs.entrySet()) {
@@ -95,6 +88,13 @@ public class StaticImportCandidateCheck extends AbstractCheck {
             }
         }
         return result;
+    }
+
+    private String findWinner(String constantName) {
+        return collectCandidates(constantName).entrySet().stream()
+            .max(Map.Entry.comparingByValue())
+            .map(Map.Entry::getKey)
+            .orElse(null);
     }
 
     private void recordStaticImport(DetailAST staticImportAst) {

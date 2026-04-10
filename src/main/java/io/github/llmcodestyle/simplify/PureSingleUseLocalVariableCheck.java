@@ -83,11 +83,7 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
         if (!isEligibleBlock(ast)) {
             return;
         }
-        analyzeBlock(ast);
-    }
-
-    private void analyzeBlock(DetailAST slist) {
-        analyzeStatements(AstSingleUseUtil.collectStatements(slist));
+        analyzeStatements(AstSingleUseUtil.collectStatements(ast));
     }
 
     private void analyzeStatements(List<DetailAST> statements) {
@@ -111,7 +107,7 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
         }
         String varName = ident.getText();
 
-        if (countIdentDirect(statements.get(idx + 1), varName) > 0) {
+        if (countIdentExcludingNested(statements.get(idx + 1), varName, false) > 0) {
             return;
         }
 
@@ -176,10 +172,6 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
     /**
      * Count IDENT uses NOT inside nested SLIST blocks — top-level uses only.
      */
-    private static int countIdentDirect(DetailAST root, String name) {
-        return countIdentExcludingNested(root, name, false);
-    }
-
     private static int countIdentExcludingNested(DetailAST node, String name, boolean insideNested) {
         if (insideNested) {
             return 0;

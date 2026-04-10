@@ -69,14 +69,10 @@ public class SingleUseLocalVariableCheck extends AbstractCheck {
                 totalRefs += AstSingleUseUtil.countIdent(statements.get(j), varName);
             }
 
-            if (totalRefs == 1 && refsInNext == 1 && !AstSingleUseUtil.isInsideRepeatingContext(nextStmt, varName) && !isInsideNestedBlock(nextStmt, varName)) {
+            if (totalRefs == 1 && refsInNext == 1 && !AstSingleUseUtil.isInsideRepeatingContext(nextStmt, varName) && !containsIdentInNestedBlock(nextStmt, varName, false)) {
                 log(stmt.getLineNo(), stmt.getColumnNo(), MSG_KEY, varName);
             }
         }
-    }
-
-    private static boolean isInsideNestedBlock(DetailAST statement, String varName) {
-        return containsIdentInNestedBlock(statement, varName, false);
     }
 
     private static boolean containsIdentInNestedBlock(DetailAST node, String varName, boolean insideBlock) {

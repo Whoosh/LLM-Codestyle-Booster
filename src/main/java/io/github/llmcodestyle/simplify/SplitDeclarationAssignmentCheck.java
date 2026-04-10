@@ -86,7 +86,7 @@ public class SplitDeclarationAssignmentCheck extends AbstractCheck {
     private static boolean findCleanAssignmentBetween(List<DetailAST> stmts, int from, String varName) {
         for (int j = from; j < stmts.size(); j++) {
             DetailAST candidate = stmts.get(j);
-            if (isControlFlowStmt(candidate)) {
+            if (CONTROL_FLOW_TYPES.contains(candidate.getType())) {
                 return false;
             }
             if (isPlainAssignmentTo(candidate, varName)) {
@@ -97,10 +97,6 @@ public class SplitDeclarationAssignmentCheck extends AbstractCheck {
             }
         }
         return false;
-    }
-
-    private static boolean isControlFlowStmt(DetailAST stmt) {
-        return CONTROL_FLOW_TYPES.contains(stmt.getType());
     }
 
     private static boolean isPlainAssignmentTo(DetailAST stmt, String varName) {

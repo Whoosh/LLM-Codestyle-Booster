@@ -6,6 +6,7 @@ import io.github.llmcodestyle.pojos.RegexConstantOccurrence;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -106,53 +107,30 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
     }
 
     private static String extractStringLiteral(DetailAST variableDef) {
-        DetailAST assign = variableDef.findFirstToken(ASSIGN);
-        if (assign == null) {
-            return null;
-        }
-        DetailAST expr = assign.findFirstToken(EXPR);
-        if (expr == null) {
-            return null;
-        }
-        DetailAST literal = expr.findFirstToken(STRING_LITERAL);
-        return literal != null ? literal.getText() : null;
+        String literal = findFirstTextInChain(variableDef, ASSIGN, EXPR, STRING_LITERAL);
+        return literal.isEmpty() ? null : literal;
     }
 
     private static String extractPatternCompileArg(DetailAST variableDef) {
         DetailAST assign = variableDef.findFirstToken(ASSIGN);
-        if (assign == null) {
+        DetailAST expr = assign != null ? assign.findFirstToken(EXPR) : null;
+        DetailAST methodCall = expr != null ? expr.findFirstToken(METHOD_CALL) : null;
+        if (methodCall == null || !isPatternCompileCall(methodCall)) {
             return null;
         }
-        DetailAST expr = assign.findFirstToken(EXPR);
-        if (expr == null) {
-            return null;
-        }
-        DetailAST methodCall = expr.findFirstToken(METHOD_CALL);
-        if (methodCall == null) {
-            return null;
-        }
+        String firstArg = findFirstTextInChain(methodCall, ELIST, EXPR, STRING_LITERAL);
+        return firstArg.isEmpty() ? null : firstArg;
+    }
+
+    private static boolean isPatternCompileCall(DetailAST methodCall) {
         DetailAST dot = methodCall.findFirstToken(DOT);
         if (dot == null) {
-            return null;
+            return false;
         }
         DetailAST target = dot.getFirstChild();
-        if (target == null || !PATTERN_TYPE.equals(target.getText())) {
-            return null;
-        }
         DetailAST method = dot.getLastChild();
-        if (method == null || !"compile".equals(method.getText())) {
-            return null;
-        }
-        DetailAST elist = methodCall.findFirstToken(ELIST);
-        if (elist == null) {
-            return null;
-        }
-        DetailAST firstExpr = elist.findFirstToken(EXPR);
-        if (firstExpr == null) {
-            return null;
-        }
-        DetailAST literal = firstExpr.findFirstToken(STRING_LITERAL);
-        return literal != null ? literal.getText() : null;
+        return target != null && PATTERN_TYPE.equals(target.getText())
+            && method != null && "compile".equals(method.getText());
     }
 
     private static String extractConstName(DetailAST variableDef) {

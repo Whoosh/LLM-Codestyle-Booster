@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class StaticImportCandidateCheckTest {
 
-    private static final int EXPECTED_DISTINCT_VIOLATIONS = 4;
+    private static final int EXPECTED_DISTINCT_VIOLATIONS = 8;
     private static final int HOLDER_PATTERN_LINE = 17;
 
     @Test
@@ -28,7 +28,14 @@ class StaticImportCandidateCheckTest {
     @Test
     void everyDistinctQualifiedRefFires() throws Exception {
         List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateInvalid.java", Map.of());
-        assertEquals(EXPECTED_DISTINCT_VIOLATIONS, violations.size(), "Expected 4 violations (every distinct qualified ref) but got: " + format(violations));
+        assertEquals(EXPECTED_DISTINCT_VIOLATIONS, violations.size(), "Expected 8 distinct violations (constants + util method calls) but got: " + format(violations));
+    }
+
+    @Test
+    void utilMethodCallsFire() throws Exception {
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateInvalid.java", Map.of());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("extractPackageName")), format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("isBlank")), format(violations));
     }
 
     @Test

@@ -11,7 +11,15 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Suggests static imports for every {@code ClassName.CONSTANT_NAME} qualified reference that is used enough times to justify a static import.
+ * Suggests static imports for two reference shapes:
+ * <ul>
+ *   <li>{@code ClassName.CONSTANT_NAME} — any qualified reference to an
+ *       UPPER_SNAKE_CASE field on a class whose name starts with an uppercase letter.</li>
+ *   <li>{@code UtilClass.methodName(...)} — any method call whose receiver is a
+ *       simple identifier ending in {@code Util} or {@code Utils}. The convention
+ *       in this codebase is that utility classes should be star-statically-imported
+ *       so that call sites read as bare function calls.</li>
+ * </ul>
  */
 public class StaticImportCandidateCheck extends AbstractCheck {
 
@@ -129,12 +137,26 @@ public class StaticImportCandidateCheck extends AbstractCheck {
         }
         String className = left.getText();
         String memberName = right.getText();
-        if (!Character.isUpperCase(className.charAt(0)) || !isUpperCaseConstant(memberName)) {
+        if (className.isEmpty() || !Character.isUpperCase(className.charAt(0))) {
+            return;
+        }
+        boolean isConstant = isUpperCaseConstant(memberName);
+        boolean isUtilMethodCall = isUtilClassName(className) && isInsideMethodCall(dot);
+        if (!isConstant && !isUtilMethodCall) {
             return;
         }
         String key = className + "." + memberName;
         qualifiedRefs.merge(key, 1, Integer::sum);
         firstLines.putIfAbsent(key, dot.getLineNo());
+    }
+
+    private static boolean isUtilClassName(String name) {
+        return name.endsWith("Util") || name.endsWith("Utils");
+    }
+
+    private static boolean isInsideMethodCall(DetailAST dot) {
+        DetailAST parent = dot.getParent();
+        return parent != null && parent.getType() == METHOD_CALL;
     }
 
     private static boolean isUpperCaseConstant(String name) {

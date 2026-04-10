@@ -15,6 +15,11 @@ public class StaticImportCandidateInvalid {
         long max = Long.MIN_VALUE;
         // Qualified constant as method-call receiver — must fire (regression from parent-DOT guard)
         java.util.regex.Matcher m = Holder.PATTERN.matcher("x");
+        // Util-class method calls — should fire (new case)
+        String p = AstUtil.extractPackageName(null);
+        String nm = AstUtil.extractTypeName(null);
+        String a = AstMethodCallUtil.extractFirstArgText(null);
+        Object b = StringUtils.isBlank("text");
     }
 
     static class Holder {

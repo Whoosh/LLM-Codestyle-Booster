@@ -4,6 +4,7 @@ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 import io.github.llmcodestyle.simplify.BooleanFromConditionCheck;
 import io.github.llmcodestyle.simplify.CollapsibleConstantConcatenationCheck;
+import io.github.llmcodestyle.simplify.CommonsLang3StringConstantCheck;
 import io.github.llmcodestyle.simplify.CollapsibleGuardClauseCheck;
 import io.github.llmcodestyle.simplify.CollapsibleNestedIfCheck;
 import io.github.llmcodestyle.simplify.CollectionsToListOfCheck;
@@ -76,6 +77,8 @@ import static org.junit.jupiter.api.Assertions.*;
  *   <li>{@link TrivialSingleUsePrivateMethodCheck} — inlines a method called from one site;
  *       executes its body the same number of times before and after, parameter usage cap
  *       prevents argument-expression duplication</li>
+ *   <li>{@link CommonsLang3StringConstantCheck} — only renames a static final constant
+ *       to its library equivalent, no runtime semantics change</li>
  * </ul>
  */
 class AsymptoticSafetyTest {

@@ -52,3 +52,4 @@ RedundantConstantAliasCheck — flags static final aliases and same-class duplic
 TrivialSingleUsePrivateMethodCheck — flags private one-statement methods called from exactly one site, no cross-rule interaction
 MethodMayBeStaticCheck — flags private instance methods that never reference this/super or instance state, no cross-rule interaction
 UtilClassNamingCheck — flags all-static-public classes that aren't *Util/*Utils and *Constants classes with public methods, no cross-rule interaction
+CommonsLang3StringConstantCheck — flags static final String constants whose value duplicates Apache Commons Lang3 StringUtils.* equivalents, no cross-rule interaction

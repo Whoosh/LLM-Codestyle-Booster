@@ -240,6 +240,7 @@
         <module name="io.github.llmcodestyle.simplify.IfReturnBooleanLiteralCheck"/>
         <module name="io.github.llmcodestyle.simplify.RedundantConstantAliasCheck"/>
         <module name="io.github.llmcodestyle.simplify.TrivialSingleUsePrivateMethodCheck"/>
+        <module name="io.github.llmcodestyle.simplify.CommonsLang3StringConstantCheck"/>
 
         <!-- Miscellaneous -->
         <module name="ArrayTypeStyle"/>

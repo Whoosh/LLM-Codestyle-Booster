@@ -69,10 +69,7 @@ public class RedundantConstantAliasCheck extends AbstractCheck {
     private static Map<String, String> collectStringConstants(DetailAST objBlock, boolean insideInterface) {
         Map<String, String> result = new HashMap<>();
         for (DetailAST child = objBlock.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if (child.getType() != VARIABLE_DEF || !isEffectivelyStaticFinal(child, insideInterface)) {
-                continue;
-            }
-            if (!"String".equals(extractTypeName(child))) {
+            if (child.getType() != VARIABLE_DEF || !isEffectivelyStaticFinal(child, insideInterface) || !"String".equals(extractTypeName(child))) {
                 continue;
             }
             String literal = stringLiteralInitializer(child);

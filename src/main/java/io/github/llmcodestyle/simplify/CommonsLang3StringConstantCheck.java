@@ -75,10 +75,7 @@ public class CommonsLang3StringConstantCheck extends AbstractCheck {
 
     private static boolean isStaticFinalStringField(DetailAST varDef) {
         DetailAST parent = varDef.getParent();
-        if (parent == null || parent.getType() != OBJBLOCK) {
-            return false;
-        }
-        if (!AstUtil.hasModifier(varDef, LITERAL_STATIC) || !AstUtil.hasModifier(varDef, FINAL)) {
+        if (parent == null || parent.getType() != OBJBLOCK || !AstUtil.hasModifier(varDef, LITERAL_STATIC) || !AstUtil.hasModifier(varDef, FINAL)) {
             return false;
         }
         return "String".equals(AstUtil.extractTypeName(varDef));

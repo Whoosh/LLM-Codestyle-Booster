@@ -97,19 +97,7 @@ public class TrivialSingleUsePrivateMethodCheck extends AbstractCheck {
     }
 
     private static boolean isCandidate(DetailAST methodDef) {
-        if (!AstUtil.hasModifier(methodDef, LITERAL_PRIVATE)) {
-            return false;
-        }
-        if (AstUtil.hasModifier(methodDef, ABSTRACT) || AstUtil.hasModifier(methodDef, LITERAL_NATIVE)) {
-            return false;
-        }
-        if (AstAnnotationUtil.hasAnnotationNamed(methodDef, "Override")) {
-            return false;
-        }
-        if (hasAnyAnnotation(methodDef)) {
-            return false;
-        }
-        if (methodDef.findFirstToken(TYPE_PARAMETERS) != null) {
+        if (!isBareUnannotatedPrivate(methodDef)) {
             return false;
         }
         DetailAST slist = methodDef.findFirstToken(SLIST);
@@ -117,6 +105,15 @@ public class TrivialSingleUsePrivateMethodCheck extends AbstractCheck {
             return false;
         }
         return countMethodCalls(slist) <= MAX_METHOD_CALLS && parametersUsedAtMostOnce(methodDef, slist);
+    }
+
+    private static boolean isBareUnannotatedPrivate(DetailAST methodDef) {
+        return AstUtil.hasModifier(methodDef, LITERAL_PRIVATE)
+            && !AstUtil.hasModifier(methodDef, ABSTRACT)
+            && !AstUtil.hasModifier(methodDef, LITERAL_NATIVE)
+            && !AstAnnotationUtil.hasAnnotationNamed(methodDef, "Override")
+            && !hasAnyAnnotation(methodDef)
+            && methodDef.findFirstToken(TYPE_PARAMETERS) == null;
     }
 
     private static int countMethodCalls(DetailAST root) {

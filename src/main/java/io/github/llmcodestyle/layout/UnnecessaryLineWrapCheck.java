@@ -44,19 +44,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST ast) {
-        if (isNestedInCheckedParent(ast)) {
-            return;
-        }
-
-        if (ast.getType() == LITERAL_TRY && ast.findFirstToken(RESOURCE_SPECIFICATION) == null) {
-            return;
-        }
-
-        if (ast.getType() == RESOURCE && tryHeaderFitsOnOneLine(ast)) {
-            return;
-        }
-
-        if (containsLongChainInScope(ast)) {
+        if (shouldSkip(ast)) {
             return;
         }
 
@@ -71,6 +59,17 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
         if (combined.length() <= maxLineLength) {
             log(firstLine, MSG_KEY, combined.length(), maxLineLength);
         }
+    }
+
+    private boolean shouldSkip(DetailAST ast) {
+        if (isNestedInCheckedParent(ast) || containsLongChainInScope(ast)) {
+            return true;
+        }
+        int type = ast.getType();
+        if (type == LITERAL_TRY) {
+            return ast.findFirstToken(RESOURCE_SPECIFICATION) == null;
+        }
+        return type == RESOURCE && tryHeaderFitsOnOneLine(ast);
     }
 
     private static int computeFirstLine(DetailAST ast) {
@@ -220,13 +219,17 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
             return false;
         }
         char last = sb.charAt(sb.length() - 1);
-        char first = next.charAt(0);
-        if (first == ')' || first == '}' || first == ']') {
-            return false;
-        }
-        if (last == '(' || last == '{' || last == '[') {
+        if (isClosingBracket(next.charAt(0)) || isOpeningBracket(last)) {
             return false;
         }
         return last != ' ';
+    }
+
+    private static boolean isClosingBracket(char ch) {
+        return ch == ')' || ch == '}' || ch == ']';
+    }
+
+    private static boolean isOpeningBracket(char ch) {
+        return ch == '(' || ch == '{' || ch == '[';
     }
 }

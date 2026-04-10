@@ -73,10 +73,7 @@ public class SplitDeclarationAssignmentCheck extends AbstractCheck {
     }
 
     private static String uninitializedVarName(DetailAST stmt) {
-        if (stmt.getType() != VARIABLE_DEF) {
-            return null;
-        }
-        if (stmt.findFirstToken(ASSIGN) != null) {
+        if (stmt.getType() != VARIABLE_DEF || stmt.findFirstToken(ASSIGN) != null) {
             return null;
         }
         DetailAST ident = stmt.findFirstToken(IDENT);

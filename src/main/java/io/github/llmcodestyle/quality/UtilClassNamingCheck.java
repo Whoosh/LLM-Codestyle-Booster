@@ -63,10 +63,7 @@ public class UtilClassNamingCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST classDef) {
-        if (AstUtil.hasModifier(classDef, ABSTRACT)) {
-            return;
-        }
-        if (isNonStaticNestedClass(classDef)) {
+        if (AstUtil.hasModifier(classDef, ABSTRACT) || isNonStaticNestedClass(classDef)) {
             return;
         }
         DetailAST nameIdent = classDef.findFirstToken(IDENT);

@@ -41,19 +41,11 @@ public class ForbiddenGenericCatchCheck extends AbstractCheck {
         if (type == null) {
             return;
         }
-        checkTypeNode(type);
+        checkEachChild(type);
     }
 
-    private void checkTypeNode(DetailAST typeNode) {
-        DetailAST child = typeNode.getFirstChild();
-        while (child != null) {
-            checkChild(child);
-            child = child.getNextSibling();
-        }
-    }
-
-    private void checkBorNode(DetailAST bor) {
-        DetailAST child = bor.getFirstChild();
+    private void checkEachChild(DetailAST parent) {
+        DetailAST child = parent.getFirstChild();
         while (child != null) {
             checkChild(child);
             child = child.getNextSibling();
@@ -69,7 +61,7 @@ public class ForbiddenGenericCatchCheck extends AbstractCheck {
                 logIfForbidden(last);
             }
         } else if (child.getType() == BOR) {
-            checkBorNode(child);
+            checkEachChild(child);
         }
     }
 

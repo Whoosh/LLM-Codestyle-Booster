@@ -66,10 +66,7 @@ public class StaticImportCandidateCheck extends AbstractCheck {
         for (Map.Entry<String, Integer> entry : qualifiedRefs.entrySet()) {
             String qualifiedRef = entry.getKey();
             String constantName = qualifiedRef.substring(qualifiedRef.lastIndexOf('.') + 1);
-            if (staticImports.contains(constantName)) {
-                continue;
-            }
-            if (constantNameToClassCount.getOrDefault(constantName, 0) > 1 && !qualifiedRef.equals(findWinner(constantName))) {
+            if (staticImports.contains(constantName) || constantNameToClassCount.getOrDefault(constantName, 0) > 1 && !qualifiedRef.equals(findWinner(constantName))) {
                 continue;
             }
             Integer lineNo = firstLines.get(qualifiedRef);
@@ -127,18 +124,12 @@ public class StaticImportCandidateCheck extends AbstractCheck {
         }
         DetailAST left = dot.getFirstChild();
         DetailAST right = dot.getLastChild();
-        if (left == null || right == null) {
-            return;
-        }
-        if (left.getType() != IDENT || right.getType() != IDENT) {
+        if (left == null || right == null || left.getType() != IDENT || right.getType() != IDENT) {
             return;
         }
         String className = left.getText();
         String memberName = right.getText();
-        if (!Character.isUpperCase(className.charAt(0))) {
-            return;
-        }
-        if (!isUpperCaseConstant(memberName)) {
+        if (!Character.isUpperCase(className.charAt(0)) || !isUpperCaseConstant(memberName)) {
             return;
         }
         String key = className + "." + memberName;

@@ -62,10 +62,7 @@ public class BooleanFromConditionCheck extends AbstractCheck {
             return null;
         }
         DetailAST type = stmt.findFirstToken(TYPE);
-        if (type == null || type.findFirstToken(LITERAL_BOOLEAN) == null) {
-            return null;
-        }
-        if (literalKindOfInit(stmt) == 0) {
+        if (type == null || type.findFirstToken(LITERAL_BOOLEAN) == null || literalKindOfInit(stmt) == 0) {
             return null;
         }
         DetailAST ident = stmt.findFirstToken(IDENT);

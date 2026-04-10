@@ -77,10 +77,7 @@ public class NoSystemOutInProductionCheck extends AbstractCheck {
     }
 
     private boolean isExempt() {
-        if (simpleClassName.endsWith(MAIN_SUFFIX) || simpleClassName.startsWith(MAIN_SUFFIX) || simpleClassName.endsWith("Application")) {
-            return true;
-        }
-        if (simpleClassName.endsWith(TEST_SUFFIX) || simpleClassName.endsWith(SLOW_TEST_SUFFIX)) {
+        if (isMainOrTestClassName()) {
             return true;
         }
         for (String segment : pkgName.split(DOT_STR)) {
@@ -89,6 +86,14 @@ public class NoSystemOutInProductionCheck extends AbstractCheck {
             }
         }
         return false;
+    }
+
+    private boolean isMainOrTestClassName() {
+        return simpleClassName.endsWith(MAIN_SUFFIX)
+            || simpleClassName.startsWith(MAIN_SUFFIX)
+            || simpleClassName.endsWith("Application")
+            || simpleClassName.endsWith(TEST_SUFFIX)
+            || simpleClassName.endsWith(SLOW_TEST_SUFFIX);
     }
 
     private static boolean isSystemOutOrErrCall(DetailAST methodCall) {

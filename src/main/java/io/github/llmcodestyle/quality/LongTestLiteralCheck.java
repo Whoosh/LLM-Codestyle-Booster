@@ -46,22 +46,14 @@ public class LongTestLiteralCheck extends AbstractCheck {
     @Override
     public void visitToken(DetailAST ast) {
         int contentLen = ast.getText().length() - 2;
-        if (contentLen <= maxLength) {
-            return;
-        }
-        if (!isInsideTestMethod(ast)) {
-            return;
-        }
-        if (isFieldInitializer(ast)) {
-            return;
-        }
-        if (isInsideDisplayName(ast)) {
-            return;
-        }
-        if (isAssertionMessage(ast)) {
+        if (contentLen <= maxLength || shouldExempt(ast)) {
             return;
         }
         log(ast.getLineNo(), ast.getColumnNo(), MSG_KEY, contentLen, maxLength);
+    }
+
+    private static boolean shouldExempt(DetailAST ast) {
+        return !isInsideTestMethod(ast) || isFieldInitializer(ast) || isInsideDisplayName(ast) || isAssertionMessage(ast);
     }
 
     private static boolean isInsideTestMethod(DetailAST ast) {

@@ -46,10 +46,7 @@ public class SingleUseLocalVariableCheck extends AbstractCheck {
         List<DetailAST> statements = AstSingleUseUtil.collectStatements(slist);
         for (int i = 0; i < statements.size() - 1; i++) {
             DetailAST stmt = statements.get(i);
-            if (stmt.getType() != VARIABLE_DEF) {
-                continue;
-            }
-            if (stmt.findFirstToken(ASSIGN) == null) {
+            if (stmt.getType() != VARIABLE_DEF || stmt.findFirstToken(ASSIGN) == null) {
                 continue;
             }
             DetailAST ident = stmt.findFirstToken(IDENT);

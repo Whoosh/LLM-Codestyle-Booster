@@ -52,13 +52,7 @@ public class CollapsibleGuardClauseCheck extends AbstractCheck {
         }
         DetailAST guard = stmts.get(0);
         DetailAST tail = stmts.get(1);
-        if (guard.getType() != LITERAL_IF || tail.getType() != LITERAL_IF) {
-            return;
-        }
-        if (hasElseClause(guard) || hasElseClause(tail)) {
-            return;
-        }
-        if (!isVoidReturnOnly(guard)) {
+        if (guard.getType() != LITERAL_IF || tail.getType() != LITERAL_IF || hasElseClause(guard) || hasElseClause(tail) || !isVoidReturnOnly(guard)) {
             return;
         }
         log(guard.getLineNo(), guard.getColumnNo(), MSG_KEY);

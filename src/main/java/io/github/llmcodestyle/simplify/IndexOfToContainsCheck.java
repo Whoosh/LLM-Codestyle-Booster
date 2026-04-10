@@ -72,10 +72,7 @@ public class IndexOfToContainsCheck extends AbstractCheck {
             return false;
         }
         DetailAST node = expr.getType() == EXPR ? expr.getFirstChild() : expr;
-        if (node == null || node.getType() != METHOD_CALL) {
-            return false;
-        }
-        if (!"indexOf".equals(AstMethodCallUtil.extractMethodName(node))) {
+        if (node == null || node.getType() != METHOD_CALL || !"indexOf".equals(AstMethodCallUtil.extractMethodName(node))) {
             return false;
         }
         DetailAST elist = node.findFirstToken(ELIST);

@@ -115,11 +115,7 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
         for (int j = idx + 1; j < statements.size(); j++) {
             totalUses += AstSingleUseUtil.countIdent(statements.get(j), varName);
         }
-        if (totalUses != 1) {
-            return;
-        }
-
-        if (isUsedInRepeatingContextFrom(statements, idx + 1, varName)) {
+        if (totalUses != 1 || isUsedInRepeatingContextFrom(statements, idx + 1, varName)) {
             return;
         }
 
@@ -132,10 +128,8 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
     }
 
     private static boolean isPureExpression(DetailAST node) {
-        if (isImpureToken(node.getType())) {
-            return false;
-        }
-        if (node.getType() == METHOD_CALL && !PURE_METHODS.contains(extractMethodName(node))) {
+        int type = node.getType();
+        if (isImpureToken(type) || type == METHOD_CALL && !PURE_METHODS.contains(extractMethodName(node))) {
             return false;
         }
         DetailAST child = node.getFirstChild();

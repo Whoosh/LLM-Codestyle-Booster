@@ -136,10 +136,7 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
      */
     private static boolean isMethodCovered(String testContent, String className, String methodName, Set<String> instanceVars) {
         String call = methodName + "(";
-        if (testContent.contains(className + "." + call)) {
-            return true;
-        }
-        if (testContent.contains(className + "::" + methodName)) {
+        if (testContent.contains(className + "." + call) || testContent.contains(className + "::" + methodName)) {
             return true;
         }
         for (String varName : instanceVars) {
@@ -170,16 +167,7 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
     }
 
     private void collectMethodIfEligible(DetailAST methodDef) {
-        if (AstUtil.typeNestingDepth(methodDef) > 1) {
-            return;
-        }
-        if (AstUtil.hasModifier(methodDef, ABSTRACT)) {
-            return;
-        }
-        if (isInterface && !AstUtil.hasModifier(methodDef, LITERAL_DEFAULT)) {
-            return;
-        }
-        if (AstUtil.hasModifier(methodDef, LITERAL_PRIVATE) || AstUtil.hasModifier(methodDef, LITERAL_PROTECTED)) {
+        if (isIneligibleByModifiers(methodDef)) {
             return;
         }
         DetailAST ident = methodDef.findFirstToken(IDENT);
@@ -187,16 +175,22 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
             return;
         }
         String name = ident.getText();
-        if (EXEMPT_METHODS.contains(name)) {
-            return;
-        }
-        if ("main".equals(name) && hasStringArrayParam(methodDef)) {
-            return;
-        }
-        if (recordComponents.contains(name)) {
+        if (isIneligibleByName(name, methodDef)) {
             return;
         }
         methods.add(new MethodInfo(name, ident.getLineNo()));
+    }
+
+    private boolean isIneligibleByModifiers(DetailAST methodDef) {
+        return AstUtil.typeNestingDepth(methodDef) > 1
+            || AstUtil.hasModifier(methodDef, ABSTRACT)
+            || isInterface && !AstUtil.hasModifier(methodDef, LITERAL_DEFAULT)
+            || AstUtil.hasModifier(methodDef, LITERAL_PRIVATE)
+            || AstUtil.hasModifier(methodDef, LITERAL_PROTECTED);
+    }
+
+    private boolean isIneligibleByName(String name, DetailAST methodDef) {
+        return EXEMPT_METHODS.contains(name) || "main".equals(name) && hasStringArrayParam(methodDef) || recordComponents.contains(name);
     }
 
     private void collectRecordComponents(DetailAST recordDef) {

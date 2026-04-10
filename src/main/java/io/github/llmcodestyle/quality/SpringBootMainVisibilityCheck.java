@@ -94,6 +94,9 @@ public class SpringBootMainVisibilityCheck extends AbstractCheck {
             return false;
         }
         DetailAST param = params.findFirstToken(PARAMETER_DEF);
+        if (param == null) {
+            return false;
+        }
         DetailAST type = param.findFirstToken(TYPE);
         if (type == null || type.findFirstToken(ARRAY_DECLARATOR) == null && param.findFirstToken(ELLIPSIS) == null) {
             return false;

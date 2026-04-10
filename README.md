@@ -1,6 +1,6 @@
 # LLM Codestyle Booster
 
-One dependency that brings **34 custom Checkstyle checks** + fully configured **Checkstyle**, **PMD**, and **SpotBugs** rulesets to your Maven project.
+One dependency that brings **41 custom Checkstyle checks** + fully configured **Checkstyle**, **PMD**, and **SpotBugs** rulesets to your Maven project.
 
 Designed for teams that want strict, opinionated static analysis out of the box, with easy per-project overrides.
 
@@ -10,11 +10,11 @@ Designed for teams that want strict, opinionated static analysis out of the box,
 |----------|--------|---------|
 | **Forbidden** | 6 | No `System.out` in production, no `@SuppressWarnings`, no generic `catch(Exception)`, no commented-out code |
 | **Layout** | 8 | Chained calls must break after 4+ dots, unnecessary line wraps, compactable parameter lists, array init spacing, static star imports |
-| **Quality** | 9 | Test method naming (camelCase), public method test coverage, unused private members, util class packaging, duplicate regex constants |
-| **Simplify** | 11 | `indexOf` &rarr; `contains`, `size() == 0` &rarr; `isEmpty()`, inline regex &rarr; `Pattern` constant, single-use variable inlining, identical catch bodies, `containsKey` + `get` &rarr; single lookup |
+| **Quality** | 11 | Test method naming, public method test coverage, unused private members, util class packaging, duplicate regex constants, Spring Boot main visibility, unrelated nested records |
+| **Simplify** | 16 | `indexOf` &rarr; `contains`, `size() == 0` &rarr; `isEmpty()`, inline regex &rarr; `Pattern` constant, single-use variable inlining, identical catch bodies, `containsKey` + `get` &rarr; single lookup, collapsible guard clauses, nested ifs, boolean-from-condition, split decl/assign, if-return literal |
 
 Plus bundled configs:
-- **Checkstyle** &mdash; full config with all 34 custom checks + standard built-in checks
+- **Checkstyle** &mdash; full config with all 41 custom checks + standard built-in checks
 - **PMD** &mdash; paranoid-mode ruleset (all categories, strict thresholds)
 - **SpotBugs** &mdash; max effort, low threshold, with fb-contrib and findsecbugs plugins
 
@@ -328,6 +328,8 @@ To use **both** bundled and local exclusions, list them comma-separated:
 | `UtilClassInUtilsPackageCheck` | `*Util` / `*Utils` classes must live in a `utils` package |
 | `RepeatedExceptionWrappingCheck` | Flags 3+ catch blocks with identical catch-and-rethrow wrapping pattern |
 | `DuplicateRegexConstantCheck` | Flags duplicate regex constants (`String`/`Pattern`) across classes in a module |
+| `SpringBootMainVisibilityCheck` | Enforces `public static void main(String[])` on `@SpringBootApplication` classes |
+| `UnrelatedNestedRecordCheck` | Flags nested records that don't reference the enclosing type — move to a `pojos` package |
 
 ### Simplify
 
@@ -344,6 +346,11 @@ To use **both** bundled and local exclusions, list them comma-separated:
 | `MapContainsKeyThenGetCheck` | `if (map.containsKey(k)) map.get(k)` &rarr; single `getOrDefault`/`computeIfAbsent` |
 | `CollectionsToListOfCheck` | `Collections.emptyList()` / `unmodifiableList(Arrays.asList(...))` &rarr; `List.of(...)` |
 | `ConditionalReturnToTernaryCheck` | `if-else` with single return in each branch &rarr; ternary return |
+| `CollapsibleGuardClauseCheck` | `if(a){return;} if(b){...}` at end of method &rarr; `if(!a && b){...}` |
+| `CollapsibleNestedIfCheck` | `if(a){if(b){...}}` (no else) &rarr; `if(a && b){...}` |
+| `BooleanFromConditionCheck` | `boolean x = false; if(cond) x = true;` &rarr; `boolean x = cond;` (and mirror) |
+| `SplitDeclarationAssignmentCheck` | `int x; ...; x = 5;` with no use/branch between &rarr; merge into single declaration |
+| `IfReturnBooleanLiteralCheck` | `if(c) return true; return false;` &rarr; `return c;` (no-else fall-through form) |
 
 ---
 

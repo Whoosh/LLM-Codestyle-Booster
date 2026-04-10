@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.utils.AstQueryUtil;
 import io.github.llmcodestyle.utils.AstSingleUseUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
@@ -45,10 +46,7 @@ public class CollapsibleNestedIfCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST outerIf) {
-        if (isElseIf(outerIf)) {
-            return;
-        }
-        if (hasElseClause(outerIf)) {
+        if (AstQueryUtil.isElseIf(outerIf) || hasElseClause(outerIf)) {
             return;
         }
         DetailAST outerBody = extractBlockBody(outerIf);
@@ -56,18 +54,10 @@ public class CollapsibleNestedIfCheck extends AbstractCheck {
             return;
         }
         DetailAST innerIf = singleChildIf(outerBody);
-        if (innerIf == null) {
-            return;
-        }
-        if (hasElseClause(innerIf)) {
+        if (innerIf == null || hasElseClause(innerIf)) {
             return;
         }
         log(outerIf.getLineNo(), outerIf.getColumnNo(), MSG_KEY);
-    }
-
-    private static boolean isElseIf(DetailAST ifAst) {
-        DetailAST parent = ifAst.getParent();
-        return parent != null && parent.getType() == LITERAL_ELSE;
     }
 
     private static boolean hasElseClause(DetailAST ifAst) {

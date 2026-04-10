@@ -3,6 +3,7 @@ package io.github.llmcodestyle.quality;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstAnnotationUtil;
+import io.github.llmcodestyle.utils.AstQueryUtil;
 import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
@@ -82,10 +83,7 @@ public class MethodMayBeStaticCheck extends AbstractCheck {
 
     private void analyzeMethod(DetailAST methodDef) {
         DetailAST slist = methodDef.findFirstToken(SLIST);
-        if (slist == null) {
-            return;
-        }
-        if (referencesInstanceState(slist)) {
+        if (slist == null || referencesInstanceState(slist)) {
             return;
         }
         DetailAST ident = methodDef.findFirstToken(IDENT);
@@ -99,13 +97,10 @@ public class MethodMayBeStaticCheck extends AbstractCheck {
     }
 
     private static boolean isCandidate(DetailAST methodDef) {
-        if (!AstUtil.hasModifier(methodDef, LITERAL_PRIVATE)) {
-            return false;
-        }
-        if (AstUtil.hasModifier(methodDef, LITERAL_STATIC)) {
-            return false;
-        }
-        if (AstUtil.hasModifier(methodDef, ABSTRACT) || AstUtil.hasModifier(methodDef, LITERAL_NATIVE)) {
+        if (!AstUtil.hasModifier(methodDef, LITERAL_PRIVATE)
+            || AstUtil.hasModifier(methodDef, LITERAL_STATIC)
+            || AstUtil.hasModifier(methodDef, ABSTRACT)
+            || AstUtil.hasModifier(methodDef, LITERAL_NATIVE)) {
             return false;
         }
         return !AstAnnotationUtil.hasAnnotationNamed(methodDef, "Override");
@@ -115,11 +110,11 @@ public class MethodMayBeStaticCheck extends AbstractCheck {
         for (DetailAST child = objBlock.getFirstChild(); child != null; child = child.getNextSibling()) {
             int type = child.getType();
             if (type == VARIABLE_DEF && !AstUtil.hasModifier(child, LITERAL_STATIC)) {
-                addIdentTo(child, instanceFields);
+                AstQueryUtil.addIdentTo(child, instanceFields);
             } else if (type == METHOD_DEF) {
-                addIdentTo(child, declaredMethods);
+                AstQueryUtil.addIdentTo(child, declaredMethods);
                 if (!AstUtil.hasModifier(child, LITERAL_STATIC)) {
-                    addIdentTo(child, instanceMethods);
+                    AstQueryUtil.addIdentTo(child, instanceMethods);
                 }
             }
         }
@@ -128,22 +123,9 @@ public class MethodMayBeStaticCheck extends AbstractCheck {
         }
     }
 
-    private static void addIdentTo(DetailAST def, Set<String> names) {
-        DetailAST ident = def.findFirstToken(IDENT);
-        if (ident != null) {
-            names.add(ident.getText());
-        }
-    }
-
     private boolean referencesInstanceState(DetailAST node) {
         int type = node.getType();
-        if (type == LITERAL_THIS || type == LITERAL_SUPER) {
-            return true;
-        }
-        if (type == METHOD_CALL && isInstanceCall(node)) {
-            return true;
-        }
-        if (type == IDENT && instanceFields.contains(node.getText())) {
+        if (type == LITERAL_THIS || type == LITERAL_SUPER || type == METHOD_CALL && isInstanceCall(node) || type == IDENT && instanceFields.contains(node.getText())) {
             return true;
         }
         for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {

@@ -2,6 +2,7 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.utils.AstQueryUtil;
 import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
@@ -55,10 +56,7 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
     @Override
     public void visitToken(DetailAST recordDef) {
         DetailAST outerType = findEnclosingType(recordDef);
-        if (outerType == null) {
-            return;
-        }
-        if (referencesAnyOuterName(recordDef, collectOuterMemberNames(outerType), collectRecordOwnNames(recordDef))) {
+        if (outerType == null || referencesAnyOuterName(recordDef, collectOuterMemberNames(outerType), collectRecordOwnNames(recordDef))) {
             return;
         }
         DetailAST recordIdent = recordDef.findFirstToken(IDENT);
@@ -101,15 +99,8 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
         for (DetailAST child = objblock.getFirstChild(); child != null; child = child.getNextSibling()) {
             int type = child.getType();
             if (type == VARIABLE_DEF || type == METHOD_DEF) {
-                addIdentTo(child, names);
+                AstQueryUtil.addIdentTo(child, names);
             }
-        }
-    }
-
-    private static void addIdentTo(DetailAST def, Set<String> names) {
-        DetailAST ident = def.findFirstToken(IDENT);
-        if (ident != null) {
-            names.add(ident.getText());
         }
     }
 
@@ -117,7 +108,7 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
         for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
             int type = child.getType();
             if (type == VARIABLE_DEF || type == METHOD_DEF || type == PARAMETER_DEF) {
-                addIdentTo(child, names);
+                AstQueryUtil.addIdentTo(child, names);
             }
             collectDeclaredNames(child, names);
         }
@@ -129,13 +120,10 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
     }
 
     private static boolean scanForReferences(DetailAST node, Set<String> outerNames, Set<String> recordOwnNames) {
+        // LITERAL_THIS is intentionally not treated as an outer reference: records are
+        // implicitly static, so `this` always refers to the record's own instance.
         for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
-            // LITERAL_THIS is intentionally not treated as an outer reference: records are
-            // implicitly static, so `this` always refers to the record's own instance.
-            if (matchesOuterIdent(child, outerNames, recordOwnNames)) {
-                return true;
-            }
-            if (scanForReferences(child, outerNames, recordOwnNames)) {
+            if (matchesOuterIdent(child, outerNames, recordOwnNames) || scanForReferences(child, outerNames, recordOwnNames)) {
                 return true;
             }
         }

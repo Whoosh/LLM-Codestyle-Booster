@@ -160,4 +160,5 @@ public final class AstUtil {
         DetailAST ident = type.findFirstToken(IDENT);
         return ident != null ? ident.getText() : "";
     }
+
 }

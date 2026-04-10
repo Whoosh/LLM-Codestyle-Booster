@@ -45,16 +45,7 @@ public final class AstMethodCallUtil {
      * Returns empty string if no arguments or first arg is not a simple IDENT.
      */
     public static String extractFirstArgText(DetailAST methodCall) {
-        DetailAST elist = methodCall.findFirstToken(ELIST);
-        if (elist == null) {
-            return "";
-        }
-        DetailAST firstExpr = elist.findFirstToken(EXPR);
-        if (firstExpr == null) {
-            return "";
-        }
-        DetailAST ident = firstExpr.findFirstToken(IDENT);
-        return ident != null ? ident.getText() : "";
+        return AstQueryUtil.findFirstTextInChain(methodCall, ELIST, EXPR, IDENT);
     }
 
     /**

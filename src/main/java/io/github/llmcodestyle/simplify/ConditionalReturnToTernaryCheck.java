@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.utils.AstQueryUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -36,14 +37,11 @@ public class ConditionalReturnToTernaryCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST ifAst) {
-        if (isElseIf(ifAst)) {
+        if (AstQueryUtil.isElseIf(ifAst)) {
             return;
         }
         DetailAST elseAst = ifAst.findFirstToken(LITERAL_ELSE);
-        if (elseAst == null) {
-            return;
-        }
-        if (elseAst.findFirstToken(LITERAL_IF) != null) {
+        if (elseAst == null || elseAst.findFirstToken(LITERAL_IF) != null) {
             return;
         }
         DetailAST ifReturn = findSingleReturn(ifAst.findFirstToken(SLIST));
@@ -54,11 +52,6 @@ public class ConditionalReturnToTernaryCheck extends AbstractCheck {
         if (isSimpleExpr(ifReturn) && isSimpleExpr(elseReturn)) {
             log(ifAst, MSG_KEY);
         }
-    }
-
-    private static boolean isElseIf(DetailAST ifAst) {
-        DetailAST parent = ifAst.getParent();
-        return parent != null && parent.getType() == LITERAL_ELSE;
     }
 
     private static DetailAST findSingleReturn(DetailAST slist) {

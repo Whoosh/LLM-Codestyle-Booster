@@ -2,6 +2,7 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.utils.AstQueryUtil;
 import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
@@ -88,7 +89,7 @@ public class RepeatedExceptionWrappingCheck extends AbstractCheck {
             return;
         }
         String caughtType = extractCaughtType(catchAst);
-        String thrownType = extractThrownType(slist);
+        String thrownType = AstQueryUtil.findFirstTextInChain(slist, LITERAL_THROW, EXPR, LITERAL_NEW, IDENT);
         if (caughtType.isEmpty() || thrownType.isEmpty()) {
             return;
         }
@@ -116,22 +117,5 @@ public class RepeatedExceptionWrappingCheck extends AbstractCheck {
     private static String extractCaughtType(DetailAST catchAst) {
         DetailAST paramDef = catchAst.findFirstToken(PARAMETER_DEF);
         return paramDef != null ? AstUtil.extractTypeName(paramDef) : "";
-    }
-
-    private static String extractThrownType(DetailAST slist) {
-        DetailAST throwAst = slist.findFirstToken(LITERAL_THROW);
-        if (throwAst == null) {
-            return "";
-        }
-        DetailAST expr = throwAst.findFirstToken(EXPR);
-        if (expr == null) {
-            return "";
-        }
-        DetailAST newAst = expr.findFirstToken(LITERAL_NEW);
-        if (newAst == null) {
-            return "";
-        }
-        DetailAST ident = newAst.findFirstToken(IDENT);
-        return ident != null ? ident.getText() : "";
     }
 }

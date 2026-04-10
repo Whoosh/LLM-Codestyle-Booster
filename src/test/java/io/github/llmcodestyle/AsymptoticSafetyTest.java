@@ -2,15 +2,20 @@ package io.github.llmcodestyle;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
+import io.github.llmcodestyle.simplify.BooleanFromConditionCheck;
 import io.github.llmcodestyle.simplify.CollapsibleConstantConcatenationCheck;
+import io.github.llmcodestyle.simplify.CollapsibleGuardClauseCheck;
+import io.github.llmcodestyle.simplify.CollapsibleNestedIfCheck;
 import io.github.llmcodestyle.simplify.CollectionsToListOfCheck;
 import io.github.llmcodestyle.simplify.ConditionalReturnToTernaryCheck;
 import io.github.llmcodestyle.simplify.IdenticalCatchBodyCheck;
+import io.github.llmcodestyle.simplify.IfReturnBooleanLiteralCheck;
 import io.github.llmcodestyle.simplify.IndexOfToContainsCheck;
 import io.github.llmcodestyle.simplify.InlineRegexConstantCheck;
 import io.github.llmcodestyle.simplify.MapContainsKeyThenGetCheck;
 import io.github.llmcodestyle.simplify.PureSingleUseLocalVariableCheck;
 import io.github.llmcodestyle.simplify.SingleUseLocalVariableCheck;
+import io.github.llmcodestyle.simplify.SplitDeclarationAssignmentCheck;
 import io.github.llmcodestyle.simplify.StaticImportCandidateCheck;
 import io.github.llmcodestyle.simplify.UseIsEmptyCheck;
 
@@ -53,6 +58,16 @@ import static org.junit.jupiter.api.Assertions.*;
  *       no asymptotic change (both O(n) for n elements)</li>
  *   <li>{@link ConditionalReturnToTernaryCheck} — syntactic sugar only,
  *       zero bytecode difference in return paths</li>
+ *   <li>{@link CollapsibleGuardClauseCheck} — collapses guard + conditional into a single
+ *       boolean expression, identical bytecode after javac optimization</li>
+ *   <li>{@link CollapsibleNestedIfCheck} — merges two boolean conditions with {@code &&},
+ *       same short-circuit semantics, no asymptotic change</li>
+ *   <li>{@link BooleanFromConditionCheck} — replaces if-flip with direct assignment,
+ *       evaluates the condition exactly once in both forms</li>
+ *   <li>{@link SplitDeclarationAssignmentCheck} — moves declaration to its initializer,
+ *       no runtime impact</li>
+ *   <li>{@link IfReturnBooleanLiteralCheck} — collapses if-return-literal pair to a single
+ *       return of the condition, identical control flow</li>
  * </ul>
  */
 class AsymptoticSafetyTest {

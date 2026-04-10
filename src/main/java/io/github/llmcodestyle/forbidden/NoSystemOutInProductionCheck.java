@@ -71,10 +71,7 @@ public class NoSystemOutInProductionCheck extends AbstractCheck {
     }
 
     private void checkMethodCall(DetailAST methodCall) {
-        if (isExempt()) {
-            return;
-        }
-        if (isSystemOutOrErrCall(methodCall)) {
+        if (!isExempt() && isSystemOutOrErrCall(methodCall)) {
             log(methodCall.getLineNo(), methodCall.getColumnNo(), MSG_KEY);
         }
     }

@@ -227,6 +227,11 @@
         <module name="io.github.llmcodestyle.simplify.MapContainsKeyThenGetCheck"/>
         <module name="io.github.llmcodestyle.simplify.CollectionsToListOfCheck"/>
         <module name="io.github.llmcodestyle.simplify.ConditionalReturnToTernaryCheck"/>
+        <module name="io.github.llmcodestyle.simplify.CollapsibleGuardClauseCheck"/>
+        <module name="io.github.llmcodestyle.simplify.CollapsibleNestedIfCheck"/>
+        <module name="io.github.llmcodestyle.simplify.BooleanFromConditionCheck"/>
+        <module name="io.github.llmcodestyle.simplify.SplitDeclarationAssignmentCheck"/>
+        <module name="io.github.llmcodestyle.simplify.IfReturnBooleanLiteralCheck"/>
 
         <!-- Miscellaneous -->
         <module name="ArrayTypeStyle"/>

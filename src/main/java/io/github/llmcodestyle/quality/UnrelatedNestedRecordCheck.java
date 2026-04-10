@@ -3,9 +3,9 @@ package io.github.llmcodestyle.quality;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.utils.AstQueryUtil;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +26,7 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
      */
     static final String MSG_KEY = "unrelated.nested.record";
     private static final int[] TOKENS = {RECORD_DEF};
+    private static final Set<Integer> DECL_NAME_TOKENS = Set.of(VARIABLE_DEF, METHOD_DEF, PARAMETER_DEF);
     private static final Set<Integer> DECLARATION_PARENT_TYPES = Set.of(
         VARIABLE_DEF,
         METHOD_DEF,
@@ -66,8 +67,7 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
     private static DetailAST findEnclosingType(DetailAST recordDef) {
         DetailAST parent = recordDef.getParent();
         while (parent != null) {
-            int type = parent.getType();
-            if (type == CLASS_DEF || type == INTERFACE_DEF || type == ENUM_DEF || type == RECORD_DEF) {
+            if (TYPE_DECL_TOKENS.contains(parent.getType())) {
                 return parent;
             }
             parent = parent.getParent();
@@ -81,13 +81,13 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
         if (objblock != null) {
             addDirectFieldAndMethodNames(objblock, names);
         }
-        AstUtil.collectRecordComponentNames(outerType, names);
+        collectRecordComponentNames(outerType, names);
         return names;
     }
 
     private static Set<String> collectRecordOwnNames(DetailAST recordDef) {
         Set<String> names = new HashSet<>();
-        AstUtil.collectRecordComponentNames(recordDef, names);
+        collectRecordComponentNames(recordDef, names);
         DetailAST objblock = recordDef.findFirstToken(OBJBLOCK);
         if (objblock != null) {
             collectDeclaredNames(objblock, names);
@@ -106,8 +106,7 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
 
     private static void collectDeclaredNames(DetailAST node, Set<String> names) {
         for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
-            int type = child.getType();
-            if (type == VARIABLE_DEF || type == METHOD_DEF || type == PARAMETER_DEF) {
+            if (DECL_NAME_TOKENS.contains(child.getType())) {
                 AstQueryUtil.addIdentTo(child, names);
             }
             collectDeclaredNames(child, names);

@@ -29,6 +29,7 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
      */
     static final String MSG_KEY = "public.method.not.tested";
     private static final int[] TOKENS = {CLASS_DEF, INTERFACE_DEF, RECORD_DEF, METHOD_DEF};
+    private static final Set<Integer> TOP_LEVEL_DECL_TOKENS = Set.of(CLASS_DEF, INTERFACE_DEF, RECORD_DEF);
 
     private static final Set<String> EXEMPT_METHODS = Set.of(
         "toString",
@@ -92,7 +93,7 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
             return;
         }
         int type = ast.getType();
-        if ((type == CLASS_DEF || type == INTERFACE_DEF || type == RECORD_DEF) && AstUtil.typeNestingDepth(ast) == 0) {
+        if (TOP_LEVEL_DECL_TOKENS.contains(type) && AstUtil.typeNestingDepth(ast) == 0) {
             DetailAST ident = ast.findFirstToken(IDENT);
             if (ident != null && className.isEmpty()) {
                 className = ident.getText();

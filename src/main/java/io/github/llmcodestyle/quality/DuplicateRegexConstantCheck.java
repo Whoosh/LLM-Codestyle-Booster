@@ -3,9 +3,9 @@ package io.github.llmcodestyle.quality;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.pojos.RegexConstantOccurrence;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +66,7 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
             return;
         }
 
-        String regexValue = extractRegexValue(ast, AstUtil.extractTypeName(ast));
+        String regexValue = extractRegexValue(ast, extractTypeName(ast));
         if (regexValue == null) {
             return;
         }
@@ -89,7 +89,7 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
     }
 
     private static boolean isStaticFinal(DetailAST variableDef) {
-        return AstUtil.hasModifier(variableDef, LITERAL_STATIC) && AstUtil.hasModifier(variableDef, FINAL);
+        return hasModifier(variableDef, LITERAL_STATIC) && hasModifier(variableDef, FINAL);
     }
 
     private static String extractRegexValue(DetailAST variableDef, String typeName) {
@@ -163,8 +163,7 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
     private static String extractEnclosingClassName(DetailAST ast) {
         DetailAST parent = ast.getParent();
         while (parent != null) {
-            int type = parent.getType();
-            if (type == CLASS_DEF || type == RECORD_DEF || type == ENUM_DEF || type == INTERFACE_DEF) {
+            if (TYPE_DECL_TOKENS.contains(parent.getType())) {
                 DetailAST ident = parent.findFirstToken(IDENT);
                 if (ident != null) {
                     return ident.getText();

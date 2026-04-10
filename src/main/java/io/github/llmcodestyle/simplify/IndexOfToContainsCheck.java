@@ -6,6 +6,8 @@ import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
+import java.util.Set;
+
 /**
  * Flags {@code indexOf} comparisons that should use {@code contains} instead.
  */
@@ -16,6 +18,8 @@ public class IndexOfToContainsCheck extends AbstractCheck {
      */
     static final String MSG_KEY = "indexof.use.contains";
     private static final int[] TOKENS = {LT, GE, EQUAL, NOT_EQUAL, GT};
+    private static final Set<Integer> MINUS_ONE_FORWARD_OPS = Set.of(EQUAL, NOT_EQUAL, GT);
+    private static final Set<Integer> MINUS_ONE_REVERSE_OPS = Set.of(EQUAL, NOT_EQUAL, LT);
 
     @Override
     public int[] getDefaultTokens() {
@@ -48,23 +52,15 @@ public class IndexOfToContainsCheck extends AbstractCheck {
     }
 
     private static boolean isValidComparison(int opType, DetailAST literal) {
-        return isZeroComparison(opType, literal) || isMinusOneComparison(opType, literal);
+        return isZeroComparison(opType, literal) || isMinusOne(literal) && MINUS_ONE_FORWARD_OPS.contains(opType);
     }
 
     private static boolean isZeroComparison(int opType, DetailAST literal) {
         return isZero(literal) && (opType == LT || opType == GE);
     }
 
-    private static boolean isMinusOneComparison(int opType, DetailAST literal) {
-        return isMinusOne(literal) && (opType == EQUAL || opType == NOT_EQUAL || opType == GT);
-    }
-
     private static boolean isValidComparisonReversed(int opType, DetailAST literal) {
-        return isZero(literal) && opType == GT || isMinusOneComparisonReversed(opType, literal);
-    }
-
-    private static boolean isMinusOneComparisonReversed(int opType, DetailAST literal) {
-        return isMinusOne(literal) && (opType == EQUAL || opType == NOT_EQUAL || opType == LT);
+        return isZero(literal) && opType == GT || isMinusOne(literal) && MINUS_ONE_REVERSE_OPS.contains(opType);
     }
 
     private static boolean isIndexOfCall(DetailAST expr) {

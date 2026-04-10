@@ -30,6 +30,8 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
      */
     static final String MSG_RUN = "collapsible.constant.run";
     private static final int[] TOKENS = {CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF};
+    private static final Set<Integer> METHOD_LIKE_DEFS = Set.of(METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF);
+    private static final Set<Integer> SINGLE_LITERAL_TOKENS = Set.of(STRING_LITERAL, NUM_INT, NUM_LONG, NUM_FLOAT, NUM_DOUBLE, CHAR_LITERAL);
 
     private static final int MIN_METHOD_RUN_LENGTH = 2;
 
@@ -231,7 +233,7 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
     private void checkMethodBodies(DetailAST objBlock, Set<String> literalConstants) {
         DetailAST child = objBlock.getFirstChild();
         while (child != null) {
-            if (child.getType() == METHOD_DEF || child.getType() == CTOR_DEF || child.getType() == COMPACT_CTOR_DEF) {
+            if (METHOD_LIKE_DEFS.contains(child.getType())) {
                 DetailAST slist = child.findFirstToken(SLIST);
                 if (slist != null) {
                     scanForCollapsibleRuns(slist, literalConstants);
@@ -298,11 +300,7 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
     }
 
     private static boolean isSingleLiteral(DetailAST node) {
-        if (node == null) {
-            return false;
-        }
-        int type = node.getType();
-        return type == STRING_LITERAL || type == NUM_INT || type == NUM_LONG || type == NUM_FLOAT || type == NUM_DOUBLE || type == CHAR_LITERAL;
+        return node != null && SINGLE_LITERAL_TOKENS.contains(node.getType());
     }
 
     /**

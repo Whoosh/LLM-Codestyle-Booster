@@ -7,6 +7,7 @@ import io.github.llmcodestyle.utils.AstSingleUseUtil;
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Detects an early-return guard followed by a single conditional that could be safely collapsed:
@@ -25,6 +26,7 @@ public class CollapsibleGuardClauseCheck extends AbstractCheck {
      */
     static final String MSG_KEY = "collapsible.guard.clause";
     private static final int[] TOKENS = {SLIST};
+    private static final Set<Integer> METHOD_LIKE_PARENTS = Set.of(METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF);
 
     @Override
     public int[] getDefaultTokens() {
@@ -60,11 +62,7 @@ public class CollapsibleGuardClauseCheck extends AbstractCheck {
 
     private static boolean isMethodOrCtorBody(DetailAST slist) {
         DetailAST parent = slist.getParent();
-        if (parent == null) {
-            return false;
-        }
-        int type = parent.getType();
-        return type == METHOD_DEF || type == CTOR_DEF || type == COMPACT_CTOR_DEF;
+        return parent != null && METHOD_LIKE_PARENTS.contains(parent.getType());
     }
 
     private static boolean hasElseClause(DetailAST ifAst) {

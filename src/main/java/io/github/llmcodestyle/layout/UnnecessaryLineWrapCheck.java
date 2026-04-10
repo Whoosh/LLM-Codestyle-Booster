@@ -7,6 +7,8 @@ import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
+import java.util.Set;
+
 /**
  * Flags statements split across multiple lines that would fit on a single line within the max length.
  */
@@ -20,6 +22,15 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
     };
     private static final int DEFAULT_MAX_LINE_LENGTH = 180;
     private static final int CHAIN_THRESHOLD = 4;
+
+    private static final Set<Character> CLOSING_BRACKETS = Set.of(')', '}', ']');
+    private static final Set<Character> OPENING_BRACKETS = Set.of('(', '{', '[');
+
+    private static final Set<Integer> DEFS_WITH_TYPE_OR_IDENT_FIRST = Set.of(METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF, RECORD_DEF, VARIABLE_DEF, RESOURCE);
+    private static final Set<Integer> CONTAINER_TYPE_DEFS = Set.of(CLASS_DEF, INTERFACE_DEF, ENUM_DEF);
+    private static final Set<Integer> CONTAINER_OR_RECORD_DEFS = Set.of(RECORD_DEF, CLASS_DEF, INTERFACE_DEF, ENUM_DEF);
+    private static final Set<Integer> METHOD_SIGNATURE_DEFS = Set.of(METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF);
+    private static final Set<Integer> CHECKED_PARENT_TYPES = Set.of(METHOD_CALL, VARIABLE_DEF, RESOURCE, LITERAL_THROW, LITERAL_RETURN);
 
     private int maxLineLength = DEFAULT_MAX_LINE_LENGTH;
 
@@ -74,7 +85,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
 
     private static int computeFirstLine(DetailAST ast) {
         int type = ast.getType();
-        if (type == METHOD_DEF || type == CTOR_DEF || type == COMPACT_CTOR_DEF || type == RECORD_DEF || type == VARIABLE_DEF || type == RESOURCE) {
+        if (DEFS_WITH_TYPE_OR_IDENT_FIRST.contains(type)) {
             DetailAST typeToken = ast.findFirstToken(TYPE);
             if (typeToken != null) {
                 return typeToken.getLineNo();
@@ -84,7 +95,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
                 return ident.getLineNo();
             }
         }
-        if (type == CLASS_DEF || type == INTERFACE_DEF || type == ENUM_DEF) {
+        if (CONTAINER_TYPE_DEFS.contains(type)) {
             return firstNonAnnotationLine(ast);
         }
         return ast.getLineNo();
@@ -108,7 +119,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
     private static int computeLastLine(DetailAST ast) {
         int type = ast.getType();
 
-        if (type == METHOD_DEF || type == CTOR_DEF || type == COMPACT_CTOR_DEF) {
+        if (METHOD_SIGNATURE_DEFS.contains(type)) {
             return findSignatureLastLine(ast);
         }
 
@@ -117,7 +128,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
             return rparen != null ? rparen.getLineNo() : ast.getLineNo();
         }
 
-        if (type == RECORD_DEF || type == CLASS_DEF || type == INTERFACE_DEF || type == ENUM_DEF) {
+        if (CONTAINER_OR_RECORD_DEFS.contains(type)) {
             DetailAST objBlock = ast.findFirstToken(OBJBLOCK);
             return objBlock != null ? objBlock.getLineNo() : AstUtil.findLastLine(ast);
         }
@@ -146,7 +157,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
 
     private static boolean containsLongChainInScope(DetailAST ast) {
         int type = ast.getType();
-        if (type == CLASS_DEF || type == INTERFACE_DEF || type == ENUM_DEF) {
+        if (CONTAINER_TYPE_DEFS.contains(type)) {
             return false;
         }
         if (type == LITERAL_TRY) {
@@ -186,8 +197,7 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
     private static boolean isNestedInCheckedParent(DetailAST ast) {
         DetailAST parent = ast.getParent();
         while (parent != null) {
-            int parentType = parent.getType();
-            if (parentType == METHOD_CALL || parentType == VARIABLE_DEF || parentType == RESOURCE || parentType == LITERAL_THROW || parentType == LITERAL_RETURN) {
+            if (CHECKED_PARENT_TYPES.contains(parent.getType())) {
                 return true;
             }
             parent = parent.getParent();
@@ -219,17 +229,9 @@ public class UnnecessaryLineWrapCheck extends AbstractCheck {
             return false;
         }
         char last = sb.charAt(sb.length() - 1);
-        if (isClosingBracket(next.charAt(0)) || isOpeningBracket(last)) {
+        if (CLOSING_BRACKETS.contains(next.charAt(0)) || OPENING_BRACKETS.contains(last)) {
             return false;
         }
         return last != ' ';
-    }
-
-    private static boolean isClosingBracket(char ch) {
-        return ch == ')' || ch == '}' || ch == ']';
-    }
-
-    private static boolean isOpeningBracket(char ch) {
-        return ch == '(' || ch == '{' || ch == '[';
     }
 }

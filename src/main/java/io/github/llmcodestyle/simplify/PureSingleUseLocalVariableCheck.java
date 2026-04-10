@@ -16,6 +16,9 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
 
     static final String MSG_KEY = "pure.single.use.local.variable";
     private static final int[] TOKENS = {SLIST};
+    private static final Set<Integer> CREATION_OR_MUTATION_TOKENS = Set.of(LITERAL_NEW, POST_INC, POST_DEC, INC, DEC, ASSIGN);
+    private static final Set<Integer> COMPOUND_ASSIGN_TOKENS = Set.of(PLUS_ASSIGN, MINUS_ASSIGN, STAR_ASSIGN, DIV_ASSIGN);
+    private static final Set<Integer> METHOD_LIKE_BLOCKS = Set.of(METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF, LAMBDA, STATIC_INIT, INSTANCE_INIT);
 
     private static final Set<String> PURE_METHODS = Set.of(
         "get",
@@ -143,15 +146,7 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
     }
 
     private static boolean isImpureToken(int type) {
-        return isCreationOrMutation(type) || isCompoundAssignment(type);
-    }
-
-    private static boolean isCreationOrMutation(int type) {
-        return type == LITERAL_NEW || type == POST_INC || type == POST_DEC || type == INC || type == DEC || type == ASSIGN;
-    }
-
-    private static boolean isCompoundAssignment(int type) {
-        return type == PLUS_ASSIGN || type == MINUS_ASSIGN || type == STAR_ASSIGN || type == DIV_ASSIGN;
+        return CREATION_OR_MUTATION_TOKENS.contains(type) || COMPOUND_ASSIGN_TOKENS.contains(type);
     }
 
     private static String extractMethodName(DetailAST methodCall) {
@@ -197,11 +192,7 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
             return false;
         }
         int type = parent.getType();
-        return isMethodLikeBlock(type) || isFlowBlock(type);
-    }
-
-    private static boolean isMethodLikeBlock(int type) {
-        return type == METHOD_DEF || type == CTOR_DEF || type == COMPACT_CTOR_DEF || type == LAMBDA || type == STATIC_INIT || type == INSTANCE_INIT;
+        return METHOD_LIKE_BLOCKS.contains(type) || isFlowBlock(type);
     }
 
     private static boolean isFlowBlock(int type) {

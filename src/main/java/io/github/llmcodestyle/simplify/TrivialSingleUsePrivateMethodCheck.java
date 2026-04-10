@@ -10,6 +10,7 @@ import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Detects {@code private} methods whose body is a single trivial statement and that are
@@ -46,6 +47,8 @@ public class TrivialSingleUsePrivateMethodCheck extends AbstractCheck {
     static final String MSG_KEY = "trivial.single.use.private.method";
     private static final int MAX_METHOD_CALLS = 3;
     private static final int[] TOKENS = {CLASS_DEF, RECORD_DEF, ENUM_DEF, INTERFACE_DEF};
+    private static final Set<Integer> PUNCTUATION_TOKENS = Set.of(RCURLY, LCURLY, SEMI);
+    private static final Set<Integer> TRIVIAL_BODY_STATEMENT_TOKENS = Set.of(LITERAL_RETURN, EXPR, LITERAL_THROW);
 
     @Override
     public int[] getDefaultTokens() {
@@ -141,8 +144,7 @@ public class TrivialSingleUsePrivateMethodCheck extends AbstractCheck {
         DetailAST first = null;
         int statementCount = 0;
         for (DetailAST child = slist.getFirstChild(); child != null; child = child.getNextSibling()) {
-            int type = child.getType();
-            if (type == RCURLY || type == LCURLY || type == SEMI) {
+            if (PUNCTUATION_TOKENS.contains(child.getType())) {
                 continue;
             }
             statementCount++;
@@ -153,8 +155,7 @@ public class TrivialSingleUsePrivateMethodCheck extends AbstractCheck {
         if (statementCount != 1 || first == null) {
             return false;
         }
-        int type = first.getType();
-        return type == LITERAL_RETURN || type == EXPR || type == LITERAL_THROW;
+        return TRIVIAL_BODY_STATEMENT_TOKENS.contains(first.getType());
     }
 
     private static boolean parametersUsedAtMostOnce(DetailAST methodDef, DetailAST slist) {

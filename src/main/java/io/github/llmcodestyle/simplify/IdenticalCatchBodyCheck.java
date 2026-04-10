@@ -8,6 +8,7 @@ import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +22,7 @@ public class IdenticalCatchBodyCheck extends AbstractCheck {
      */
     static final String MSG_KEY = "identical.catch.body";
     private static final int[] TOKENS = {LITERAL_TRY};
+    private static final Set<Integer> FINGERPRINT_LITERALS = Set.of(STRING_LITERAL, NUM_INT, NUM_LONG);
 
     @Override
     public int[] getDefaultTokens() {
@@ -84,7 +86,7 @@ public class IdenticalCatchBodyCheck extends AbstractCheck {
         if (node.getType() == IDENT) {
             String text = node.getText();
             sb.append(exVarName.equals(text) ? ":$EX" : ":" + text);
-        } else if (node.getType() == STRING_LITERAL || node.getType() == NUM_INT || node.getType() == NUM_LONG) {
+        } else if (FINGERPRINT_LITERALS.contains(node.getType())) {
             sb.append(':').append(node.getText());
         }
         sb.append('(');

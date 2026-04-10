@@ -7,6 +7,7 @@ import io.github.llmcodestyle.utils.AstSingleUseUtil;
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Flags local variables assigned once and used exactly once in the immediately following statement.
@@ -18,6 +19,7 @@ public class SingleUseLocalVariableCheck extends AbstractCheck {
      */
     static final String MSG_KEY = "single.use.local.variable";
     private static final int[] TOKENS = {SLIST};
+    private static final Set<Integer> METHOD_LIKE_PARENTS = Set.of(METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF, LAMBDA, STATIC_INIT, INSTANCE_INIT);
 
     @Override
     public int[] getDefaultTokens() {
@@ -93,11 +95,7 @@ public class SingleUseLocalVariableCheck extends AbstractCheck {
             return false;
         }
         int type = parent.getType();
-        return isMethodLikeParent(type) || isControlFlowParent(type);
-    }
-
-    private static boolean isMethodLikeParent(int type) {
-        return type == METHOD_DEF || type == CTOR_DEF || type == COMPACT_CTOR_DEF || type == LAMBDA || type == STATIC_INIT || type == INSTANCE_INIT;
+        return METHOD_LIKE_PARENTS.contains(type) || isControlFlowParent(type);
     }
 
     private static boolean isControlFlowParent(int type) {

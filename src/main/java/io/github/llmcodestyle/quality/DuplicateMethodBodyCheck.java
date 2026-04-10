@@ -67,6 +67,8 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
 
     private static final Set<Integer> NESTED_TYPE_TOKENS = Set.of(CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF, ANNOTATION_DEF);
 
+    private static final Set<Integer> NAMED_DECL_TOKENS = Set.of(VARIABLE_DEF, PARAMETER_DEF, RESOURCE);
+
     private int minStatements = DEFAULT_MIN_STATEMENTS;
     private int maxBodyNodes = DEFAULT_MAX_BODY_NODES;
 
@@ -202,8 +204,7 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
         if (!visited.add(node)) {
             return;
         }
-        int type = node.getType();
-        if (type == VARIABLE_DEF || type == PARAMETER_DEF || type == RESOURCE) {
+        if (NAMED_DECL_TOKENS.contains(node.getType())) {
             DetailAST ident = node.findFirstToken(IDENT);
             if (ident != null) {
                 assignIfAbsent(nameMap, ident.getText());

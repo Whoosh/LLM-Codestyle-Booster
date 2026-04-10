@@ -6,11 +6,16 @@ import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Utility methods shared between single-use local variable checks.
  */
 public final class AstSingleUseUtil {
+
+    private static final Set<Integer> REPEAT_CONTEXT_PARENTS = Set.of(LITERAL_WHILE, LITERAL_DO, LAMBDA);
+    private static final Set<Integer> LOOP_OR_CONDITION_TOKENS = Set.of(LITERAL_WHILE, LITERAL_FOR, LITERAL_DO, LITERAL_IF, LITERAL_ELSE);
+    private static final Set<Integer> EXCEPTION_BLOCK_TOKENS = Set.of(LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_SYNCHRONIZED);
 
     private AstSingleUseUtil() {
     }
@@ -79,23 +84,20 @@ public final class AstSingleUseUtil {
         if (parentType == LITERAL_FOR) {
             return child.getType() != FOR_EACH_CLAUSE || parentRepeat;
         }
-        if (parentType == LITERAL_WHILE || parentType == LITERAL_DO || parentType == LAMBDA) {
-            return true;
-        }
-        return parentRepeat;
+        return REPEAT_CONTEXT_PARENTS.contains(parentType) || parentRepeat;
     }
 
     /**
      * Returns {@code true} if {@code type} is a loop or conditional control-flow token.
      */
     public static boolean isLoopOrCondition(int type) {
-        return type == LITERAL_WHILE || type == LITERAL_FOR || type == LITERAL_DO || type == LITERAL_IF || type == LITERAL_ELSE;
+        return LOOP_OR_CONDITION_TOKENS.contains(type);
     }
 
     /**
      * Returns {@code true} if {@code type} is an exception-handling control-flow token.
      */
     public static boolean isExceptionBlock(int type) {
-        return type == LITERAL_TRY || type == LITERAL_CATCH || type == LITERAL_FINALLY || type == LITERAL_SYNCHRONIZED;
+        return EXCEPTION_BLOCK_TOKENS.contains(type);
     }
 }

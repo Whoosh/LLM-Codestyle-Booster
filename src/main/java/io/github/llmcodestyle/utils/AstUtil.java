@@ -11,6 +11,16 @@ import java.util.Set;
  */
 public final class AstUtil {
 
+    /**
+     * Token types for class, interface, and enum declarations. Records excluded.
+     */
+    public static final Set<Integer> CLASS_LIKE_TYPES = Set.of(CLASS_DEF, INTERFACE_DEF, ENUM_DEF);
+
+    /**
+     * Token types for all top-level and nested type declarations (including records).
+     */
+    public static final Set<Integer> TYPE_DECL_TOKENS = Set.of(CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF);
+
     private AstUtil() {
     }
 
@@ -54,8 +64,7 @@ public final class AstUtil {
     public static boolean isInnerClass(DetailAST classDef) {
         DetailAST parent = classDef.getParent();
         while (parent != null) {
-            int type = parent.getType();
-            if (type == CLASS_DEF || type == INTERFACE_DEF || type == ENUM_DEF) {
+            if (CLASS_LIKE_TYPES.contains(parent.getType())) {
                 return true;
             }
             parent = parent.getParent();
@@ -69,8 +78,7 @@ public final class AstUtil {
     public static boolean isNestedType(DetailAST typeDef) {
         DetailAST parent = typeDef.getParent();
         while (parent != null) {
-            int type = parent.getType();
-            if (type == CLASS_DEF || type == INTERFACE_DEF || type == ENUM_DEF || type == RECORD_DEF) {
+            if (TYPE_DECL_TOKENS.contains(parent.getType())) {
                 return true;
             }
             parent = parent.getParent();
@@ -85,8 +93,7 @@ public final class AstUtil {
         int depth = 0;
         DetailAST parent = node.getParent();
         while (parent != null) {
-            int type = parent.getType();
-            if (type == CLASS_DEF || type == INTERFACE_DEF || type == ENUM_DEF || type == RECORD_DEF) {
+            if (TYPE_DECL_TOKENS.contains(parent.getType())) {
                 depth++;
             }
             parent = parent.getParent();

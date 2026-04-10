@@ -6,6 +6,8 @@ import io.github.llmcodestyle.utils.AstMethodCallUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
+import java.util.Set;
+
 /**
  * Flags {@code length()} / {@code size()} comparisons replaceable with {@code isEmpty()}.
  */
@@ -16,6 +18,8 @@ public class UseIsEmptyCheck extends AbstractCheck {
      */
     static final String MSG_KEY = "use.isEmpty";
     private static final int[] TOKENS = {GT, GE, LT, LE, EQUAL, NOT_EQUAL};
+    private static final Set<Integer> ZERO_FORWARD_OPS = Set.of(GT, NOT_EQUAL, EQUAL);
+    private static final Set<Integer> ZERO_REVERSE_OPS = Set.of(LT, NOT_EQUAL, EQUAL);
 
     @Override
     public int[] getDefaultTokens() {
@@ -47,11 +51,7 @@ public class UseIsEmptyCheck extends AbstractCheck {
     }
 
     private static boolean isReplaceable(int op, int value) {
-        return isReplaceableZero(op, value) || isReplaceableOne(op, value);
-    }
-
-    private static boolean isReplaceableZero(int op, int value) {
-        return value == 0 && (op == GT || op == NOT_EQUAL || op == EQUAL);
+        return value == 0 && ZERO_FORWARD_OPS.contains(op) || isReplaceableOne(op, value);
     }
 
     private static boolean isReplaceableOne(int op, int value) {
@@ -59,11 +59,7 @@ public class UseIsEmptyCheck extends AbstractCheck {
     }
 
     private static boolean isReplaceableReversed(int op, int value) {
-        return isReplaceableReversedZero(op, value) || isReplaceableReversedOne(op, value);
-    }
-
-    private static boolean isReplaceableReversedZero(int op, int value) {
-        return value == 0 && (op == LT || op == NOT_EQUAL || op == EQUAL);
+        return value == 0 && ZERO_REVERSE_OPS.contains(op) || isReplaceableReversedOne(op, value);
     }
 
     private static boolean isReplaceableReversedOne(int op, int value) {

@@ -2,9 +2,9 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +23,7 @@ public class UnusedPrivateMembersCheck extends AbstractCheck {
     private static final int[] TOKENS = {CLASS_DEF};
 
     private static final Set<String> EXCLUDED_NAMES = Set.of("serialVersionUID");
+    private static final Set<Integer> PRIVATE_DECL_TOKENS = Set.of(VARIABLE_DEF, METHOD_DEF, CLASS_DEF, ENUM_DEF);
 
     @Override
     public int[] getDefaultTokens() {
@@ -41,7 +42,7 @@ public class UnusedPrivateMembersCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST ast) {
-        if (AstUtil.isNestedType(ast)) {
+        if (isNestedType(ast)) {
             return;
         }
         checkFile(ast);
@@ -72,8 +73,7 @@ public class UnusedPrivateMembersCheck extends AbstractCheck {
         collectPrivateDeclarations(objBlock, privates, declarationIdents);
         DetailAST child = objBlock.getFirstChild();
         while (child != null) {
-            int type = child.getType();
-            if (type == CLASS_DEF || type == ENUM_DEF || type == INTERFACE_DEF || type == RECORD_DEF) {
+            if (TYPE_DECL_TOKENS.contains(child.getType())) {
                 collectAllPrivateDeclarations(child, privates, declarationIdents);
             }
             child = child.getNextSibling();
@@ -83,8 +83,7 @@ public class UnusedPrivateMembersCheck extends AbstractCheck {
     private static void collectPrivateDeclarations(DetailAST objBlock, Map<String, Integer> privates, Set<DetailAST> declarationIdents) {
         DetailAST child = objBlock.getFirstChild();
         while (child != null) {
-            int type = child.getType();
-            if ((type == VARIABLE_DEF || type == METHOD_DEF || type == CLASS_DEF || type == ENUM_DEF) && isPrivateNonAnnotated(child)) {
+            if (PRIVATE_DECL_TOKENS.contains(child.getType()) && isPrivateNonAnnotated(child)) {
                 DetailAST ident = child.findFirstToken(IDENT);
                 if (ident != null) {
                     privates.putIfAbsent(ident.getText(), ident.getLineNo());

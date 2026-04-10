@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UnrelatedNestedRecordCheckTest {
 
     private static final Map<String, String> NO_PROPS = Map.of();
-    private static final int EXPECTED_VIOLATIONS = 5;
+    private static final int EXPECTED_VIOLATIONS = 7;
 
     @Test
     void unrelatedNestedRecordsProduceViolations() throws Exception {

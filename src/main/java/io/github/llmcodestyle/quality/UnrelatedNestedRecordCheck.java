@@ -140,10 +140,9 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
 
     private static boolean scanForReferences(DetailAST node, Set<String> outerNames, Set<String> recordOwnNames) {
         for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
+            // LITERAL_THIS is intentionally not treated as an outer reference: records are
+            // implicitly static, so `this` always refers to the record's own instance.
             if (matchesOuterIdent(child, outerNames, recordOwnNames)) {
-                return true;
-            }
-            if (child.getType() == LITERAL_THIS) {
                 return true;
             }
             if (scanForReferences(child, outerNames, recordOwnNames)) {
@@ -169,10 +168,6 @@ public class UnrelatedNestedRecordCheck extends AbstractCheck {
         if (parent == null) {
             return false;
         }
-        return !isDeclarationParent(parent.getType()) || !node.equals(parent.findFirstToken(IDENT));
-    }
-
-    private static boolean isDeclarationParent(int parentType) {
-        return DECLARATION_PARENT_TYPES.contains(parentType);
+        return !DECLARATION_PARENT_TYPES.contains(parent.getType()) || !node.equals(parent.findFirstToken(IDENT));
     }
 }

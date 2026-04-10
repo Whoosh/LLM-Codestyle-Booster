@@ -23,4 +23,18 @@ public class UnrelatedNestedRecordValid {
             }
         }
     }
+
+    // Records nested 2 levels deep that DO reference their immediate enclosing
+    // type's members must NOT be flagged.
+    static class InnerHolder {
+
+        int innerField;
+
+        record DeepReferencing(int v) {
+
+            public int total(InnerHolder host) {
+                return v + host.innerField;
+            }
+        }
+    }
 }

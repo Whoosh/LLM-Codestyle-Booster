@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.layout;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ class UnnecessaryLineWrapCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(
             UnnecessaryLineWrapCheck.class,
             "layout/invalid/UnnecessaryLineWrapInvalid.java",
             Map.of("maxLineLength", "180"));
@@ -27,7 +27,7 @@ class UnnecessaryLineWrapCheckTest {
     @Test
     void validCasesProduceNoViolations() throws Exception {
         assertTrue(
-            TestCheckSupport.runTreeWalkerCheck(
+            TestCheckSupportUtil.runTreeWalkerCheck(
                 UnnecessaryLineWrapCheck.class,
                 "layout/valid/UnnecessaryLineWrapValid.java",
                 Map.of("maxLineLength", "180")).isEmpty(),
@@ -38,7 +38,7 @@ class UnnecessaryLineWrapCheckTest {
     void setMaxLineLengthAffectsThreshold() throws Exception {
         new UnnecessaryLineWrapCheck().setMaxLineLength(Integer.parseInt(SHORT_MAX_LINE));
         assertFalse(
-            TestCheckSupport.runTreeWalkerCheck(
+            TestCheckSupportUtil.runTreeWalkerCheck(
                 UnnecessaryLineWrapCheck.class,
                 "layout/invalid/UnnecessaryLineWrapInvalid.java",
                 Map.of("maxLineLength", SHORT_MAX_LINE)).isEmpty(),

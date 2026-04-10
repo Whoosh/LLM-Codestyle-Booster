@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.simplify;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +25,6 @@ class IfReturnBooleanLiteralCheckTest {
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {
-        return TestCheckSupport.runTreeWalkerCheck(IfReturnBooleanLiteralCheck.class, resource, NO_PROPS);
+        return TestCheckSupportUtil.runTreeWalkerCheck(IfReturnBooleanLiteralCheck.class, resource, NO_PROPS);
     }
 }

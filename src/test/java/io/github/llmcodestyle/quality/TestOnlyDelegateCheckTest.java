@@ -2,7 +2,7 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -17,19 +17,19 @@ class TestOnlyDelegateCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(TestOnlyDelegateCheck.class, INVALID_FILE, Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(TestOnlyDelegateCheck.class, INVALID_FILE, Map.of());
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 6 test-only delegate violations, got " + violations.size());
     }
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        assertTrue(TestCheckSupport.runTreeWalkerCheck(TestOnlyDelegateCheck.class, VALID_FILE, Map.of()).isEmpty(), "Expected no violations for valid cases");
+        assertTrue(TestCheckSupportUtil.runTreeWalkerCheck(TestOnlyDelegateCheck.class, VALID_FILE, Map.of()).isEmpty(), "Expected no violations for valid cases");
     }
 
     @Test
     void messageContainsBothMethodNames() throws Exception {
         assertTrue(
-            TestCheckSupport.runTreeWalkerCheck(
+            TestCheckSupportUtil.runTreeWalkerCheck(
                 TestOnlyDelegateCheck.class,
                 INVALID_FILE,
                 Map.of()).stream().anyMatch(e -> e.getMessage().contains("splitByPattern") && e.getMessage().contains("buildProblems")),
@@ -39,7 +39,7 @@ class TestOnlyDelegateCheckTest {
     @Test
     void publicDelegateIsFlagged() throws Exception {
         assertTrue(
-            TestCheckSupport.runTreeWalkerCheck(
+            TestCheckSupportUtil.runTreeWalkerCheck(
                 TestOnlyDelegateCheck.class,
                 INVALID_FILE,
                 Map.of()).stream().anyMatch(e -> e.getMessage().contains("publicDelegate")),
@@ -49,7 +49,7 @@ class TestOnlyDelegateCheckTest {
     @Test
     void instanceDelegateIsFlagged() throws Exception {
         assertTrue(
-            TestCheckSupport.runTreeWalkerCheck(
+            TestCheckSupportUtil.runTreeWalkerCheck(
                 TestOnlyDelegateCheck.class,
                 INVALID_FILE,
                 Map.of()).stream().anyMatch(e -> e.getMessage().contains("instanceDelegate")),

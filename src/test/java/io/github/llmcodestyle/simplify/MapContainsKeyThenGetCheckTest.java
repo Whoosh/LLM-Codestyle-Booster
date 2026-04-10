@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.simplify;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -23,6 +23,6 @@ class MapContainsKeyThenGetCheckTest {
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {
-        return TestCheckSupport.runTreeWalkerCheck(MapContainsKeyThenGetCheck.class, resource, NO_PROPS);
+        return TestCheckSupportUtil.runTreeWalkerCheck(MapContainsKeyThenGetCheck.class, resource, NO_PROPS);
     }
 }

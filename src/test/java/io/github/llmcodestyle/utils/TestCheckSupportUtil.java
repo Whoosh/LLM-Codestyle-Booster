@@ -1,4 +1,6 @@
-package io.github.llmcodestyle;
+package io.github.llmcodestyle.utils;
+
+import io.github.llmcodestyle.TestAuditListener;
 
 import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
@@ -16,16 +18,16 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Shared helper for building Checker instances in custom check tests.
  */
-public final class TestCheckSupport {
+public final class TestCheckSupportUtil {
 
-    private TestCheckSupport() {
+    private TestCheckSupportUtil() {
     }
 
     /**
      * Run a TreeWalker check against a resource file and return violations.
      */
     public static List<AuditEvent> runTreeWalkerCheck(Class<?> checkClass, String resourceFile, Map<String, String> props) throws Exception {
-        URL resource = TestCheckSupport.class.getClassLoader().getResource(resourceFile);
+        URL resource = TestCheckSupportUtil.class.getClassLoader().getResource(resourceFile);
         assertNotNull(resource, "Test resource not found: " + resourceFile);
 
         DefaultConfiguration checkConfig = new DefaultConfiguration(checkClass.getName());
@@ -41,7 +43,7 @@ public final class TestCheckSupport {
         rootConfig.addChild(twConfig);
 
         Checker checker = new Checker();
-        checker.setModuleClassLoader(TestCheckSupport.class.getClassLoader());
+        checker.setModuleClassLoader(TestCheckSupportUtil.class.getClassLoader());
         checker.configure(rootConfig);
 
         List<AuditEvent> violations = new ArrayList<>();
@@ -55,7 +57,7 @@ public final class TestCheckSupport {
      * Run multiple TreeWalker checks simultaneously against a resource file.
      */
     public static List<AuditEvent> runMultipleTreeWalkerChecks(Map<String, Map<String, String>> checks, String resourceFile) throws Exception {
-        URL resource = TestCheckSupport.class.getClassLoader().getResource(resourceFile);
+        URL resource = TestCheckSupportUtil.class.getClassLoader().getResource(resourceFile);
         assertNotNull(resource, "Test resource not found: " + resourceFile);
 
         DefaultConfiguration twConfig = new DefaultConfiguration(TreeWalker.class.getName());
@@ -72,7 +74,7 @@ public final class TestCheckSupport {
         rootConfig.addChild(twConfig);
 
         Checker checker = new Checker();
-        checker.setModuleClassLoader(TestCheckSupport.class.getClassLoader());
+        checker.setModuleClassLoader(TestCheckSupportUtil.class.getClassLoader());
         checker.configure(rootConfig);
 
         List<AuditEvent> violations = new ArrayList<>();
@@ -90,7 +92,7 @@ public final class TestCheckSupport {
 
         List<File> files = new ArrayList<>();
         for (String resourceFile : resourceFiles) {
-            URL resource = TestCheckSupport.class.getClassLoader().getResource(resourceFile);
+            URL resource = TestCheckSupportUtil.class.getClassLoader().getResource(resourceFile);
             assertNotNull(resource, "Test resource not found: " + resourceFile);
             files.add(new File(resource.toURI()));
         }
@@ -108,7 +110,7 @@ public final class TestCheckSupport {
         rootConfig.addChild(twConfig);
 
         Checker checker = new Checker();
-        checker.setModuleClassLoader(TestCheckSupport.class.getClassLoader());
+        checker.setModuleClassLoader(TestCheckSupportUtil.class.getClassLoader());
         checker.configure(rootConfig);
 
         List<AuditEvent> violations = new ArrayList<>();
@@ -122,7 +124,7 @@ public final class TestCheckSupport {
      * Run a FileSet check (AbstractFileSetCheck subclass) against a resource file.
      */
     public static List<AuditEvent> runFileSetCheck(Class<?> checkClass, String resourceFile, Map<String, String> props) throws Exception {
-        URL resource = TestCheckSupport.class.getClassLoader().getResource(resourceFile);
+        URL resource = TestCheckSupportUtil.class.getClassLoader().getResource(resourceFile);
         assertNotNull(resource, "Test resource not found: " + resourceFile);
 
         DefaultConfiguration checkConfig = new DefaultConfiguration(checkClass.getName());
@@ -135,7 +137,7 @@ public final class TestCheckSupport {
         rootConfig.addChild(checkConfig);
 
         Checker checker = new Checker();
-        checker.setModuleClassLoader(TestCheckSupport.class.getClassLoader());
+        checker.setModuleClassLoader(TestCheckSupportUtil.class.getClassLoader());
         checker.configure(rootConfig);
 
         List<AuditEvent> violations = new ArrayList<>();

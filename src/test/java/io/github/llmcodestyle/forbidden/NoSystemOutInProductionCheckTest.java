@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.forbidden;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
@@ -51,6 +51,6 @@ class NoSystemOutInProductionCheckTest {
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {
-        return TestCheckSupport.runTreeWalkerCheck(NoSystemOutInProductionCheck.class, resource, NO_PROPS);
+        return TestCheckSupportUtil.runTreeWalkerCheck(NoSystemOutInProductionCheck.class, resource, NO_PROPS);
     }
 }

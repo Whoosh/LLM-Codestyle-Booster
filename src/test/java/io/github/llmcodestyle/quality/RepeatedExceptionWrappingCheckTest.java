@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.quality;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 
@@ -27,13 +27,13 @@ class RepeatedExceptionWrappingCheckTest {
     @Test
     void higherThresholdSuppressesViolations() throws Exception {
         new RepeatedExceptionWrappingCheck().setMinOccurrences(1);
-        assertTrue(TestCheckSupport.runTreeWalkerCheck(
+        assertTrue(TestCheckSupportUtil.runTreeWalkerCheck(
             RepeatedExceptionWrappingCheck.class,
             "quality/invalid/RepeatedExceptionWrappingInvalid.java",
             Map.of("minOccurrences", "4")).isEmpty());
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {
-        return TestCheckSupport.runTreeWalkerCheck(RepeatedExceptionWrappingCheck.class, resource, NO_PROPS);
+        return TestCheckSupportUtil.runTreeWalkerCheck(RepeatedExceptionWrappingCheck.class, resource, NO_PROPS);
     }
 }

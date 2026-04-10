@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.quality;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
@@ -17,20 +17,20 @@ class LongTestLiteralCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(LongTestLiteralCheck.class, "quality/invalid/LongTestLiteralInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(LongTestLiteralCheck.class, "quality/invalid/LongTestLiteralInvalid.java", Map.of());
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 3 long test literal violations, got " + violations.size());
     }
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        assertTrue(TestCheckSupport.runTreeWalkerCheck(LongTestLiteralCheck.class, "quality/valid/LongTestLiteralValid.java", Map.of()).isEmpty(), "Expected no violations");
+        assertTrue(TestCheckSupportUtil.runTreeWalkerCheck(LongTestLiteralCheck.class, "quality/valid/LongTestLiteralValid.java", Map.of()).isEmpty(), "Expected no violations");
     }
 
     @Test
     void setMaxLengthAffectsThreshold() throws Exception {
         new LongTestLiteralCheck().setMaxLength(Integer.parseInt(SHORT_MAX));
         assertFalse(
-            TestCheckSupport.runTreeWalkerCheck(
+            TestCheckSupportUtil.runTreeWalkerCheck(
                 LongTestLiteralCheck.class,
                 "quality/invalid/LongTestLiteralInvalid.java",
                 Map.of("maxLength", SHORT_MAX)).isEmpty(),

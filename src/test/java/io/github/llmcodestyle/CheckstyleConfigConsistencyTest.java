@@ -10,6 +10,7 @@ import org.junit.jupiter.api.io.TempDir;
 import io.github.llmcodestyle.forbidden.ForbidAssertKeywordCheck;
 import io.github.llmcodestyle.layout.BlankLineAfterCommentCheck;
 import io.github.llmcodestyle.layout.UnnecessaryLineWrapCheck;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 
 import java.net.URL;
 import java.nio.file.Files;
@@ -72,7 +73,7 @@ class CheckstyleConfigConsistencyTest {
 
     @Test
     void annotationOnSeparateLineDoesNotTriggerUnnecessaryWrap() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+        List<AuditEvent> violations = TestCheckSupportUtil.runMultipleTreeWalkerChecks(
             Map.of(
                 ANNOTATION_CHECK,
                 Map.of("allowSamelineSingleParameterlessAnnotation", "false", "allowSamelineParameterizedAnnotation", "false"),
@@ -88,7 +89,7 @@ class CheckstyleConfigConsistencyTest {
 
     @Test
     void tempDirOnSeparateLineDoesNotTriggerUnnecessaryWrap() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+        List<AuditEvent> violations = TestCheckSupportUtil.runMultipleTreeWalkerChecks(
             Map.of(
                 ANNOTATION_CHECK,
                 Map.of("allowSamelineSingleParameterlessAnnotation", "false", "tokens", "VARIABLE_DEF"),
@@ -101,7 +102,7 @@ class CheckstyleConfigConsistencyTest {
 
     @Test
     void assertReplacementWithIfThrowSatisfiesLeftCurly() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+        List<AuditEvent> violations = TestCheckSupportUtil.runMultipleTreeWalkerChecks(
             Map.of(
                 LEFT_CURLY_CHECK,
                 Map.of(),
@@ -115,8 +116,8 @@ class CheckstyleConfigConsistencyTest {
 
     @Test
     void commentDirectlyAboveCodeSatisfiesBothCommentChecks() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(Map.of(COMMENTS_INDENT_CHECK, Map.of()), "valid/IdempotencyGoldenMain.java");
-        List<AuditEvent> blankLineViolations = TestCheckSupport.runFileSetCheck(
+        List<AuditEvent> violations = TestCheckSupportUtil.runMultipleTreeWalkerChecks(Map.of(COMMENTS_INDENT_CHECK, Map.of()), "valid/IdempotencyGoldenMain.java");
+        List<AuditEvent> blankLineViolations = TestCheckSupportUtil.runFileSetCheck(
             BlankLineAfterCommentCheck.class,
             "valid/IdempotencyGoldenMain.java",
             Map.of("fileExtensions", "java"));
@@ -149,7 +150,7 @@ class CheckstyleConfigConsistencyTest {
 
     @Test
     void shortChainOnOneLineDoesNotTriggerChainedCallBreak() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+        List<AuditEvent> violations = TestCheckSupportUtil.runMultipleTreeWalkerChecks(
             Map.of("io.github.llmcodestyle.layout.ChainedCallLineBreakCheck", Map.of("minChainLength", "4")),
             "valid/IdempotencyGoldenMain.java");
         assertEquals(0, countMessages(violations, "Chained method calls"), "3-call chain on one line must not trigger ChainedCallLineBreak: " + format(violations));
@@ -157,7 +158,7 @@ class CheckstyleConfigConsistencyTest {
 
     @Test
     void methodCallArgsAndUnnecessaryWrapDoNotConflict() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+        List<AuditEvent> violations = TestCheckSupportUtil.runMultipleTreeWalkerChecks(
             Map.of(
                 "io.github.llmcodestyle.layout.MethodCallArgumentsOnSameLineCheck",
                 Map.of(),
@@ -169,7 +170,7 @@ class CheckstyleConfigConsistencyTest {
 
     @Test
     void singleUseVarAndChainedCallDoNotConflict() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+        List<AuditEvent> violations = TestCheckSupportUtil.runMultipleTreeWalkerChecks(
             Map.of(
                 "io.github.llmcodestyle.simplify.SingleUseLocalVariableCheck",
                 Map.of(),
@@ -181,7 +182,7 @@ class CheckstyleConfigConsistencyTest {
 
     @Test
     void compactableParamsAndMethodCallArgsDoNotConflict() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+        List<AuditEvent> violations = TestCheckSupportUtil.runMultipleTreeWalkerChecks(
             Map.of(
                 "io.github.llmcodestyle.layout.CompactableParameterListCheck",
                 Map.of("maxLineLength", "180"),
@@ -193,7 +194,7 @@ class CheckstyleConfigConsistencyTest {
 
     @Test
     void arrayInitWhitespaceChecksDoNotPingPong() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+        List<AuditEvent> violations = TestCheckSupportUtil.runMultipleTreeWalkerChecks(
             Map.of(
                 WHITESPACE_AROUND_CHECK,
                 Map.of("tokens", WS_AROUND_TOKENS_NO_ARRAY_INIT),
@@ -205,7 +206,7 @@ class CheckstyleConfigConsistencyTest {
 
     @Test
     void stressTestChainPatternsProduceNoLayoutConflicts() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runMultipleTreeWalkerChecks(
+        List<AuditEvent> violations = TestCheckSupportUtil.runMultipleTreeWalkerChecks(
             Map.of(
                 UnnecessaryLineWrapCheck.class.getName(),
                 Map.of("maxLineLength", "180"),
@@ -220,7 +221,7 @@ class CheckstyleConfigConsistencyTest {
     }
 
     private static List<AuditEvent> runChainPlusWrap(String resource) throws Exception {
-        return TestCheckSupport.runMultipleTreeWalkerChecks(
+        return TestCheckSupportUtil.runMultipleTreeWalkerChecks(
             Map.of(
                 UnnecessaryLineWrapCheck.class.getName(),
                 Map.of("maxLineLength", "180"),

@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.layout;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ class BlankLineAfterCommentCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runFileSetCheck(
+        List<AuditEvent> violations = TestCheckSupportUtil.runFileSetCheck(
             BlankLineAfterCommentCheck.class,
             "layout/invalid/BlankLineAfterCommentInvalid.java",
             Map.of("fileExtensions", "java"));
@@ -26,7 +26,7 @@ class BlankLineAfterCommentCheckTest {
     @Test
     void validCasesProduceNoViolations() throws Exception {
         assertTrue(
-            TestCheckSupport.runFileSetCheck(
+            TestCheckSupportUtil.runFileSetCheck(
                 BlankLineAfterCommentCheck.class,
                 "layout/valid/BlankLineAfterCommentValid.java",
                 Map.of("fileExtensions", "java")).isEmpty(),
@@ -35,7 +35,7 @@ class BlankLineAfterCommentCheckTest {
 
     @Test
     void messageIsDescriptive() throws Exception {
-        for (AuditEvent event : TestCheckSupport.runFileSetCheck(
+        for (AuditEvent event : TestCheckSupportUtil.runFileSetCheck(
             BlankLineAfterCommentCheck.class,
             "layout/invalid/BlankLineAfterCommentInvalid.java",
             Map.of("fileExtensions", "java"))) {

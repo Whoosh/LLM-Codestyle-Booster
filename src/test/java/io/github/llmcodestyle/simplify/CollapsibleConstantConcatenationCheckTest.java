@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.simplify;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
@@ -20,13 +20,13 @@ class CollapsibleConstantConcatenationCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class, INVALID_RESOURCE, Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class, INVALID_RESOURCE, Map.of());
         assertEquals(EXPECTED_TOTAL_VIOLATIONS, violations.size(), "Expected 18 violations, got: " + format(violations));
     }
 
     @Test
     void invalidMessagesContainFieldName() throws Exception {
-        for (AuditEvent event : TestCheckSupport.runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class, INVALID_RESOURCE, Map.of())) {
+        for (AuditEvent event : TestCheckSupportUtil.runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class, INVALID_RESOURCE, Map.of())) {
             assertTrue(
                 event.getMessage().contains("collapsible") || event.getMessage().contains("single constant"),
                 "Expected collapsible/constant mention in message, got: " + event.getMessage());
@@ -35,7 +35,7 @@ class CollapsibleConstantConcatenationCheckTest {
 
     @Test
     void tripleCountsThreeOperands() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class, INVALID_RESOURCE, Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class, INVALID_RESOURCE, Map.of());
         AuditEvent tripleConcatEvent = violations.stream()
             .filter(e -> e.getMessage().contains("TRIPLE_CONCAT"))
             .findFirst()
@@ -46,28 +46,28 @@ class CollapsibleConstantConcatenationCheckTest {
 
     @Test
     void arrayElementConcatenationsFireSeparately() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class, INVALID_RESOURCE, Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class, INVALID_RESOURCE, Map.of());
         long arrayViolations = violations.stream().filter(e -> e.getMessage().contains("Array element")).count();
         assertEquals(EXPECTED_ARRAY_VIOLATIONS, arrayViolations, "Expected 4 array element violations, got: " + arrayViolations + " — " + format(violations));
     }
 
     @Test
     void nestedClassAndEnumFireIndependently() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(
             CollapsibleConstantConcatenationCheck.class, "simplify/invalid/CollapsibleConstantEdgeCases.java", Map.of());
         assertEquals(EXPECTED_EDGE_CASE_VIOLATIONS, violations.size(), "Expected 5 edge case violations, got: " + format(violations));
     }
 
     @Test
     void methodBodyRunsDetected() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class, INVALID_RESOURCE, Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class, INVALID_RESOURCE, Map.of());
         long methodRunViolations = violations.stream().filter(e -> e.getMessage().contains("consecutive")).count();
         assertEquals(EXPECTED_RUN_VIOLATIONS, methodRunViolations, "Expected 3 method-body violations, got: " + methodRunViolations + " — " + format(violations));
     }
 
     @Test
     void recordWithMethodBodyRunDetected() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(
             CollapsibleConstantConcatenationCheck.class, "simplify/invalid/CollapsibleRecordMethodRun.java", Map.of());
         long runViolations = violations.stream().filter(e -> e.getMessage().contains("consecutive")).count();
         assertTrue(runViolations >= 1, "Expected at least 1 method-body run violation in record, got: " + runViolations + " - all: " + format(violations));
@@ -76,7 +76,7 @@ class CollapsibleConstantConcatenationCheckTest {
     @Test
     void validCasesProduceNoViolations() throws Exception {
         assertTrue(
-            TestCheckSupport.runTreeWalkerCheck(
+            TestCheckSupportUtil.runTreeWalkerCheck(
                 CollapsibleConstantConcatenationCheck.class,
                 "simplify/valid/CollapsibleConstantValid.java",
                 Map.of()).isEmpty(),

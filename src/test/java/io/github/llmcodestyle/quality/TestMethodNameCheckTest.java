@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.quality;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ class TestMethodNameCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(TestMethodNameCheck.class, "quality/invalid/TestMethodNameInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(TestMethodNameCheck.class, "quality/invalid/TestMethodNameInvalid.java", Map.of());
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 4 underscore violations in test methods, got " + violations.size());
         for (AuditEvent event : violations) {
             assertTrue(event.getMessage().contains("camelCase"), "Expected camelCase mention in message, got: " + event.getMessage());
@@ -25,6 +25,6 @@ class TestMethodNameCheckTest {
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        assertTrue(TestCheckSupport.runTreeWalkerCheck(TestMethodNameCheck.class, "quality/valid/TestMethodNameValid.java", Map.of()).isEmpty(), "Expected no violations");
+        assertTrue(TestCheckSupportUtil.runTreeWalkerCheck(TestMethodNameCheck.class, "quality/valid/TestMethodNameValid.java", Map.of()).isEmpty(), "Expected no violations");
     }
 }

@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.simplify;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ class StaticImportCandidateCheckTest {
     @Test
     void invalidCasesProduceViolations() throws Exception {
         assertFalse(
-            TestCheckSupport.runTreeWalkerCheck(
+            TestCheckSupportUtil.runTreeWalkerCheck(
                 StaticImportCandidateCheck.class,
                 "simplify/invalid/StaticImportCandidateInvalid.java",
                 Map.of()).isEmpty(),
@@ -27,25 +27,25 @@ class StaticImportCandidateCheckTest {
 
     @Test
     void everyDistinctQualifiedRefFires() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateInvalid.java", Map.of());
         assertEquals(EXPECTED_DISTINCT_VIOLATIONS, violations.size(), "Expected 4 violations (every distinct qualified ref) but got: " + format(violations));
     }
 
     @Test
     void qualifiedConstantAsMethodReceiverFires() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateInvalid.java", Map.of());
         assertTrue(violations.stream().anyMatch(e -> e.getLine() == HOLDER_PATTERN_LINE), "Expected violation on line 17, got: " + format(violations));
     }
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/valid/StaticImportCandidateValid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/valid/StaticImportCandidateValid.java", Map.of());
         assertEquals(0, violations.size(), "Expected no violations (PI already static-imported) but got: " + format(violations));
     }
 
     @Test
     void staticImportExcludesQualifiedRefButOtherConstantStillFires() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateWithImport.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateWithImport.java", Map.of());
         assertEquals(1, violations.size(), "Expected 1 violation (Integer.MAX_VALUE only), got: " + format(violations));
     }
 

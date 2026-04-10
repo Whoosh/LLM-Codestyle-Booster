@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.simplify;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +25,6 @@ class CollapsibleGuardClauseCheckTest {
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {
-        return TestCheckSupport.runTreeWalkerCheck(CollapsibleGuardClauseCheck.class, resource, NO_PROPS);
+        return TestCheckSupportUtil.runTreeWalkerCheck(CollapsibleGuardClauseCheck.class, resource, NO_PROPS);
     }
 }

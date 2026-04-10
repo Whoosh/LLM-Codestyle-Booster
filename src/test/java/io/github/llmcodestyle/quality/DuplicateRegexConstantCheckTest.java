@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.quality;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
 
@@ -91,11 +91,11 @@ class DuplicateRegexConstantCheckTest {
     }
 
     private static List<AuditEvent> runSingle(String resource) throws Exception {
-        return TestCheckSupport.runTreeWalkerCheck(DuplicateRegexConstantCheck.class, resource, NO_PROPS);
+        return TestCheckSupportUtil.runTreeWalkerCheck(DuplicateRegexConstantCheck.class, resource, NO_PROPS);
     }
 
     private static List<AuditEvent> runMulti(String... resources) throws Exception {
-        return TestCheckSupport.runTreeWalkerCheckMultiFile(DuplicateRegexConstantCheck.class, List.of(resources), NO_PROPS);
+        return TestCheckSupportUtil.runTreeWalkerCheckMultiFile(DuplicateRegexConstantCheck.class, List.of(resources), NO_PROPS);
     }
 
     private static String format(List<AuditEvent> events) {

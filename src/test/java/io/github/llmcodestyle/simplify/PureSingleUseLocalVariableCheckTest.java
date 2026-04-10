@@ -1,6 +1,6 @@
 package io.github.llmcodestyle.simplify;
 
-import io.github.llmcodestyle.TestCheckSupport;
+import io.github.llmcodestyle.utils.TestCheckSupportUtil;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
@@ -16,13 +16,13 @@ class PureSingleUseLocalVariableCheckTest {
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarInvalid.java", Map.of());
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 4 pure single-use violations, got: " + violations.size());
     }
 
     @Test
     void violationMessagesContainVariableName() throws Exception {
-        List<AuditEvent> violations = TestCheckSupport.runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarInvalid.java", Map.of());
+        List<AuditEvent> violations = TestCheckSupportUtil.runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarInvalid.java", Map.of());
         assertTrue(violations.stream().anyMatch(e -> e.getMessage().contains("number")), "Expected 'number' in messages");
         assertTrue(violations.stream().anyMatch(e -> e.getMessage().contains("len")), "Expected 'len' in messages");
     }
@@ -30,7 +30,7 @@ class PureSingleUseLocalVariableCheckTest {
     @Test
     void validCasesProduceNoViolations() throws Exception {
         assertTrue(
-            TestCheckSupport.runTreeWalkerCheck(
+            TestCheckSupportUtil.runTreeWalkerCheck(
                 PureSingleUseLocalVariableCheck.class, "simplify/valid/PureSingleUseVarValid.java", Map.of()).isEmpty(),
             "Expected no violations");
     }

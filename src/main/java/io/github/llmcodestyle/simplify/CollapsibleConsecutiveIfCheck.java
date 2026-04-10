@@ -8,6 +8,7 @@ import io.github.llmcodestyle.utils.AstSingleUseUtil;
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Detects two (or more) consecutive {@code if} statements whose bodies are a single
@@ -35,6 +36,7 @@ public class CollapsibleConsecutiveIfCheck extends AbstractCheck {
      */
     static final String MSG_KEY = "collapsible.consecutive.if";
     private static final int[] TOKENS = {SLIST};
+    private static final Set<Integer> TERMINATING_TOKENS = Set.of(LITERAL_RETURN, LITERAL_CONTINUE, LITERAL_BREAK, LITERAL_THROW);
 
     @Override
     public int[] getDefaultTokens() {
@@ -59,7 +61,7 @@ public class CollapsibleConsecutiveIfCheck extends AbstractCheck {
             DetailAST current = statements.get(i);
             DetailAST prevBody = extractTerminatingBody(prev);
             DetailAST currentBody = extractTerminatingBody(current);
-            if (prevBody != null && currentBody != null && structurallyEqual(prevBody, currentBody)) {
+            if (prevBody != null && currentBody != null && AstQueryUtil.structurallyEqual(prevBody, currentBody)) {
                 log(current.getLineNo(), current.getColumnNo(), MSG_KEY, prev.getLineNo());
             }
         }
@@ -83,7 +85,7 @@ public class CollapsibleConsecutiveIfCheck extends AbstractCheck {
             return null;
         }
         DetailAST single = unwrapSingleStatement(bodyNode);
-        return single != null && isTerminating(single.getType()) ? single : null;
+        return single != null && TERMINATING_TOKENS.contains(single.getType()) ? single : null;
     }
 
     /**
@@ -99,34 +101,4 @@ public class CollapsibleConsecutiveIfCheck extends AbstractCheck {
         return inner.size() == 1 ? inner.get(0) : null;
     }
 
-    private static boolean isTerminating(int type) {
-        return type == LITERAL_RETURN || type == LITERAL_CONTINUE || type == LITERAL_BREAK || type == LITERAL_THROW;
-    }
-
-    /**
-     * Structural AST equality: same type, same text, same children in order. Token positions ignored.
-     */
-    private static boolean structurallyEqual(DetailAST a, DetailAST b) {
-        if (a == null || b == null) {
-            return a == null && b == null;
-        }
-        if (a.getType() != b.getType()) {
-            return false;
-        }
-        String ta = a.getText();
-        String tb = b.getText();
-        if (ta == null ? tb != null : !ta.equals(tb)) {
-            return false;
-        }
-        DetailAST ca = a.getFirstChild();
-        DetailAST cb = b.getFirstChild();
-        while (ca != null && cb != null) {
-            if (!structurallyEqual(ca, cb)) {
-                return false;
-            }
-            ca = ca.getNextSibling();
-            cb = cb.getNextSibling();
-        }
-        return ca == null && cb == null;
-    }
 }

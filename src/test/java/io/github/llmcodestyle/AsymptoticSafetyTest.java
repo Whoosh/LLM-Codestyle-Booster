@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import io.github.llmcodestyle.simplify.BooleanFromConditionCheck;
 import io.github.llmcodestyle.simplify.CollapsibleConstantConcatenationCheck;
 import io.github.llmcodestyle.simplify.CollapsibleConsecutiveIfCheck;
+import io.github.llmcodestyle.simplify.OrChainToSetContainsCheck;
 import io.github.llmcodestyle.simplify.CommonsLang3StringConstantCheck;
 import io.github.llmcodestyle.simplify.CollapsibleGuardClauseCheck;
 import io.github.llmcodestyle.simplify.CollapsibleNestedIfCheck;
@@ -88,6 +89,10 @@ import static org.junit.jupiter.api.Assertions.*;
  *   <li>{@link DuplicateMethodBodyCheck} — reporting duplicate bodies does not suggest any
  *       runtime change. The check itself runs in O(total source AST nodes) with a per-method
  *       body cap ({@code maxBodyNodes}, default 400) to bound the hash-key size</li>
+ *   <li>{@link OrChainToSetContainsCheck} — the recommended fix is to extract literals into a
+ *       {@code static final Set} and use {@code .contains()}; the call sites then do one
+ *       hash-lookup per invocation instead of an N-way equality chain, which is either neutral
+ *       or an improvement (JIT resolves the Set once at class init)</li>
  * </ul>
  */
 class AsymptoticSafetyTest {

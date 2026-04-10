@@ -243,6 +243,7 @@
         <module name="io.github.llmcodestyle.simplify.TrivialSingleUsePrivateMethodCheck"/>
         <module name="io.github.llmcodestyle.simplify.CommonsLang3StringConstantCheck"/>
         <module name="io.github.llmcodestyle.simplify.CollapsibleConsecutiveIfCheck"/>
+        <module name="io.github.llmcodestyle.simplify.OrChainToSetContainsCheck"/>
 
         <!-- Miscellaneous -->
         <module name="ArrayTypeStyle"/>

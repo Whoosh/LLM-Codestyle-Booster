@@ -2,6 +2,7 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.pojos.RegexConstantOccurrence;
 import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
@@ -42,7 +43,7 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
     private static final String PATTERN_TYPE = "Pattern";
     private static final String UNKNOWN = "<unknown>";
 
-    private final Map<String, FirstOccurrence> seenRegex = new HashMap<>();
+    private final Map<String, RegexConstantOccurrence> seenRegex = new HashMap<>();
 
     @Override
     public int[] getDefaultTokens() {
@@ -73,11 +74,11 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
         String constName = extractConstName(ast);
         String className = extractEnclosingClassName(ast);
 
-        FirstOccurrence prev = seenRegex.get(regexValue);
+        RegexConstantOccurrence prev = seenRegex.get(regexValue);
         if (prev != null) {
             log(ast, MSG_KEY, constName, prev.constName(), prev.className());
         } else {
-            seenRegex.put(regexValue, new FirstOccurrence(className, constName));
+            seenRegex.put(regexValue, new RegexConstantOccurrence(className, constName));
         }
     }
 
@@ -174,6 +175,4 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
         return UNKNOWN;
     }
 
-    private record FirstOccurrence(String className, String constName) {
-    }
 }

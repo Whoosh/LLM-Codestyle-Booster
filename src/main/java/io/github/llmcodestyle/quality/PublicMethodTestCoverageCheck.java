@@ -2,6 +2,7 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.pojos.MethodInfo;
 import io.github.llmcodestyle.utils.AstUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
@@ -257,6 +258,4 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
         }
     }
 
-    private record MethodInfo(String name, int line) {
-    }
 }

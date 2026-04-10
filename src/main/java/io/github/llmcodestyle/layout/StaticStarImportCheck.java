@@ -2,6 +2,7 @@ package io.github.llmcodestyle.layout;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.pojos.ImportInfo;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -69,11 +70,11 @@ public class StaticStarImportCheck extends AbstractCheck {
     @Override
     public void finishTree(DetailAST rootAST) {
         for (ImportInfo info : explicitImports) {
-            List<String> parents = memberToParents.get(info.memberName);
+            List<String> parents = memberToParents.get(info.memberName());
             if (parents != null && hasCollision(parents)) {
                 continue;
             }
-            log(info.ast, MSG_KEY);
+            log(info.ast(), MSG_KEY);
         }
         explicitImports.clear();
         memberToParents.clear();
@@ -104,6 +105,4 @@ public class StaticStarImportCheck extends AbstractCheck {
         return parentDot.getText();
     }
 
-    private record ImportInfo(DetailAST ast, String memberName, String parentClass) {
-    }
 }

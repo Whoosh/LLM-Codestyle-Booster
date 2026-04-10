@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.pojos.CatchEntry;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -39,7 +40,7 @@ public class IdenticalCatchBodyCheck extends AbstractCheck {
     @Override
     public void visitToken(DetailAST tryAst) {
         for (List<CatchEntry> group : collectCatchEntries(tryAst).stream()
-            .collect(Collectors.groupingBy(CatchEntry::fp))
+            .collect(Collectors.groupingBy(CatchEntry::fingerprint))
             .values()) {
             if (group.size() >= 2) {
                 for (CatchEntry entry : group) {
@@ -61,9 +62,6 @@ public class IdenticalCatchBodyCheck extends AbstractCheck {
             }
         }
         return entries;
-    }
-
-    private record CatchEntry(DetailAST ast, String fp) {
     }
 
     private static String extractCaughtVarName(DetailAST catchAst) {

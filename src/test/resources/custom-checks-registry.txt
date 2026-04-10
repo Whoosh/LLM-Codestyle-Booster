@@ -51,3 +51,4 @@ IfReturnBooleanLiteralCheck — collapses if-return-literal pair to a single ret
 RedundantConstantAliasCheck — flags static final aliases and same-class duplicate Pattern.compile, no cross-rule interaction
 TrivialSingleUsePrivateMethodCheck — flags private one-statement methods called from exactly one site, no cross-rule interaction
 MethodMayBeStaticCheck — flags private instance methods that never reference this/super or instance state, no cross-rule interaction
+UtilClassNamingCheck — flags all-static-public classes that aren't *Util/*Utils and *Constants classes with public methods, no cross-rule interaction

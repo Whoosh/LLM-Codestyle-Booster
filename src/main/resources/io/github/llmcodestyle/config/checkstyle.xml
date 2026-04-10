@@ -219,6 +219,7 @@
         <module name="io.github.llmcodestyle.quality.SpringBootMainVisibilityCheck"/>
         <module name="io.github.llmcodestyle.quality.UnrelatedNestedRecordCheck"/>
         <module name="io.github.llmcodestyle.quality.MethodMayBeStaticCheck"/>
+        <module name="io.github.llmcodestyle.quality.UtilClassNamingCheck"/>
 
         <!-- Custom checks: simplify -->
         <module name="io.github.llmcodestyle.simplify.InlineRegexConstantCheck"/>

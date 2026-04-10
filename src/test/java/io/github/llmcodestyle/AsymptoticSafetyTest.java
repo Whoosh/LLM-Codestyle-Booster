@@ -14,6 +14,7 @@ import io.github.llmcodestyle.simplify.IndexOfToContainsCheck;
 import io.github.llmcodestyle.simplify.InlineRegexConstantCheck;
 import io.github.llmcodestyle.simplify.MapContainsKeyThenGetCheck;
 import io.github.llmcodestyle.simplify.PureSingleUseLocalVariableCheck;
+import io.github.llmcodestyle.simplify.RedundantConstantAliasCheck;
 import io.github.llmcodestyle.simplify.SingleUseLocalVariableCheck;
 import io.github.llmcodestyle.simplify.SplitDeclarationAssignmentCheck;
 import io.github.llmcodestyle.simplify.StaticImportCandidateCheck;
@@ -68,6 +69,8 @@ import static org.junit.jupiter.api.Assertions.*;
  *       no runtime impact</li>
  *   <li>{@link IfReturnBooleanLiteralCheck} — collapses if-return-literal pair to a single
  *       return of the condition, identical control flow</li>
+ *   <li>{@link RedundantConstantAliasCheck} — flags useless static final aliases and
+ *       same-class duplicate Pattern.compile, replacing two field reads with one</li>
  * </ul>
  */
 class AsymptoticSafetyTest {

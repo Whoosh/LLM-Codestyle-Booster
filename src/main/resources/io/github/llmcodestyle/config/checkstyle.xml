@@ -236,6 +236,7 @@
         <module name="io.github.llmcodestyle.simplify.BooleanFromConditionCheck"/>
         <module name="io.github.llmcodestyle.simplify.SplitDeclarationAssignmentCheck"/>
         <module name="io.github.llmcodestyle.simplify.IfReturnBooleanLiteralCheck"/>
+        <module name="io.github.llmcodestyle.simplify.RedundantConstantAliasCheck"/>
 
         <!-- Miscellaneous -->
         <module name="ArrayTypeStyle"/>

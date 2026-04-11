@@ -42,10 +42,4 @@ class MethodMayBeStaticCheckTest {
         return runTreeWalkerCheck(MethodMayBeStaticCheck.class, resource, NO_PROPS);
     }
 
-    private static String format(List<AuditEvent> events) {
-        return events.stream()
-            .map(e -> "\n  Line " + e.getLine() + ": " + e.getMessage())
-            .toList()
-            .toString();
-    }
 }

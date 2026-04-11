@@ -75,10 +75,4 @@ class CollapsibleConstantConcatenationCheckTest {
         assertTrue(runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class, "simplify/valid/CollapsibleConstantValid.java", Map.of()).isEmpty(), "Expected no violations");
     }
 
-    private static String format(List<AuditEvent> violations) {
-        return violations.stream()
-            .map(e -> "Line " + e.getLine() + ": " + e.getMessage())
-            .toList()
-            .toString();
-    }
 }

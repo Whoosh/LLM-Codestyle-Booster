@@ -19,17 +19,22 @@ class DuplicateMethodBodyCheckTest {
     private static final String PHYSICS_QUIZ_ROW = "quality/invalid/DuplicateMethodBodyPhysicsQuizRow.java";
     private static final String STATEFUL_A = "quality/invalid/DuplicateMethodBodyStatefulA.java";
     private static final String STATEFUL_B = "quality/invalid/DuplicateMethodBodyStatefulB.java";
+    private static final String PHYSICS_PROMPT_BUILDER = "quality/invalid/DuplicateMethodBodyPhysicsPromptBuilder.java";
+    private static final String JAVA_PROMPT_BUILDER = "quality/invalid/DuplicateMethodBodyJavaPromptBuilder.java";
     private static final String VALID = "quality/valid/DuplicateMethodBodyValid.java";
 
     private static final int CROSS_FILE_DUPLICATES = 3;
     private static final int LOOSER_MIN_STATEMENTS = 3;
     private static final int TIGHTER_MAX_BODY_NODES = 50;
-    private static final Map<String, String> LOOSER_PROPS = Map.of("minStatements", "3");
+    // Under the new dual filter a method is only trivial when BOTH thresholds are
+    // below it, so to skip 2-statement walkBorNode we must also raise minBodyNodes
+    // above its node count.
+    private static final Map<String, String> LOOSER_PROPS = Map.of("minStatements", "3", "minBodyNodes", "500");
 
     @Test
     void singleFileDetectsWithinClassDuplicate() throws Exception {
         List<AuditEvent> violations = runSingle(INVALID_A);
-        assertEquals(1, violations.size(), format(violations));
+        assertEquals(1, violations.size(), formatWithFile(violations));
         assertTrue(violations.get(0).getMessage().contains("walkBorNode"));
         assertTrue(violations.get(0).getMessage().contains("walkTypeNode"));
     }
@@ -42,7 +47,7 @@ class DuplicateMethodBodyCheckTest {
     @Test
     void crossFileAccumulatesDuplicates() throws Exception {
         List<AuditEvent> violations = runMulti(INVALID_A, INVALID_B);
-        assertEquals(CROSS_FILE_DUPLICATES, violations.size(), format(violations));
+        assertEquals(CROSS_FILE_DUPLICATES, violations.size(), formatWithFile(violations));
     }
 
     @Test
@@ -74,18 +79,27 @@ class DuplicateMethodBodyCheckTest {
     @Test
     void crossFileStatelessDuplicateSuggestsUtilExtraction() throws Exception {
         List<AuditEvent> violations = runMulti(JSON_ARRAYS, PHYSICS_QUIZ_ROW);
-        assertEquals(1, violations.size(), format(violations));
+        assertEquals(1, violations.size(), formatWithFile(violations));
         String msg = violations.get(0).getMessage();
-        assertTrue(msg.contains("parseAnswers") && msg.contains("parseTags"), format(violations));
+        assertTrue(msg.contains("parseAnswers") && msg.contains("parseTags"), formatWithFile(violations));
+        assertTrue(msg.contains("extract into a shared utility class"), msg);
+    }
+
+    @Test
+    void crossFileSingleTryBodyDuplicateCaught() throws Exception {
+        List<AuditEvent> violations = runMulti(PHYSICS_PROMPT_BUILDER, JAVA_PROMPT_BUILDER);
+        assertEquals(1, violations.size(), formatWithFile(violations));
+        String msg = violations.get(0).getMessage();
+        assertTrue(msg.contains("readResource") && msg.contains("loadResource"), formatWithFile(violations));
         assertTrue(msg.contains("extract into a shared utility class"), msg);
     }
 
     @Test
     void crossFileStatefulDuplicateDoesNotSuggestUtilExtraction() throws Exception {
         List<AuditEvent> violations = runMulti(STATEFUL_A, STATEFUL_B);
-        assertEquals(1, violations.size(), format(violations));
+        assertEquals(1, violations.size(), formatWithFile(violations));
         String msg = violations.get(0).getMessage();
-        assertTrue(msg.contains("computeDiscount") && msg.contains("computePrice"), format(violations));
+        assertTrue(msg.contains("computeDiscount") && msg.contains("computePrice"), formatWithFile(violations));
         assertFalse(msg.contains("extract into a shared utility class"), msg);
         assertTrue(msg.contains("consolidate into a shared helper"), msg);
     }
@@ -99,6 +113,7 @@ class DuplicateMethodBodyCheckTest {
     void settersAreDirectlyInvokable() {
         DuplicateMethodBodyCheck check = new DuplicateMethodBodyCheck();
         check.setMinStatements(LOOSER_MIN_STATEMENTS);
+        check.setMinBodyNodes(TIGHTER_MAX_BODY_NODES);
         check.setMaxBodyNodes(TIGHTER_MAX_BODY_NODES);
         assertNotNull(check);
     }
@@ -106,7 +121,7 @@ class DuplicateMethodBodyCheckTest {
     @Test
     void tunedThresholdsRespected() throws Exception {
         List<AuditEvent> violations = runTreeWalkerCheck(DuplicateMethodBodyCheck.class, INVALID_A, LOOSER_PROPS);
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("walkBorNode")), "2-statement methods skipped: " + format(violations));
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("walkBorNode")), "2-statement methods skipped: " + formatWithFile(violations));
     }
 
     private static List<AuditEvent> runSingle(String resource) throws Exception {
@@ -117,10 +132,4 @@ class DuplicateMethodBodyCheckTest {
         return runTreeWalkerCheckMultiFile(DuplicateMethodBodyCheck.class, List.of(resources), NO_PROPS);
     }
 
-    private static String format(List<AuditEvent> events) {
-        return events.stream()
-            .map(e -> "\n  Line " + e.getLine() + " [" + e.getFileName() + "]: " + e.getMessage())
-            .toList()
-            .toString();
-    }
 }

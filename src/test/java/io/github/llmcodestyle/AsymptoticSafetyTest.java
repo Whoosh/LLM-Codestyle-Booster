@@ -123,10 +123,4 @@ class AsymptoticSafetyTest {
         assertTrue(violations.isEmpty(), "Combined single-use checks must not flag any of 38 asymptotic traps (" + violations.size() + " violations): " + format(violations));
     }
 
-    private static String format(List<AuditEvent> events) {
-        return events.stream()
-            .map(e -> "Line " + e.getLine() + ": " + e.getMessage())
-            .toList()
-            .toString();
-    }
 }

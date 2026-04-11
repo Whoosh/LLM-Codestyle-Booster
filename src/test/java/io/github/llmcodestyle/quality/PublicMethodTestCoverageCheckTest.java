@@ -21,6 +21,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.github.llmcodestyle.utils.TestCheckSupportUtil.*;
 import static java.nio.file.FileVisitResult.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -174,10 +175,4 @@ class PublicMethodTestCoverageCheckTest {
         return violations;
     }
 
-    private static String format(List<AuditEvent> events) {
-        return events.stream()
-            .map(e -> "Line " + e.getLine() + ": " + e.getMessage())
-            .toList()
-            .toString();
-    }
 }

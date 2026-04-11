@@ -55,10 +55,4 @@ class StaticImportCandidateCheckTest {
         assertEquals(1, violations.size(), "Expected 1 violation (Integer.MAX_VALUE only), got: " + format(violations));
     }
 
-    private static String format(List<AuditEvent> violations) {
-        return violations.stream()
-            .map(e -> "Line " + e.getLine() + ": " + e.getMessage())
-            .toList()
-            .toString();
-    }
 }

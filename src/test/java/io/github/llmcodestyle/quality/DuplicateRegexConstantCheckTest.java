@@ -28,37 +28,37 @@ class DuplicateRegexConstantCheckTest {
     @Test
     void duplicateStringAndPatternAcrossTwoFiles() throws Exception {
         List<AuditEvent> violations = runMulti(INVALID_A, INVALID_B);
-        assertEquals(TWO_DUPS, violations.size(), "Expected EMAIL_REGEX + DIGITS duplicates: " + format(violations));
+        assertEquals(TWO_DUPS, violations.size(), "Expected EMAIL_REGEX + DIGITS duplicates: " + formatWithFile(violations));
     }
 
     @Test
     void duplicatesAccumulateAcrossThreeFiles() throws Exception {
         List<AuditEvent> violations = runMulti(INVALID_A, INVALID_B, INVALID_C);
-        assertEquals(THREE_FILES_DUPS, violations.size(), "A->0, B->2 (email+digits), C->3 (date+ws+range): " + format(violations));
+        assertEquals(THREE_FILES_DUPS, violations.size(), "A->0, B->2 (email+digits), C->3 (date+ws+range): " + formatWithFile(violations));
     }
 
     @Test
     void duplicatesAcrossFourFilesIncludingEnum() throws Exception {
         List<AuditEvent> violations = runMulti(INVALID_A, INVALID_B, INVALID_C, INVALID_D);
-        assertEquals(FOUR_FILES_DUPS, violations.size(), "A->0, B->2, C->3, D->1 (ip): " + format(violations));
+        assertEquals(FOUR_FILES_DUPS, violations.size(), "A->0, B->2, C->3, D->1 (ip): " + formatWithFile(violations));
     }
 
     @Test
     void duplicateDetectedInRecord() throws Exception {
         List<AuditEvent> violations = runMulti(INVALID_A, INVALID_C);
-        assertEquals(TWO_DUPS, violations.size(), "Record should flag DATE_PATTERN + WHITESPACE dups from A: " + format(violations));
+        assertEquals(TWO_DUPS, violations.size(), "Record should flag DATE_PATTERN + WHITESPACE dups from A: " + formatWithFile(violations));
     }
 
     @Test
     void duplicateDetectedInEnum() throws Exception {
         List<AuditEvent> violations = runMulti(INVALID_A, INVALID_D);
-        assertEquals(1, violations.size(), "Enum should flag IP_REGEX dup from A: " + format(violations));
+        assertEquals(1, violations.size(), "Enum should flag IP_REGEX dup from A: " + formatWithFile(violations));
     }
 
     @Test
     void duplicateWithinSameFile() throws Exception {
         List<AuditEvent> violations = runSingle(INVALID_WITHIN);
-        assertEquals(TWO_DUPS, violations.size(), "Same-file dups for VERSION and ASSIGN: " + format(violations));
+        assertEquals(TWO_DUPS, violations.size(), "Same-file dups for VERSION and ASSIGN: " + formatWithFile(violations));
     }
 
     @Test
@@ -81,8 +81,8 @@ class DuplicateRegexConstantCheckTest {
         List<AuditEvent> violations = runMulti(INVALID_A, INVALID_B);
         boolean refsEmail = violations.stream().anyMatch(v -> v.getMessage().contains("EMAIL_REGEX") && v.getMessage().contains("DuplicateRegexConstantInvalidA"));
         boolean refsDigits = violations.stream().anyMatch(v -> v.getMessage().contains("DIGITS") && v.getMessage().contains("DuplicateRegexConstantInvalidA"));
-        assertTrue(refsEmail, "Should reference EMAIL_REGEX in A: " + format(violations));
-        assertTrue(refsDigits, "Should reference DIGITS in A: " + format(violations));
+        assertTrue(refsEmail, "Should reference EMAIL_REGEX in A: " + formatWithFile(violations));
+        assertTrue(refsDigits, "Should reference DIGITS in A: " + formatWithFile(violations));
     }
 
     @Test
@@ -98,10 +98,4 @@ class DuplicateRegexConstantCheckTest {
         return runTreeWalkerCheckMultiFile(DuplicateRegexConstantCheck.class, List.of(resources), NO_PROPS);
     }
 
-    private static String format(List<AuditEvent> events) {
-        return events.stream()
-            .map(e -> "\n  Line " + e.getLine() + " [" + e.getFileName() + "]: " + e.getMessage())
-            .toList()
-            .toString();
-    }
 }

@@ -304,10 +304,4 @@ class CheckstyleConfigConsistencyTest {
         return null;
     }
 
-    private static String format(List<AuditEvent> events) {
-        return events.stream()
-            .map(e -> "Line " + e.getLine() + ": " + e.getMessage())
-            .toList()
-            .toString();
-    }
 }

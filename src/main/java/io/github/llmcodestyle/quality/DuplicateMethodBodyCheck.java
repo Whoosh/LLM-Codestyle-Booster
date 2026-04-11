@@ -29,8 +29,13 @@ import java.util.Set;
  * <ul>
  *   <li>abstract methods, constructors, compact constructors — skipped (no body / contextual wiring)</li>
  *   <li>{@code @Override}-annotated methods — skipped (interface/contract-driven)</li>
- *   <li>bodies with fewer than {@code minStatements} top-level statements — skipped</li>
  *   <li>bodies with more than {@code maxBodyNodes} AST nodes — skipped (asymptotic safety)</li>
+ *   <li>bodies that are trivial by both measures — skipped. A body is trivial when it has
+ *       fewer than {@code minStatements} top-level statements <em>and</em> fewer than
+ *       {@code minBodyNodes} total AST nodes. This AND (rather than OR) keeps single
+ *       top-level {@code try}/{@code switch}/{@code for}/{@code while} statements with
+ *       non-trivial nested bodies in scope — e.g. a {@code loadResource(String)} helper
+ *       whose entire body is one try-with-resources is still compared across files.</li>
  * </ul>
  *
  * <p>Normalization:
@@ -60,6 +65,7 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
     private static final int[] TOKENS = {METHOD_DEF};
 
     private static final int DEFAULT_MIN_STATEMENTS = 2;
+    private static final int DEFAULT_MIN_BODY_NODES = 30;
     private static final int DEFAULT_MAX_BODY_NODES = 400;
 
     private static final Set<Integer> LITERAL_TOKENS = Set.of(
@@ -79,19 +85,34 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
     private static final Set<Integer> NAMED_DECL_TOKENS = Set.of(VARIABLE_DEF, PARAMETER_DEF, RESOURCE);
 
     private int minStatements = DEFAULT_MIN_STATEMENTS;
+    private int minBodyNodes = DEFAULT_MIN_BODY_NODES;
     private int maxBodyNodes = DEFAULT_MAX_BODY_NODES;
 
     private final Map<String, DuplicateMethodOccurrence> seenBodies = new HashMap<>();
 
     /**
-     * Set the minimum number of top-level statements in the body for a method to be considered.
+     * Minimum number of top-level statements in the body for a method to be considered.
+     * Evaluated in conjunction with {@link #setMinBodyNodes(int)}: a method is skipped as
+     * trivial only if <em>both</em> its top-level statement count is below this threshold
+     * <em>and</em> its total AST-node count is below {@code minBodyNodes}. This lets single
+     * top-level {@code try} / {@code switch} / {@code for} statements with a non-trivial
+     * nested body still be considered.
      */
     public void setMinStatements(int minStatements) {
         this.minStatements = minStatements;
     }
 
     /**
-     * Set the maximum number of AST nodes in a body above which the method is ignored
+     * Minimum total AST node count below which a single-statement method is considered
+     * trivial (getters, delegates, one-line returns). Works in AND with {@link
+     * #setMinStatements(int)} — see its javadoc.
+     */
+    public void setMinBodyNodes(int minBodyNodes) {
+        this.minBodyNodes = minBodyNodes;
+    }
+
+    /**
+     * Maximum number of AST nodes in a body above which the method is ignored
      * (asymptotic safety cap).
      */
     public void setMaxBodyNodes(int maxBodyNodes) {
@@ -119,7 +140,11 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
             return;
         }
         DetailAST slist = methodDef.findFirstToken(SLIST);
-        if (slist == null || collectStatements(slist).size() < minStatements || countNodes(slist) > maxBodyNodes) {
+        if (slist == null) {
+            return;
+        }
+        int bodyNodes = countNodes(slist);
+        if (bodyNodes > maxBodyNodes || collectStatements(slist).size() < minStatements && bodyNodes < minBodyNodes) {
             return;
         }
 

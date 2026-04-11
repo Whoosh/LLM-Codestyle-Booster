@@ -146,4 +146,26 @@ public final class TestCheckSupportUtil {
         checker.destroy();
         return violations;
     }
+
+    /**
+     * Formats a list of audit events as {@code "Line N: msg"} entries, joined for use in
+     * assertion failure messages.
+     */
+    public static String format(List<AuditEvent> events) {
+        return events.stream()
+            .map(e -> "Line " + e.getLine() + ": " + e.getMessage())
+            .toList()
+            .toString();
+    }
+
+    /**
+     * Formats a list of audit events as {@code "\n  Line N [file]: msg"} entries — the
+     * variant that includes the source file name, used by multi-file tests.
+     */
+    public static String formatWithFile(List<AuditEvent> events) {
+        return events.stream()
+            .map(e -> "\n  Line " + e.getLine() + " [" + e.getFileName() + "]: " + e.getMessage())
+            .toList()
+            .toString();
+    }
 }

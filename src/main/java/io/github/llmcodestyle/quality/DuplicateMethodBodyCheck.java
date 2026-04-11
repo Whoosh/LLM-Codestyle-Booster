@@ -6,7 +6,9 @@ import io.github.llmcodestyle.pojos.DuplicateMethodOccurrence;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static com.puppycrawl.tools.checkstyle.utils.TokenUtil.*;
+import static io.github.llmcodestyle.utils.AstInstanceStateUtil.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,9 +47,16 @@ import java.util.Set;
 public class DuplicateMethodBodyCheck extends AbstractCheck {
 
     /**
-     * Violation message key.
+     * Violation message key: at least one side references the enclosing instance state,
+     * so the duplication must be resolved in place.
      */
     static final String MSG_KEY = "duplicate.method.body";
+
+    /**
+     * Violation message key: both sides are independent of any instance state, so the
+     * duplication can be resolved by extracting a shared utility method.
+     */
+    static final String MSG_KEY_EXTRACTABLE = "duplicate.method.body.extractable";
     private static final int[] TOKENS = {METHOD_DEF};
 
     private static final int DEFAULT_MIN_STATEMENTS = 2;
@@ -117,13 +126,33 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
         String normalized = normalize(methodDef, slist);
         String methodName = extractName(methodDef);
         String className = extractEnclosingClassName(methodDef);
+        boolean stateless = isStateless(methodDef, slist);
 
         DuplicateMethodOccurrence previous = seenBodies.get(normalized);
         if (previous != null) {
-            log(methodDef, MSG_KEY, methodName, previous.methodName(), previous.className());
+            log(methodDef, stateless && previous.stateless() ? MSG_KEY_EXTRACTABLE : MSG_KEY, methodName, previous.methodName(), previous.className());
         } else {
-            seenBodies.put(normalized, new DuplicateMethodOccurrence(className, methodName));
+            seenBodies.put(normalized, new DuplicateMethodOccurrence(className, methodName, stateless));
         }
+    }
+
+    private static boolean isStateless(DetailAST methodDef, DetailAST slist) {
+        if (hasModifier(methodDef, LITERAL_STATIC)) {
+            return true;
+        }
+        DetailAST typeDef = findEnclosingType(methodDef);
+        return typeDef == null || !referencesInstanceState(slist, collectScope(typeDef));
+    }
+
+    private static DetailAST findEnclosingType(DetailAST methodDef) {
+        DetailAST parent = methodDef.getParent();
+        while (parent != null) {
+            if (NESTED_TYPE_TOKENS.contains(parent.getType())) {
+                return parent;
+            }
+            parent = parent.getParent();
+        }
+        return null;
     }
 
     @Override
@@ -154,15 +183,12 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
     }
 
     private static String extractEnclosingClassName(DetailAST methodDef) {
-        DetailAST parent = methodDef.getParent();
-        while (parent != null) {
-            if (NESTED_TYPE_TOKENS.contains(parent.getType())) {
-                DetailAST ident = parent.findFirstToken(IDENT);
-                if (ident != null) {
-                    return ident.getText();
-                }
+        DetailAST typeDef = findEnclosingType(methodDef);
+        if (typeDef != null) {
+            DetailAST ident = typeDef.findFirstToken(IDENT);
+            if (ident != null) {
+                return ident.getText();
             }
-            parent = parent.getParent();
         }
         return "<unknown>";
     }

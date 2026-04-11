@@ -15,6 +15,10 @@ class DuplicateMethodBodyCheckTest {
 
     private static final String INVALID_A = "quality/invalid/DuplicateMethodBodyInvalidA.java";
     private static final String INVALID_B = "quality/invalid/DuplicateMethodBodyInvalidB.java";
+    private static final String JSON_ARRAYS = "quality/invalid/DuplicateMethodBodyJsonArrays.java";
+    private static final String PHYSICS_QUIZ_ROW = "quality/invalid/DuplicateMethodBodyPhysicsQuizRow.java";
+    private static final String STATEFUL_A = "quality/invalid/DuplicateMethodBodyStatefulA.java";
+    private static final String STATEFUL_B = "quality/invalid/DuplicateMethodBodyStatefulB.java";
     private static final String VALID = "quality/valid/DuplicateMethodBodyValid.java";
 
     private static final int CROSS_FILE_DUPLICATES = 3;
@@ -65,6 +69,25 @@ class DuplicateMethodBodyCheckTest {
         List<AuditEvent> violations = runSingle(VALID);
         assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("equals")));
         assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("hashCode")));
+    }
+
+    @Test
+    void crossFileStatelessDuplicateSuggestsUtilExtraction() throws Exception {
+        List<AuditEvent> violations = runMulti(JSON_ARRAYS, PHYSICS_QUIZ_ROW);
+        assertEquals(1, violations.size(), format(violations));
+        String msg = violations.get(0).getMessage();
+        assertTrue(msg.contains("parseAnswers") && msg.contains("parseTags"), format(violations));
+        assertTrue(msg.contains("extract into a shared utility class"), msg);
+    }
+
+    @Test
+    void crossFileStatefulDuplicateDoesNotSuggestUtilExtraction() throws Exception {
+        List<AuditEvent> violations = runMulti(STATEFUL_A, STATEFUL_B);
+        assertEquals(1, violations.size(), format(violations));
+        String msg = violations.get(0).getMessage();
+        assertTrue(msg.contains("computeDiscount") && msg.contains("computePrice"), format(violations));
+        assertFalse(msg.contains("extract into a shared utility class"), msg);
+        assertTrue(msg.contains("consolidate into a shared helper"), msg);
     }
 
     @Test

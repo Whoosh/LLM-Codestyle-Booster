@@ -29,6 +29,13 @@ class UnrelatedNestedRecordCheckTest {
         assertTrue(run("quality/valid/UnrelatedNestedRecordTopLevel.java").isEmpty());
     }
 
+    @Test
+    void utilClassWithNestedPojoRecordIsFlagged() throws Exception {
+        List<AuditEvent> violations = run("quality/invalid/UnrelatedNestedRecordUtilClassInvalid.java");
+        assertEquals(1, violations.size(), format(violations));
+        assertTrue(violations.get(0).getMessage().contains("ValidationResult"), format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(UnrelatedNestedRecordCheck.class, resource, NO_PROPS);
     }

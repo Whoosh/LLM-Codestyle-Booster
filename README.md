@@ -362,6 +362,60 @@ To use **both** bundled and local exclusions, list them comma-separated:
 
 ---
 
+## Fixing violations with an LLM — avoid cascade churn
+
+If you let an LLM fix violations one at a time, you'll burn a lot of edit cycles:
+the model extracts a long literal to a constant, which shifts the `static final`
+ordering, which triggers an import reorder, which re-wraps a line, which exposes
+a single-use local, and so on. Each pass resurfaces the same file because the
+previous pass only handled one finding.
+
+The checks themselves are deliberately independent (each is a self-contained
+Checkstyle/PMD visitor), so atomicity has to come from the workflow. **Do this:**
+
+1. Run the full suite once: `mvn verify` (or `mvn checkstyle:check pmd:check
+   spotbugs:check` if you want to skip tests). This produces the authoritative
+   list of everything wrong with the codebase in one shot.
+2. **Group findings by file, not by rule.** The reports in
+   `target/checkstyle-result.xml`, `target/pmd.xml`, and
+   `target/spotbugsXml.xml` already include file paths and line numbers — a
+   one-off `grep`/`jq`/`xmllint` is enough to regroup them.
+3. Hand the per-file findings to the model as a **single prompt** with an
+   explicit instruction: *"Apply every fix below to this file in a single edit.
+   Do not commit after the first fix — many of these interact (line wrap ↔
+   constant extraction ↔ import order ↔ static-final ordering)."*
+4. Re-run `mvn verify`. Any remaining findings are genuinely new (cross-file
+   effects or things the model missed), not cascade churn.
+
+The key move is step 3: the model needs the **whole fix plan for the file**
+before it starts editing, not one finding at a time. Otherwise each fix
+invalidates the previous diff and you pay for the file twice.
+
+### Rules that commonly interact
+
+Keep these groups in mind when you read a per-file report — a single edit
+should address the whole cluster, not one rule at a time:
+
+- **Extraction + ordering + imports**: `InlineRegexConstant`,
+  `DuplicateRegexConstant`, `CollapsibleConstantConcatenation`,
+  `CommonsLang3StringConstant` → create new `static final` fields that must
+  then satisfy `StaticFinalFirst` and may enable new `StaticImportCandidate`
+  suggestions.
+- **Line-length churn**: `UnnecessaryLineWrap`, `CompactableParameterList`,
+  `ChainedCallLineBreak`, `MethodCallArgumentsOnSameLine` — any edit in a
+  long line can flip the verdict of the others; resolve them together.
+- **Variable flow**: `SingleUseLocalVariable`, `PureSingleUseLocalVariable`,
+  `SplitDeclarationAssignment`, `BooleanFromCondition`, `IfReturnBooleanLiteral`,
+  `ConditionalReturnToTernary` — inlining one variable can create or kill the
+  preconditions for the others. Plan the final shape before editing.
+- **Duplication + extraction**: `DuplicateMethodBodyCheck` (`...extractable`
+  variant), `DuplicateRegexConstantCheck`, `TestOnlyDelegateCheck`,
+  `RepeatedExceptionWrappingCheck` — these all want you to move code to a
+  shared location. Do the moves in one pass across all affected files so the
+  shared helper lands with its call sites updated.
+
+---
+
 ## Requirements
 
 - **Java 25+**

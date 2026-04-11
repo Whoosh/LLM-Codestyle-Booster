@@ -57,3 +57,5 @@ CollapsibleConsecutiveIfCheck — flags consecutive if statements with structura
 DuplicateMethodBodyCheck — flags methods with structurally identical bodies after normalizing param/local names (cross-file), no cross-rule interaction
 OrChainToSetContainsCheck — flags chains of 3+ || operands that compare one LHS against literals, suggests Set.contains() replacement, no cross-rule interaction
 TopLevelRecordInPojosPackageCheck — flags top-level record declarations whose package does not end with the configured suffix (default 'pojos'), no cross-rule interaction
+UnrelatedNestedEnumCheck — flags nested enums that don't reference any field or method of the enclosing type, no cross-rule interaction
+TopLevelEnumInEnumsPackageCheck — flags top-level enum declarations whose package does not end with the configured suffix (default 'enums'), no cross-rule interaction

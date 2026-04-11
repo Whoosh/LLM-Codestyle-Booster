@@ -219,6 +219,8 @@
         <module name="io.github.llmcodestyle.quality.SpringBootMainVisibilityCheck"/>
         <module name="io.github.llmcodestyle.quality.UnrelatedNestedRecordCheck"/>
         <module name="io.github.llmcodestyle.quality.TopLevelRecordInPojosPackageCheck"/>
+        <module name="io.github.llmcodestyle.quality.UnrelatedNestedEnumCheck"/>
+        <module name="io.github.llmcodestyle.quality.TopLevelEnumInEnumsPackageCheck"/>
         <module name="io.github.llmcodestyle.quality.MethodMayBeStaticCheck"/>
         <module name="io.github.llmcodestyle.quality.UtilClassNamingCheck"/>
         <module name="io.github.llmcodestyle.quality.DuplicateMethodBodyCheck"/>

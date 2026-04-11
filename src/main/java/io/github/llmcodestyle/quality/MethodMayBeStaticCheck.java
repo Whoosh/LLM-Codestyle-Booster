@@ -10,15 +10,26 @@ import static io.github.llmcodestyle.utils.AstInstanceStateUtil.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
 
 /**
- * Detects {@code private} non-static methods whose body never references {@code this},
- * {@code super}, or any instance member of the enclosing type. Such methods can — and
- * should — be marked {@code static}: it documents intent, lets callers reason about
- * the method without an instance, and improves JIT specialisation.
+ * Detects non-static methods whose body never references {@code this}, {@code super},
+ * or any instance member of the enclosing type. Such methods can — and should — be
+ * marked {@code static}: it documents intent, lets callers reason about the method
+ * without an instance, and improves JIT specialisation.
  *
- * <p>The check stays conservative on purpose:
+ * <p>Visibility is <strong>not</strong> a filter: any method that structurally cannot
+ * be overridden is in scope. Specifically, a method is considered in scope when any of
+ * the following holds:
  * <ul>
- *   <li>Only {@code private} methods are flagged. Promoting a wider-scoped method to
- *       {@code static} can break overrides and binary compatibility.</li>
+ *   <li>the method is {@code private} or {@code final};</li>
+ *   <li>the enclosing type is a {@code record};</li>
+ *   <li>the enclosing type is a {@code final class}.</li>
+ * </ul>
+ * <p>Methods in non-{@code final} classes, interfaces (incl. {@code default} methods),
+ * and enums with concrete non-{@code final} methods are skipped: a subclass or enum
+ * constant body could override them, and promoting them to {@code static} would be a
+ * breaking change.
+ *
+ * <p>Additional conservative filters:
+ * <ul>
  *   <li>{@code @Override}, {@code abstract}, and {@code native} methods are skipped.</li>
  *   <li>Methods inside non-static nested classes are skipped — they may implicitly
  *       depend on outer-instance state without naming it.</li>
@@ -66,7 +77,7 @@ public class MethodMayBeStaticCheck extends AbstractCheck {
         }
         InstanceScope scope = collectScope(typeDef);
         for (DetailAST child = objBlock.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if (child.getType() == METHOD_DEF && isCandidate(child)) {
+            if (child.getType() == METHOD_DEF && isCandidate(child, typeDef)) {
                 analyzeMethod(child, scope);
             }
         }
@@ -87,10 +98,25 @@ public class MethodMayBeStaticCheck extends AbstractCheck {
         return isNestedType(typeDef) && typeDef.getType() == CLASS_DEF && !hasModifier(typeDef, LITERAL_STATIC);
     }
 
-    private static boolean isCandidate(DetailAST methodDef) {
-        if (!hasModifier(methodDef, LITERAL_PRIVATE) || hasModifier(methodDef, LITERAL_STATIC) || hasModifier(methodDef, ABSTRACT) || hasModifier(methodDef, LITERAL_NATIVE)) {
+    private static boolean isCandidate(DetailAST methodDef, DetailAST enclosingType) {
+        return !hasModifier(methodDef, LITERAL_STATIC)
+            && !hasModifier(methodDef, ABSTRACT)
+            && !hasModifier(methodDef, LITERAL_NATIVE)
+            && !hasAnnotationNamed(methodDef, "Override")
+            && !isPotentiallyOverridable(methodDef, enclosingType);
+    }
+
+    /**
+     * Returns {@code true} if the method could be overridden by a subclass (or enum
+     * constant body, or interface implementer). A method that is {@code private} or
+     * {@code final}, or that lives in a {@code record} or {@code final class}, cannot
+     * be overridden and is therefore safe to flag regardless of visibility.
+     */
+    private static boolean isPotentiallyOverridable(DetailAST methodDef, DetailAST enclosingType) {
+        if (hasModifier(methodDef, LITERAL_PRIVATE) || hasModifier(methodDef, FINAL)) {
             return false;
         }
-        return !hasAnnotationNamed(methodDef, "Override");
+        int type = enclosingType.getType();
+        return type != RECORD_DEF && !(type == CLASS_DEF && hasModifier(enclosingType, FINAL));
     }
 }

@@ -73,4 +73,15 @@ public class MethodMayBeStaticValid {
     private int useStaticImport(Object o) {
         return asList(o).size();
     }
+
+    // Public stateless method in a non-final class → must NOT be flagged, because a
+    // subclass could override it and promoting to static would be a breaking change.
+    public int publicOverridableHelper(int x, int y) {
+        return x * y + 1;
+    }
+
+    // Package-private stateless method in a non-final class → same story, skipped.
+    int packagePrivateOverridableHelper(int x) {
+        return x + 1;
+    }
 }

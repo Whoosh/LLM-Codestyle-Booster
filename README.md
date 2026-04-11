@@ -330,7 +330,7 @@ To use **both** bundled and local exclusions, list them comma-separated:
 | `DuplicateRegexConstantCheck` | Flags duplicate regex constants (`String`/`Pattern`) across classes in a module |
 | `SpringBootMainVisibilityCheck` | Enforces `public static void main(String[])` on `@SpringBootApplication` classes |
 | `UnrelatedNestedRecordCheck` | Flags nested records that don't reference the enclosing type — move to a `pojos` package |
-| `MethodMayBeStaticCheck` | Flags `private` instance methods whose body never touches `this`/`super` or any instance member — add the `static` modifier |
+| `MethodMayBeStaticCheck` | Flags instance methods whose body never touches `this`/`super` or any instance member — add the `static` modifier. Visibility is not a filter: `public` is in scope when the method is `private`/`final`, or when the enclosing type is a `record` or `final class`. Methods that could be overridden by a subclass or interface implementer are skipped |
 | `UtilClassNamingCheck` | All-static-public classes must end in `*Util`/`*Utils`; `*Constants` classes must not declare any public method |
 | `DuplicateMethodBodyCheck` | Cross-class detector for methods with structurally identical bodies after local/param renaming — consolidate into a shared helper |
 

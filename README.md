@@ -170,6 +170,81 @@ Add the plugin with `llm-codestyle-booster` as a dependency:
 
 ---
 
+## Verify your setup — protect against silently shadowed config
+
+The bundled `checkstyle.xml` lives inside the jar at classpath path
+`io/github/llmcodestyle/config/checkstyle.xml`, and your pom points at it via
+`<configLocation>` as a classpath reference. However, **maven-checkstyle-plugin
+resolves `configLocation` against `${project.basedir}` before falling back to
+the plugin classpath**. If a file happens to exist at the exact mirror path
+inside your project (e.g. `./io/github/llmcodestyle/config/checkstyle.xml`,
+vendored by a well-meaning earlier copy), the local file silently wins — your
+jar is up to date, but new checks from newer versions are never loaded.
+
+This is the single most common cause of "why is check X not firing in my
+project?". Two lightweight defenses:
+
+### 1. One-off diagnostic — run after every version bump
+
+Confirm that Checkstyle actually read the config out of the jar, not from a
+vendored file:
+
+```bash
+mvn checkstyle:check -X 2>&1 \
+  | grep "was found as" \
+  | grep "io/github/llmcodestyle/config/checkstyle.xml"
+```
+
+The output path should start with `jar:file:.../llm-codestyle-booster-<version>.jar!/...`.
+If it starts with your project's working directory instead, you have a local
+shadow — find and delete it:
+
+```bash
+find . -path '*/io/github/llmcodestyle/config/checkstyle.xml' \
+  -not -path '*/target/*' -not -path '*/.m2/*'
+```
+
+### 2. Permanent prevention — maven-enforcer rule
+
+Add this one-time snippet to your root `pom.xml` to make the build fail fast
+if anyone (a script, an IDE, a misguided `cp`) ever recreates the shadow file:
+
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-enforcer-plugin</artifactId>
+    <version>3.5.0</version>
+    <executions>
+        <execution>
+            <id>no-shadowed-checkstyle-bundle</id>
+            <phase>validate</phase>
+            <goals><goal>enforce</goal></goals>
+            <configuration>
+                <rules>
+                    <requireFilesDontExist>
+                        <files>
+                            <file>${project.basedir}/io/github/llmcodestyle/config/checkstyle.xml</file>
+                        </files>
+                        <message>
+A local copy of checkstyle.xml is shadowing the one from llm-codestyle-booster.jar.
+Remove ./io/github/llmcodestyle/config/checkstyle.xml so Checkstyle picks up the
+bundled config from the jar on every version bump. See README &gt; Verify your setup.
+                        </message>
+                    </requireFilesDontExist>
+                </rules>
+                <fail>true</fail>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+
+Declarative, one-time cost, zero runtime overhead. Every subsequent `mvn verify`
+(and every CI run) now fails loudly with an explanation the moment anyone
+recreates the shadow.
+
+---
+
 ## Suppressing checks in your project
 
 ### Checkstyle: suppress by file pattern

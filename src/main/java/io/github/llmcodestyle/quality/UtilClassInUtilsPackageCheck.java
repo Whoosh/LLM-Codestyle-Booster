@@ -1,6 +1,5 @@
 package io.github.llmcodestyle.quality;
 
-import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
@@ -9,46 +8,21 @@ import static io.github.llmcodestyle.utils.AstUtil.*;
 /**
  * Enforces that classes named {@code *Util} or {@code *Utils} reside in a package whose last segment is {@code utils}.
  */
-public class UtilClassInUtilsPackageCheck extends AbstractCheck {
+public class UtilClassInUtilsPackageCheck extends PackageScopedCheckBase {
 
     /**
      * Violation message key.
      */
     static final String MSG_KEY = "util.class.wrong.package";
-    private static final int[] TOKENS = {PACKAGE_DEF, CLASS_DEF};
-
-    private String currentPackage = "";
+    private static final int[] DOMAIN_TOKENS = {CLASS_DEF};
 
     @Override
-    public int[] getDefaultTokens() {
-        return TOKENS.clone();
+    protected int[] domainTokens() {
+        return DOMAIN_TOKENS.clone();
     }
 
     @Override
-    public int[] getAcceptableTokens() {
-        return TOKENS.clone();
-    }
-
-    @Override
-    public int[] getRequiredTokens() {
-        return TOKENS.clone();
-    }
-
-    @Override
-    public void beginTree(DetailAST rootAST) {
-        currentPackage = "";
-    }
-
-    @Override
-    public void visitToken(DetailAST ast) {
-        if (ast.getType() == PACKAGE_DEF) {
-            currentPackage = extractPackageName(ast);
-        } else if (ast.getType() == CLASS_DEF) {
-            checkClassPlacement(ast);
-        }
-    }
-
-    private void checkClassPlacement(DetailAST classDef) {
+    protected void visitDomainToken(DetailAST classDef) {
         if (isInnerClass(classDef)) {
             return;
         }
@@ -60,17 +34,8 @@ public class UtilClassInUtilsPackageCheck extends AbstractCheck {
         if (!name.endsWith("Util") && !name.endsWith("Utils")) {
             return;
         }
-        if (!"utils".equals(lastSegmentOf(currentPackage))) {
-            log(ident.getLineNo(), ident.getColumnNo(), MSG_KEY, name, currentPackage);
+        if (!"utils".equals(lastPackageSegment(currentPackage()))) {
+            log(ident.getLineNo(), ident.getColumnNo(), MSG_KEY, name, currentPackage());
         }
     }
-
-    private static String lastSegmentOf(String pkg) {
-        if (pkg == null || pkg.isEmpty()) {
-            return "";
-        }
-        int idx = pkg.lastIndexOf('.');
-        return idx >= 0 ? pkg.substring(idx + 1) : pkg;
-    }
-
 }

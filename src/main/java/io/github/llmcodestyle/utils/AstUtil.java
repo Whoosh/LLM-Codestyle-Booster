@@ -102,6 +102,18 @@ public final class AstUtil {
     }
 
     /**
+     * Returns the last dot-separated segment of {@code pkg}, or an empty string if {@code pkg}
+     * is {@code null} or empty. Used to enforce package-suffix conventions.
+     */
+    public static String lastPackageSegment(String pkg) {
+        if (pkg == null || pkg.isEmpty()) {
+            return "";
+        }
+        int idx = pkg.lastIndexOf('.');
+        return idx >= 0 ? pkg.substring(idx + 1) : pkg;
+    }
+
+    /**
      * Returns {@code true} if the definition node {@code def} has a MODIFIERS child containing {@code modifierType}.
      */
     public static boolean hasModifier(DetailAST def, int modifierType) {

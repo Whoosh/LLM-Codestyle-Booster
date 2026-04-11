@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import io.github.llmcodestyle.utils.AstQueryUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -104,7 +104,7 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
         if (expr == null || !isSingleLiteral(expr.getFirstChild())) {
             return;
         }
-        AstQueryUtil.addIdentTo(varDef, result);
+        addIdentTo(varDef, result);
     }
 
     private void checkFieldInitializer(DetailAST varDef, Set<String> literalConstants) {

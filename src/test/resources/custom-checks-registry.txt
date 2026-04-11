@@ -56,3 +56,4 @@ CommonsLang3StringConstantCheck — flags static final String constants whose va
 CollapsibleConsecutiveIfCheck — flags consecutive if statements with structurally identical terminating bodies that can be merged via ||, no cross-rule interaction
 DuplicateMethodBodyCheck — flags methods with structurally identical bodies after normalizing param/local names (cross-file), no cross-rule interaction
 OrChainToSetContainsCheck — flags chains of 3+ || operands that compare one LHS against literals, suggests Set.contains() replacement, no cross-rule interaction
+TopLevelRecordInPojosPackageCheck — flags top-level record declarations whose package does not end with the configured suffix (default 'pojos'), no cross-rule interaction

@@ -25,6 +25,8 @@ class DuplicateMethodBodyCheckTest {
     private static final String PHYSICS_BATCH_INSERTER = "quality/invalid/DuplicateMethodBodyPhysicsBatchInserter.java";
     private static final String JAVA_QUIZ_INSERTER = "quality/invalid/DuplicateMethodBodyJavaQuizInserter.java";
     private static final String PHYSICS_QUIZ_INSERTER = "quality/invalid/DuplicateMethodBodyPhysicsQuizInserter.java";
+    private static final String JAVA_BATCH_POLLER = "quality/invalid/DuplicateMethodBodyJavaBatchPoller.java";
+    private static final String PHYSICS_BATCH_POLLER = "quality/invalid/DuplicateMethodBodyPhysicsBatchPoller.java";
     private static final String VALID = "quality/valid/DuplicateMethodBodyValid.java";
 
     private static final int CROSS_FILE_DUPLICATES = 3;
@@ -114,6 +116,12 @@ class DuplicateMethodBodyCheckTest {
         String msg = violations.get(0).getMessage();
         assertTrue(msg.contains("insertBatch"), formatWithFile(violations));
         assertTrue(msg.contains("consolidate into a shared helper"), msg);
+    }
+
+    @Test
+    void crossFileVarargsVsArrayMainDuplicateCaught() throws Exception {
+        List<AuditEvent> violations = runMulti(JAVA_BATCH_POLLER, PHYSICS_BATCH_POLLER);
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("main")), formatWithFile(violations));
     }
 
     @Test

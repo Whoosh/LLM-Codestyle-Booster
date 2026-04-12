@@ -23,6 +23,8 @@ class DuplicateMethodBodyCheckTest {
     private static final String JAVA_PROMPT_BUILDER = "quality/invalid/DuplicateMethodBodyJavaPromptBuilder.java";
     private static final String JAVA_BATCH_INSERTER = "quality/invalid/DuplicateMethodBodyJavaBatchInserter.java";
     private static final String PHYSICS_BATCH_INSERTER = "quality/invalid/DuplicateMethodBodyPhysicsBatchInserter.java";
+    private static final String JAVA_QUIZ_INSERTER = "quality/invalid/DuplicateMethodBodyJavaQuizInserter.java";
+    private static final String PHYSICS_QUIZ_INSERTER = "quality/invalid/DuplicateMethodBodyPhysicsQuizInserter.java";
     private static final String VALID = "quality/valid/DuplicateMethodBodyValid.java";
 
     private static final int CROSS_FILE_DUPLICATES = 3;
@@ -103,6 +105,15 @@ class DuplicateMethodBodyCheckTest {
         String msg = violations.get(0).getMessage();
         assertTrue(msg.contains("parseJsonLines") && msg.contains("readJsonLines"), formatWithFile(violations));
         assertTrue(msg.contains("extract into a shared utility class"), msg);
+    }
+
+    @Test
+    void crossFileSameNameBatchInsertDuplicateCaught() throws Exception {
+        List<AuditEvent> violations = runMulti(JAVA_QUIZ_INSERTER, PHYSICS_QUIZ_INSERTER);
+        assertEquals(1, violations.size(), formatWithFile(violations));
+        String msg = violations.get(0).getMessage();
+        assertTrue(msg.contains("insertBatch"), formatWithFile(violations));
+        assertTrue(msg.contains("consolidate into a shared helper"), msg);
     }
 
     @Test

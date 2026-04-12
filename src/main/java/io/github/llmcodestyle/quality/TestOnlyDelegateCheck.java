@@ -2,6 +2,7 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
@@ -94,6 +95,7 @@ public class TestOnlyDelegateCheck extends AbstractCheck {
         }
     }
 
+    @Nullable
     private static DetailAST findTopMethodCall(DetailAST expr) {
         DetailAST child = expr.getFirstChild();
         if (child == null) {
@@ -105,6 +107,7 @@ public class TestOnlyDelegateCheck extends AbstractCheck {
         return null;
     }
 
+    @Nullable
     private static String extractMethodName(DetailAST methodCall) {
         if (methodCall.findFirstToken(DOT) != null) {
             return null;

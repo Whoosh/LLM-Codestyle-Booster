@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
@@ -101,7 +102,7 @@ public class UseIsEmptyCheck extends AbstractCheck {
         return -1;
     }
 
-    private static DetailAST unwrap(DetailAST node) {
+    private static DetailAST unwrap(@Nullable DetailAST node) {
         if (node != null && node.getType() == EXPR) {
             return node.getFirstChild();
         }

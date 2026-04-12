@@ -2,6 +2,8 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.pojos.MethodParamInfo;
+import jakarta.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +14,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
-import static io.github.llmcodestyle.utils.AstAnnotationUtil.hasAnyAnnotationNamed;
+import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
 
 /**
  * Flags method/constructor parameters that are null-checked in the body without
@@ -40,11 +43,9 @@ public class MissingNullableParameterCheck extends AbstractCheck {
     private static final Set<Integer> METHOD_DEF_TOKENS = Set.of(METHOD_DEF, CTOR_DEF);
     private static final Set<Integer> NULL_COMP_TOKENS = Set.of(EQUAL, NOT_EQUAL);
     private static final Set<Integer> TYPE_DEF_TOKENS = Set.of(CLASS_DEF, ENUM_DEF, INTERFACE_DEF);
-    private static final Set<Integer> SCOPE_BOUNDARY_TOKENS =
-        Set.of(CLASS_DEF, RECORD_DEF, ENUM_DEF, INTERFACE_DEF, LAMBDA);
+    private static final Set<Integer> SCOPE_BOUNDARY_TOKENS = Set.of(CLASS_DEF, RECORD_DEF, ENUM_DEF, INTERFACE_DEF, LAMBDA);
 
-    private final Map<DetailAST, Map<String, List<MethodParamInfo>>> classMethodMap =
-        new IdentityHashMap<>();
+    private final Map<DetailAST, Map<String, List<MethodParamInfo>>> classMethodMap = new IdentityHashMap<>();
 
     @Override
     public int[] getDefaultTokens() {
@@ -77,7 +78,6 @@ public class MissingNullableParameterCheck extends AbstractCheck {
     }
 
     // ---- Case 1: null-checked param without @Nullable ----
-
     private void checkMissingNullable(DetailAST def) {
         if (isInsideRecord(def)) {
             return;
@@ -100,9 +100,8 @@ public class MissingNullableParameterCheck extends AbstractCheck {
     }
 
     // ---- Case 2: null literal passed to method without null handling ----
-
     private void checkNullLiteralArg(DetailAST call) {
-        String called = calledMethodName(call);
+        String called = extractLocalMethodName(call);
         if (called == null) {
             return;
         }
@@ -114,36 +113,31 @@ public class MissingNullableParameterCheck extends AbstractCheck {
         if (nullIdx.isEmpty()) {
             return;
         }
-        DetailAST enclosing = findEnclosingTypeDef(call);
-        Map<String, List<MethodParamInfo>> methods = classMethodMap.get(enclosing);
+        Map<String, List<MethodParamInfo>> methods = classMethodMap.get(findEnclosingTypeDef(call));
         if (methods == null) {
             return;
         }
         int argCount = countExprs(elist);
         List<MethodParamInfo> matches = methods.getOrDefault(called, List.of()).stream()
-            .filter(m -> m.paramCount == argCount)
+            .filter(m -> m.paramCount() == argCount)
             .toList();
         if (matches.size() != 1) {
             return;
         }
         MethodParamInfo info = matches.get(0);
         for (int i : nullIdx) {
-            if (i < info.paramCount
-                && !info.nullableIndices.contains(i)
-                && !info.nullAcceptedIndices.contains(i)) {
-                log(call, MSG_KEY_CALL, info.paramNames.get(i), called);
+            if (i < info.paramCount() && !info.nullableIndices().contains(i) && !info.nullAcceptedIndices().contains(i)) {
+                log(call, MSG_KEY_CALL, info.paramNames().get(i), called);
             }
         }
     }
 
     // ---- Pre-collection phase ----
-
-    private void collectClassMethodInfo(DetailAST node) {
+    private void collectClassMethodInfo(@Nullable DetailAST node) {
         if (node == null) {
             return;
         }
-        int type = node.getType();
-        if (TYPE_DEF_TOKENS.contains(type) && !isInsideRecord(node)) {
+        if (TYPE_DEF_TOKENS.contains(node.getType()) && !isInsideRecord(node)) {
             classMethodMap.put(node, buildMethodMap(node));
         }
         for (DetailAST c = node.getFirstChild(); c != null; c = c.getNextSibling()) {
@@ -164,8 +158,7 @@ public class MissingNullableParameterCheck extends AbstractCheck {
         return map;
     }
 
-    private static void addMethodDef(DetailAST child,
-                                     Map<String, List<MethodParamInfo>> map) {
+    private static void addMethodDef(DetailAST child, Map<String, List<MethodParamInfo>> map) {
         if (!METHOD_DEF_TOKENS.contains(child.getType())) {
             return;
         }
@@ -174,8 +167,7 @@ public class MissingNullableParameterCheck extends AbstractCheck {
         if (params == null || body == null) {
             return;
         }
-        MethodParamInfo info = analyzeParams(params, body);
-        map.computeIfAbsent(methodName(child), k -> new ArrayList<>()).add(info);
+        map.computeIfAbsent(methodName(child), k -> new ArrayList<>()).add(analyzeParams(params, body));
     }
 
     private static MethodParamInfo analyzeParams(DetailAST params, DetailAST body) {
@@ -202,15 +194,13 @@ public class MissingNullableParameterCheck extends AbstractCheck {
     }
 
     // ---- Null-comparison analysis ----
-
     private static boolean hasNonRejectionNullCheck(String paramName, DetailAST body) {
         List<DetailAST> comps = new ArrayList<>();
         collectNullComparisons(paramName, body, comps);
         return comps.stream().anyMatch(c -> !isNullRejection(c));
     }
 
-    private static void collectNullComparisons(String paramName, DetailAST node,
-                                               List<DetailAST> out) {
+    private static void collectNullComparisons(String paramName, @Nullable DetailAST node, List<DetailAST> out) {
         if (node == null) {
             return;
         }
@@ -232,8 +222,7 @@ public class MissingNullableParameterCheck extends AbstractCheck {
         if (left == null || right == null) {
             return false;
         }
-        return (isIdent(left, name) && right.getType() == LITERAL_NULL)
-            || (left.getType() == LITERAL_NULL && isIdent(right, name));
+        return isIdent(left, name) && right.getType() == LITERAL_NULL || left.getType() == LITERAL_NULL && isIdent(right, name);
     }
 
     private static boolean isNullRejection(DetailAST comparison) {
@@ -252,7 +241,7 @@ public class MissingNullableParameterCheck extends AbstractCheck {
         return elseNode != null && blockContainsThrow(elseNode.findFirstToken(SLIST));
     }
 
-    private static boolean blockContainsThrow(DetailAST slist) {
+    private static boolean blockContainsThrow(@Nullable DetailAST slist) {
         if (slist == null) {
             return false;
         }
@@ -265,7 +254,6 @@ public class MissingNullableParameterCheck extends AbstractCheck {
     }
 
     // ---- Utility ----
-
     private static boolean isIdent(DetailAST node, String name) {
         return node.getType() == IDENT && name.equals(node.getText());
     }
@@ -273,23 +261,6 @@ public class MissingNullableParameterCheck extends AbstractCheck {
     private static String methodName(DetailAST def) {
         DetailAST ident = def.findFirstToken(IDENT);
         return ident != null ? ident.getText() : "<init>";
-    }
-
-    private static String calledMethodName(DetailAST methodCall) {
-        DetailAST first = methodCall.getFirstChild();
-        if (first.getType() == IDENT) {
-            return first.getText();
-        }
-        if (first.getType() == DOT) {
-            DetailAST qualifier = first.getFirstChild();
-            if (qualifier != null && qualifier.getType() == LITERAL_THIS) {
-                DetailAST ident = qualifier.getNextSibling();
-                if (ident != null && ident.getType() == IDENT) {
-                    return ident.getText();
-                }
-            }
-        }
-        return null;
     }
 
     private static List<Integer> nullLiteralArgIndices(DetailAST elist) {
@@ -311,8 +282,7 @@ public class MissingNullableParameterCheck extends AbstractCheck {
         if (child == null) {
             return false;
         }
-        return child.getType() == LITERAL_NULL
-            || (child.getType() == TYPECAST && child.findFirstToken(LITERAL_NULL) != null);
+        return child.getType() == LITERAL_NULL || child.getType() == TYPECAST && child.findFirstToken(LITERAL_NULL) != null;
     }
 
     private static int countExprs(DetailAST elist) {
@@ -325,6 +295,7 @@ public class MissingNullableParameterCheck extends AbstractCheck {
         return count;
     }
 
+    @Nullable
     private static DetailAST findEnclosingTypeDef(DetailAST node) {
         for (DetailAST p = node.getParent(); p != null; p = p.getParent()) {
             if (TYPE_DEF_TOKENS.contains(p.getType())) {
@@ -343,8 +314,4 @@ public class MissingNullableParameterCheck extends AbstractCheck {
         return false;
     }
 
-    private record MethodParamInfo(int paramCount, List<String> paramNames,
-                                   Set<Integer> nullableIndices,
-                                   Set<Integer> nullAcceptedIndices) {
-    }
 }

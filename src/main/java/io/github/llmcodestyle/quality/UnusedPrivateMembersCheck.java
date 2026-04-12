@@ -2,6 +2,7 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
@@ -116,7 +117,7 @@ public class UnusedPrivateMembersCheck extends AbstractCheck {
         return isPrivate;
     }
 
-    private static void collectReferences(DetailAST node, Set<String> refs, Set<DetailAST> excludeNodes) {
+    private static void collectReferences(@Nullable DetailAST node, Set<String> refs, Set<DetailAST> excludeNodes) {
         if (node == null) {
             return;
         }

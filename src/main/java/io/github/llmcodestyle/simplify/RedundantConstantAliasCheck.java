@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -129,6 +130,7 @@ public class RedundantConstantAliasCheck extends AbstractCheck {
         }
     }
 
+    @Nullable
     private static String simpleIdentInitializer(DetailAST varDef) {
         DetailAST assign = varDef.findFirstToken(ASSIGN);
         if (assign == null) {
@@ -142,6 +144,7 @@ public class RedundantConstantAliasCheck extends AbstractCheck {
         return first != null && first.getType() == IDENT ? first.getText() : null;
     }
 
+    @Nullable
     private static String patternCompileValue(DetailAST varDef, Map<String, String> stringConstants) {
         DetailAST assign = varDef.findFirstToken(ASSIGN);
         if (assign == null) {
@@ -185,6 +188,7 @@ public class RedundantConstantAliasCheck extends AbstractCheck {
             && PATTERN_COMPILE.equals(method.getText());
     }
 
+    @Nullable
     private static String stringLiteralInitializer(DetailAST varDef) {
         DetailAST assign = varDef.findFirstToken(ASSIGN);
         if (assign == null) {
@@ -195,7 +199,7 @@ public class RedundantConstantAliasCheck extends AbstractCheck {
         return first != null && first.getType() == STRING_LITERAL ? stripQuotes(first.getText()) : null;
     }
 
-    private static String stripQuotes(String literal) {
+    private static String stripQuotes(@Nullable String literal) {
         if (literal == null || literal.length() < 2) {
             return "";
         }
@@ -216,7 +220,7 @@ public class RedundantConstantAliasCheck extends AbstractCheck {
         return ident == null ? "" : ident.getText();
     }
 
-    private static boolean typesCompatible(String left, String right) {
+    private static boolean typesCompatible(@Nullable String left, String right) {
         return left != null && left.equals(right);
     }
 

@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
@@ -66,6 +67,7 @@ public class IfReturnBooleanLiteralCheck extends AbstractCheck {
         return rparen != null ? rparen.getNextSibling() : null;
     }
 
+    @Nullable
     private static DetailAST followingReturnInBlock(DetailAST ifAst) {
         DetailAST sibling = ifAst.getNextSibling();
         while (sibling != null) {
@@ -81,7 +83,7 @@ public class IfReturnBooleanLiteralCheck extends AbstractCheck {
         return null;
     }
 
-    private static int singleReturnLiteralKind(DetailAST body) {
+    private static int singleReturnLiteralKind(@Nullable DetailAST body) {
         if (body == null) {
             return 0;
         }

@@ -1,6 +1,7 @@
 package io.github.llmcodestyle.utils;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstQueryUtil.*;
@@ -47,6 +48,33 @@ public final class AstMethodCallUtil {
      */
     public static String extractFirstArgText(DetailAST methodCall) {
         return findFirstTextInChain(methodCall, ELIST, EXPR, IDENT);
+    }
+
+    /**
+     * Extracts the simple method name from a {@code METHOD_CALL} for unqualified calls
+     * ({@code foo()}) or {@code this}-qualified calls ({@code this.foo()}).
+     * Returns {@code null} for any other shape (e.g. {@code obj.foo()}).
+     */
+    @Nullable
+    public static String extractLocalMethodName(DetailAST methodCall) {
+        DetailAST firstChild = methodCall.getFirstChild();
+        if (firstChild.getType() == IDENT) {
+            return firstChild.getText();
+        }
+        if (firstChild.getType() == DOT) {
+            return extractThisQualifiedName(firstChild);
+        }
+        return null;
+    }
+
+    @Nullable
+    private static String extractThisQualifiedName(DetailAST dot) {
+        DetailAST qualifier = dot.getFirstChild();
+        if (qualifier == null || qualifier.getType() != LITERAL_THIS) {
+            return null;
+        }
+        DetailAST ident = qualifier.getNextSibling();
+        return ident != null && ident.getType() == IDENT ? ident.getText() : null;
     }
 
     /**

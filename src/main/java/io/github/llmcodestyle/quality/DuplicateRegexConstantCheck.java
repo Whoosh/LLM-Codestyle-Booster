@@ -3,6 +3,7 @@ package io.github.llmcodestyle.quality;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.pojos.RegexConstantOccurrence;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
@@ -93,6 +94,7 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
         return hasModifier(variableDef, LITERAL_STATIC) && hasModifier(variableDef, FINAL);
     }
 
+    @Nullable
     private static String extractRegexValue(DetailAST variableDef, String typeName) {
         if (PATTERN_TYPE.equals(typeName)) {
             return extractPatternCompileArg(variableDef);
@@ -111,6 +113,7 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
         return literal.isEmpty() ? null : literal;
     }
 
+    @Nullable
     private static String extractPatternCompileArg(DetailAST variableDef) {
         DetailAST assign = variableDef.findFirstToken(ASSIGN);
         DetailAST expr = assign != null ? assign.findFirstToken(EXPR) : null;

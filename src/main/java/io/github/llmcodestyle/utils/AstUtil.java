@@ -1,6 +1,7 @@
 package io.github.llmcodestyle.utils;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -43,7 +44,7 @@ public final class AstUtil {
     /**
      * Recursively appends dotted segments of a qualified name into {@code sb}.
      */
-    public static void buildDottedName(DetailAST node, StringBuilder sb) {
+    public static void buildDottedName(@Nullable DetailAST node, StringBuilder sb) {
         if (node == null) {
             return;
         }
@@ -105,7 +106,7 @@ public final class AstUtil {
      * Returns the last dot-separated segment of {@code pkg}, or an empty string if {@code pkg}
      * is {@code null} or empty. Used to enforce package-suffix conventions.
      */
-    public static String lastPackageSegment(String pkg) {
+    public static String lastPackageSegment(@Nullable String pkg) {
         if (pkg == null || pkg.isEmpty()) {
             return "";
         }

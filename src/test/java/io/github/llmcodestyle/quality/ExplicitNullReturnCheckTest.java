@@ -29,15 +29,13 @@ class ExplicitNullReturnCheckTest {
     @Test
     void nullableDelegationIsFlagged() throws Exception {
         List<AuditEvent> violations = run("quality/invalid/ExplicitNullReturnInvalid.java");
-        assertTrue(violations.stream().anyMatch(
-            v -> v.getMessage().contains("getName") && v.getMessage().contains("findNullable")), format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("getName") && v.getMessage().contains("findNullable")), format(violations));
     }
 
     @Test
     void qualifiedThisDelegationIsFlagged() throws Exception {
         List<AuditEvent> violations = run("quality/invalid/ExplicitNullReturnInvalid.java");
-        assertTrue(violations.stream().anyMatch(
-            v -> v.getMessage().contains("getNameQualified") && v.getMessage().contains("findNullable")), format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("getNameQualified") && v.getMessage().contains("findNullable")), format(violations));
     }
 
     @Test

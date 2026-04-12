@@ -4,7 +4,7 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
-import static io.github.llmcodestyle.utils.AstUtil.hasModifier;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.Set;
 
@@ -50,10 +50,7 @@ public class ClassMayBeRecordCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST classDef) {
-        if (!hasModifier(classDef, FINAL) || hasModifier(classDef, ABSTRACT)) {
-            return;
-        }
-        if (classDef.findFirstToken(EXTENDS_CLAUSE) != null) {
+        if (!hasModifier(classDef, FINAL) || hasModifier(classDef, ABSTRACT) || classDef.findFirstToken(EXTENDS_CLAUSE) != null) {
             return;
         }
         DetailAST objblock = classDef.findFirstToken(OBJBLOCK);
@@ -64,8 +61,7 @@ public class ClassMayBeRecordCheck extends AbstractCheck {
         if (instanceFields <= 0 || hasDisqualifyingMethods(objblock)) {
             return;
         }
-        String className = classDef.findFirstToken(IDENT).getText();
-        log(classDef.getLineNo(), classDef.getColumnNo(), MSG_KEY, className, instanceFields);
+        log(classDef.getLineNo(), classDef.getColumnNo(), MSG_KEY, classDef.findFirstToken(IDENT).getText(), instanceFields);
     }
 
     /**

@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
@@ -53,6 +54,7 @@ public class MapContainsKeyThenGetCheck extends AbstractCheck {
         }
     }
 
+    @Nullable
     private static DetailAST findContainsKeyCall(DetailAST node) {
         if (node.getType() == METHOD_CALL && "containsKey".equals(extractMethodName(node))) {
             return node;

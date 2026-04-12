@@ -1,6 +1,7 @@
 package io.github.llmcodestyle.utils;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -39,7 +40,7 @@ public final class AstQueryUtil {
      * Ignores line/column positions. Safe on {@code null}: two {@code null}s are equal,
      * a {@code null} and a node are not.
      */
-    public static boolean structurallyEqual(DetailAST a, DetailAST b) {
+    public static boolean structurallyEqual(@Nullable DetailAST a, @Nullable DetailAST b) {
         if (a == null || b == null) {
             return a == null && b == null;
         }

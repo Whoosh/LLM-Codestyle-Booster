@@ -2,6 +2,7 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
@@ -72,6 +73,7 @@ public class SpringBootMainVisibilityCheck extends AbstractCheck {
         }
     }
 
+    @Nullable
     private static DetailAST findMainMethod(DetailAST classBody) {
         for (DetailAST child = classBody.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getType() != METHOD_DEF) {

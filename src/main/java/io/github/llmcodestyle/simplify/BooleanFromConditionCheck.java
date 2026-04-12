@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
@@ -57,6 +58,7 @@ public class BooleanFromConditionCheck extends AbstractCheck {
         }
     }
 
+    @Nullable
     private static String booleanLiteralVarName(DetailAST stmt) {
         if (stmt.getType() != VARIABLE_DEF) {
             return null;
@@ -78,6 +80,7 @@ public class BooleanFromConditionCheck extends AbstractCheck {
         return kind == LITERAL_TRUE || kind == LITERAL_FALSE ? kind : 0;
     }
 
+    @Nullable
     private static DetailAST firstChildOfInitializerExpression(DetailAST varDef) {
         DetailAST assign = varDef.findFirstToken(ASSIGN);
         if (assign == null) {
@@ -99,7 +102,8 @@ public class BooleanFromConditionCheck extends AbstractCheck {
         return rparen == null ? null : unwrapSingleStatementBody(rparen.getNextSibling());
     }
 
-    private static DetailAST unwrapSingleStatementBody(DetailAST body) {
+    @Nullable
+    private static DetailAST unwrapSingleStatementBody(@Nullable DetailAST body) {
         if (body == null) {
             return null;
         }
@@ -113,7 +117,7 @@ public class BooleanFromConditionCheck extends AbstractCheck {
         return innerStmts.size() == 1 ? innerStmts.get(0) : null;
     }
 
-    private static boolean matchesLiteralAssignment(DetailAST exprStmt, String varName, int expectedLiteralType) {
+    private static boolean matchesLiteralAssignment(@Nullable DetailAST exprStmt, String varName, int expectedLiteralType) {
         if (exprStmt == null || exprStmt.getType() != EXPR) {
             return false;
         }

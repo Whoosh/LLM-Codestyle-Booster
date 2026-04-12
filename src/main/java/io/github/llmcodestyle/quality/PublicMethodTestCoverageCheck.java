@@ -3,6 +3,7 @@ package io.github.llmcodestyle.quality;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.pojos.MethodInfo;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
@@ -227,6 +228,7 @@ public class PublicMethodTestCoverageCheck extends AbstractCheck {
         return paramCount == 1;
     }
 
+    @Nullable
     private static String readTestFiles(String mainFilePath) {
         String normalized = mainFilePath.replace('\\', '/');
         int mainIdx = normalized.indexOf(MAIN_SOURCE_MARKER);

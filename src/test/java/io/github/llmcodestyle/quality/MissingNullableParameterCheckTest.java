@@ -23,33 +23,25 @@ class MissingNullableParameterCheckTest {
     @Test
     void nullCheckedParamWithReturnDefaultIsFlagged() throws Exception {
         List<AuditEvent> violations = run("quality/invalid/MissingNullableParameterInvalid.java");
-        assertTrue(violations.stream().anyMatch(
-            v -> v.getMessage().contains("'text'") && v.getMessage().contains("'fixKatex'")),
-            format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("'text'") && v.getMessage().contains("'fixKatex'")), format(violations));
     }
 
     @Test
     void ternaryNullCheckIsFlagged() throws Exception {
         List<AuditEvent> violations = run("quality/invalid/MissingNullableParameterInvalid.java");
-        assertTrue(violations.stream().anyMatch(
-            v -> v.getMessage().contains("'template'") && v.getMessage().contains("'format'")),
-            format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("'template'") && v.getMessage().contains("'format'")), format(violations));
     }
 
     @Test
     void notEqualNullGuardIsFlagged() throws Exception {
         List<AuditEvent> violations = run("quality/invalid/MissingNullableParameterInvalid.java");
-        assertTrue(violations.stream().anyMatch(
-            v -> v.getMessage().contains("'data'") && v.getMessage().contains("'process'")),
-            format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("'data'") && v.getMessage().contains("'process'")), format(violations));
     }
 
     @Test
     void nullLiteralArgToUnhandledMethodIsFlagged() throws Exception {
         List<AuditEvent> violations = run("quality/invalid/MissingNullableParameterInvalid.java");
-        assertTrue(violations.stream().anyMatch(
-            v -> v.getMessage().contains("Null literal") && v.getMessage().contains("'transform'")),
-            format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Null literal") && v.getMessage().contains("'transform'")), format(violations));
     }
 
     @Test

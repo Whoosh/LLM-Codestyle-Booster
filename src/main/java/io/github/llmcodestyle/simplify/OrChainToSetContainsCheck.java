@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
@@ -97,6 +98,7 @@ public class OrChainToSetContainsCheck extends AbstractCheck {
      * Returns a rendered LHS text if every operand is {@code LHS == LITERAL} with a structurally
      * identical {@code LHS} and a primitive-comparable literal RHS. Returns {@code null} otherwise.
      */
+    @Nullable
     private static String detectEqualityChain(List<DetailAST> operands) {
         DetailAST canonicalLhs = null;
         for (DetailAST op : operands) {
@@ -122,6 +124,7 @@ public class OrChainToSetContainsCheck extends AbstractCheck {
      * literals (int/long/float/double/char) and simple {@code UPPER_SNAKE_CASE} identifiers
      * (the Java convention for {@code static final} constants).
      */
+    @Nullable
     private static DetailAST extractLhsWithLiteralRhs(DetailAST equal) {
         DetailAST first = equal.getFirstChild();
         if (first == null) {
@@ -144,7 +147,7 @@ public class OrChainToSetContainsCheck extends AbstractCheck {
         return COMPARABLE_LITERALS.contains(node.getType()) || node.getType() == IDENT && isUpperSnakeCase(node.getText());
     }
 
-    private static boolean isUpperSnakeCase(String name) {
+    private static boolean isUpperSnakeCase(@Nullable String name) {
         if (name == null || name.isEmpty()) {
             return false;
         }
@@ -167,6 +170,7 @@ public class OrChainToSetContainsCheck extends AbstractCheck {
      * Returns the shared receiver name if every operand is {@code receiver.equals(STRING_LITERAL)}
      * with the same receiver. Returns {@code null} otherwise.
      */
+    @Nullable
     private static String detectEqualsCallChain(List<DetailAST> operands) {
         String receiverName = null;
         for (DetailAST op : operands) {
@@ -204,7 +208,7 @@ public class OrChainToSetContainsCheck extends AbstractCheck {
      * Handles simple idents, dotted paths, and {@code something.foo()} shapes; falls back
      * to the root node's own text for anything else.
      */
-    private static String renderExpression(DetailAST node) {
+    private static String renderExpression(@Nullable DetailAST node) {
         if (node == null) {
             return "?";
         }

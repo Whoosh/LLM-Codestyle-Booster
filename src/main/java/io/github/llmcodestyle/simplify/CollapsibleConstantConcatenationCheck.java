@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstQueryUtil.*;
@@ -152,7 +153,7 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
         return eqIdx < 0 ? varDef.getColumnNo() : eqIdx + 2;
     }
 
-    private static int computeMergedStringContentLength(DetailAST node) {
+    private static int computeMergedStringContentLength(@Nullable DetailAST node) {
         if (node == null) {
             return 0;
         }
@@ -187,7 +188,8 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
         }
     }
 
-    private static DetailAST findArrayInit(DetailAST node) {
+    @Nullable
+    private static DetailAST findArrayInit(@Nullable DetailAST node) {
         if (node == null) {
             return null;
         }
@@ -200,7 +202,7 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
         return null;
     }
 
-    private static boolean allLeavesCollapsible(DetailAST node, Set<String> literalConstants) {
+    private static boolean allLeavesCollapsible(@Nullable DetailAST node, Set<String> literalConstants) {
         if (node == null) {
             return false;
         }
@@ -214,7 +216,7 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
         return isSingleLiteral(node) || node.getType() == IDENT && literalConstants.contains(node.getText());
     }
 
-    private static int countLeaves(DetailAST node) {
+    private static int countLeaves(@Nullable DetailAST node) {
         if (node == null) {
             return 0;
         }
@@ -241,7 +243,7 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
         }
     }
 
-    private void scanForCollapsibleRuns(DetailAST node, Set<String> literalConstants) {
+    private void scanForCollapsibleRuns(@Nullable DetailAST node, Set<String> literalConstants) {
         if (node == null) {
             return;
         }
@@ -297,7 +299,7 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
         }
     }
 
-    private static boolean isSingleLiteral(DetailAST node) {
+    private static boolean isSingleLiteral(@Nullable DetailAST node) {
         return node != null && SINGLE_LITERAL_TOKENS.contains(node.getType());
     }
 

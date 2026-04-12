@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
@@ -81,6 +82,7 @@ public class CommonsLang3StringConstantCheck extends AbstractCheck {
         return "String".equals(extractTypeName(varDef));
     }
 
+    @Nullable
     private static String stringLiteralInitText(DetailAST varDef) {
         DetailAST assign = varDef.findFirstToken(ASSIGN);
         if (assign == null) {

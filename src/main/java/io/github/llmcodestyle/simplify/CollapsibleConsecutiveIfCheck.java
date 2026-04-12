@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstQueryUtil.*;
@@ -72,6 +73,7 @@ public class CollapsibleConsecutiveIfCheck extends AbstractCheck {
      * or {@code null} if the if has an else, is an else-if, or the body is
      * not a single terminating control-flow statement.
      */
+    @Nullable
     private static DetailAST extractTerminatingBody(DetailAST stmt) {
         if (stmt.getType() != LITERAL_IF || stmt.findFirstToken(LITERAL_ELSE) != null || isElseIf(stmt)) {
             return null;

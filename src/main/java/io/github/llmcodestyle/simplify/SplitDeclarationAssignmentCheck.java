@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
@@ -72,6 +73,7 @@ public class SplitDeclarationAssignmentCheck extends AbstractCheck {
         }
     }
 
+    @Nullable
     private static String uninitializedVarName(DetailAST stmt) {
         if (stmt.getType() != VARIABLE_DEF || stmt.findFirstToken(ASSIGN) != null) {
             return null;

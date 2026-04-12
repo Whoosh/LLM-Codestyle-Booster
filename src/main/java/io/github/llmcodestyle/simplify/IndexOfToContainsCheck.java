@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
@@ -63,7 +64,7 @@ public class IndexOfToContainsCheck extends AbstractCheck {
         return isZero(literal) && opType == GT || isMinusOne(literal) && MINUS_ONE_REVERSE_OPS.contains(opType);
     }
 
-    private static boolean isIndexOfCall(DetailAST expr) {
+    private static boolean isIndexOfCall(@Nullable DetailAST expr) {
         if (expr == null) {
             return false;
         }
@@ -78,7 +79,7 @@ public class IndexOfToContainsCheck extends AbstractCheck {
         return isValidIndexOfArgument(elist.findFirstToken(EXPR));
     }
 
-    private static boolean isValidIndexOfArgument(DetailAST firstExpr) {
+    private static boolean isValidIndexOfArgument(@Nullable DetailAST firstExpr) {
         if (firstExpr == null || firstExpr.getFirstChild() == null) {
             return true;
         }

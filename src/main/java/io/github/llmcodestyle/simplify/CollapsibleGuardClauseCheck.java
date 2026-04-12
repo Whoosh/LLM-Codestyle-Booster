@@ -2,6 +2,7 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
@@ -88,6 +89,7 @@ public class CollapsibleGuardClauseCheck extends AbstractCheck {
         return single.getType() == LITERAL_RETURN && single.findFirstToken(EXPR) == null;
     }
 
+    @Nullable
     private static DetailAST extractIfBody(DetailAST ifAst) {
         DetailAST rparen = ifAst.findFirstToken(RPAREN);
         if (rparen == null) {

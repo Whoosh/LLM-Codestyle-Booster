@@ -2,6 +2,7 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstQueryUtil.*;
@@ -86,6 +87,7 @@ abstract class UnrelatedNestedTypeCheckBase extends AbstractCheck {
         }
     }
 
+    @Nullable
     private static DetailAST findEnclosingType(DetailAST typeDef) {
         DetailAST parent = typeDef.getParent();
         while (parent != null) {

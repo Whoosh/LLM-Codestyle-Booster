@@ -10,6 +10,7 @@ import org.junit.jupiter.api.io.TempDir;
 import io.github.llmcodestyle.forbidden.ForbidAssertKeywordCheck;
 import io.github.llmcodestyle.layout.BlankLineAfterCommentCheck;
 import io.github.llmcodestyle.layout.UnnecessaryLineWrapCheck;
+import jakarta.annotation.Nullable;
 
 import java.net.URL;
 import java.nio.file.Files;
@@ -292,6 +293,7 @@ class CheckstyleConfigConsistencyTest {
         return false;
     }
 
+    @Nullable
     private static Path resolveConfig() {
         Path fromModule = Path.of("../checkstyle.xml");
         if (Files.exists(fromModule)) {

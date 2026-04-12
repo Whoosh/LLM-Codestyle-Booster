@@ -2,12 +2,14 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import jakarta.annotation.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
-import static io.github.llmcodestyle.utils.AstAnnotationUtil.hasAnyAnnotationNamed;
+import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
 
 /**
  * Flags methods that return {@code null} explicitly or delegate to a {@code @Nullable}-annotated
@@ -33,6 +35,7 @@ public class ExplicitNullReturnCheck extends AbstractCheck {
 
     private static final int[] TOKENS = {LITERAL_RETURN};
     private static final String NULLABLE = "Nullable";
+    private static final Set<Integer> SCOPE_BOUNDARY_TYPES = Set.of(LAMBDA, CLASS_DEF, RECORD_DEF, ENUM_DEF, INTERFACE_DEF);
 
     private final Set<String> nullableMethodNames = new HashSet<>();
 
@@ -78,7 +81,7 @@ public class ExplicitNullReturnCheck extends AbstractCheck {
     }
 
     private void checkNullableDelegation(DetailAST returnAst, DetailAST methodCall, String methodName) {
-        String calledName = extractMethodName(methodCall);
+        String calledName = extractLocalMethodName(methodCall);
         if (calledName != null && nullableMethodNames.contains(calledName)) {
             log(returnAst, MSG_KEY_DELEGATION, methodName, calledName);
         }
@@ -99,32 +102,15 @@ public class ExplicitNullReturnCheck extends AbstractCheck {
         }
     }
 
+    @Nullable
     private static DetailAST findEnclosingMethod(DetailAST node) {
         for (DetailAST parent = node.getParent(); parent != null; parent = parent.getParent()) {
             int type = parent.getType();
             if (type == METHOD_DEF) {
                 return parent;
             }
-            if (type == LAMBDA || type == CLASS_DEF || type == RECORD_DEF
-                || type == ENUM_DEF || type == INTERFACE_DEF) {
+            if (SCOPE_BOUNDARY_TYPES.contains(type)) {
                 return null;
-            }
-        }
-        return null;
-    }
-
-    private static String extractMethodName(DetailAST methodCall) {
-        DetailAST firstChild = methodCall.getFirstChild();
-        if (firstChild.getType() == IDENT) {
-            return firstChild.getText();
-        }
-        if (firstChild.getType() == DOT) {
-            DetailAST qualifier = firstChild.getFirstChild();
-            if (qualifier != null && qualifier.getType() == LITERAL_THIS) {
-                DetailAST ident = qualifier.getNextSibling();
-                if (ident != null && ident.getType() == IDENT) {
-                    return ident.getText();
-                }
             }
         }
         return null;

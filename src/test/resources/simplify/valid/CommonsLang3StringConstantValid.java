@@ -20,6 +20,13 @@ public class CommonsLang3StringConstantValid {
     // Static final but not String — should not be flagged.
     private static final int LIMIT = 0;
 
+    // Static final String with no initializer — exercises stringLiteralInitText null ASSIGN path
+    private static final String UNINITIALIZED;
+
+    static {
+        UNINITIALIZED = "";
+    }
+
     // Instance field (not static) — outside the rule.
     private final String space = " ";
 

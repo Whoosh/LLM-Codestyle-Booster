@@ -55,4 +55,14 @@ public class IfReturnBooleanLiteralValid {
     private boolean computeFallback() {
         return value < -1;
     }
+
+    // Statement between if-return and final-return — followingReturnInBlock returns null
+    // Exercises line 78: siblingType != SEMI && siblingType != RCURLY (returns null)
+    public boolean statementBetweenIfAndReturn() {
+        if (value > 0) {
+            return true;
+        }
+        value++;
+        return false;
+    }
 }

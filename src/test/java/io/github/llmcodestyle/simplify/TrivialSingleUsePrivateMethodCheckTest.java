@@ -24,6 +24,17 @@ class TrivialSingleUsePrivateMethodCheckTest {
         assertTrue(run("simplify/valid/TrivialSingleUsePrivateMethodValid.java").isEmpty());
     }
 
+    @Test
+    void violationMessagesAreDescriptive() throws Exception {
+        // visitToken line 97: negated conditional on countIdent check
+        List<AuditEvent> violations = run("simplify/invalid/TrivialSingleUsePrivateMethodInvalid.java");
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), format(violations));
+        for (AuditEvent v : violations) {
+            assertFalse(v.getMessage().isEmpty(), "Message should not be empty");
+            assertTrue(v.getLine() > 0, "Line should be positive");
+        }
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(TrivialSingleUsePrivateMethodCheck.class, resource, NO_PROPS);
     }

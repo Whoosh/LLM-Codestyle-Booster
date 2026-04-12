@@ -57,4 +57,13 @@ class BlankLineAfterCommentCheckTest {
         assertEquals(1, violations.size(),
             "Expected exactly 1 violation for multi-line block comment with blank after: " + format(violations));
     }
+
+    @Test
+    void blockCommentBodyWithTrailingContentNotFlagged() throws Exception {
+        // handleBlockCommentBody: */ with trailing content should flushAndReset, not mark as comment
+        List<AuditEvent> violations = runFileSetCheck(BlankLineAfterCommentCheck.class,
+            "layout/valid/BlankLineAfterCommentBlockBody.java", JAVA_EXT);
+        assertTrue(violations.isEmpty(),
+            "Block comment body with trailing content should not produce violations: " + format(violations));
+    }
 }

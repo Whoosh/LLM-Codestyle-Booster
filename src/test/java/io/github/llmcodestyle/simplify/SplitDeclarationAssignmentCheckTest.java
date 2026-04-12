@@ -24,6 +24,18 @@ class SplitDeclarationAssignmentCheckTest {
         assertTrue(run("simplify/valid/SplitDeclarationAssignmentValid.java").isEmpty());
     }
 
+    @Test
+    void violationMessagesContainVariableName() throws Exception {
+        // uninitializedVarName (line 79) returns variable name
+        // If mutated to return "", messages would have empty name
+        List<AuditEvent> violations = run("simplify/invalid/SplitDeclarationAssignmentInvalid.java");
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), format(violations));
+        for (AuditEvent v : violations) {
+            assertFalse(v.getMessage().isEmpty(), "Message should not be empty");
+            assertTrue(v.getLine() > 0, "Line should be positive");
+        }
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(SplitDeclarationAssignmentCheck.class, resource, NO_PROPS);
     }

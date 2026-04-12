@@ -49,6 +49,22 @@ class MissingNullableParameterCheckTest {
         assertTrue(run("quality/valid/MissingNullableParameterValid.java").isEmpty());
     }
 
+    @Test
+    void typecastNullLiteralArgIsFlagged() throws Exception {
+        List<AuditEvent> violations = run("quality/invalid/MissingNullableParameterCast.java");
+        // (String) null exercises isNullLiteralExpr TYPECAST path (line 285)
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Null literal")),
+            "Cast null literal should be flagged: " + format(violations));
+    }
+
+    @Test
+    void reversedNullComparisonIsFlagged() throws Exception {
+        List<AuditEvent> violations = run("quality/invalid/MissingNullableParameterCast.java");
+        // null == text exercises matchesNullComparison reversed path (line 225)
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("'text'") && v.getMessage().contains("'reversed'")),
+            "Reversed null comparison should be flagged: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(MissingNullableParameterCheck.class, resource, NO_PROPS);
     }

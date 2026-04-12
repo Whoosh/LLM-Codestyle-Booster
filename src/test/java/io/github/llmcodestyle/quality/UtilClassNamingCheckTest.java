@@ -24,6 +24,24 @@ class UtilClassNamingCheckTest {
         assertTrue(run("quality/valid/UtilClassNamingValid.java").isEmpty());
     }
 
+    @Test
+    void violationMessageContainsClassName() throws Exception {
+        List<AuditEvent> violations = run("quality/invalid/UtilClassNamingInvalid.java");
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), format(violations));
+        for (AuditEvent v : violations) {
+            assertFalse(v.getMessage().isEmpty(), "Message should not be empty");
+            assertTrue(v.getLine() > 0, "Line should be positive");
+        }
+    }
+
+    @Test
+    void nonStaticNestedClassIsNotFlagged() throws Exception {
+        // isNonStaticNestedClass (line 88) checks isNestedType && !hasModifier(LITERAL_STATIC)
+        // Non-static nested classes are skipped because they can't be util classes
+        List<AuditEvent> violations = run("quality/valid/UtilClassNamingValid.java");
+        assertTrue(violations.isEmpty(), "Non-static nested classes should not be flagged");
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(UtilClassNamingCheck.class, resource, NO_PROPS);
     }

@@ -24,6 +24,25 @@ class IfReturnBooleanLiteralCheckTest {
         assertTrue(run("simplify/valid/IfReturnBooleanLiteralValid.java").isEmpty());
     }
 
+    @Test
+    void semiPathDetection() throws Exception {
+        // followingReturnInBlock line 78: siblingType != SEMI && siblingType != RCURLY
+        // The SLIST has children: LITERAL_IF, then possibly SEMI/RCURLY, then LITERAL_RETURN
+        List<AuditEvent> violations = run("simplify/invalid/IfReturnBooleanLiteralSemiPath.java");
+        assertEquals(1, violations.size(),
+            "Should detect if-return-boolean with RCURLY siblings: " + format(violations));
+    }
+
+    @Test
+    void exactViolationCount() throws Exception {
+        List<AuditEvent> violations = run("simplify/invalid/IfReturnBooleanLiteralInvalid.java");
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(),
+            "Exact violation count: " + format(violations));
+        for (AuditEvent v : violations) {
+            assertTrue(v.getLine() > 0, "Line should be positive");
+        }
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(IfReturnBooleanLiteralCheck.class, resource, NO_PROPS);
     }

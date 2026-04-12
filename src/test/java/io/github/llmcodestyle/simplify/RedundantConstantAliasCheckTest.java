@@ -81,6 +81,47 @@ class RedundantConstantAliasCheckTest {
             "Should flag PROBLEM_START as alias: " + format(violations));
     }
 
+    @Test
+    void mutationKillerValidProducesNoViolations() throws Exception {
+        // Exercises: two-arg Pattern.compile, non-static-final field, static-only field,
+        // no ASSIGN field, computed initializer, concat initializer for Pattern.compile
+        List<AuditEvent> violations = run("simplify/valid/RedundantConstantAliasMutationKiller.java");
+        assertTrue(violations.isEmpty(),
+            "Mutation killer valid fixture should produce no violations: " + format(violations));
+    }
+
+    @Test
+    void isEffectivelyStaticFinalDistinguishesModifiers() throws Exception {
+        // The valid fixture has non-static-final and static-only fields that must NOT be flagged
+        List<AuditEvent> violations = run("simplify/valid/RedundantConstantAliasMutationKiller.java");
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("notStaticFinal")),
+            "Non-static-final field should not be flagged: " + format(violations));
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("staticOnly")),
+            "Static-only (not final) field should not be flagged: " + format(violations));
+    }
+
+    @Test
+    void patternCompileWithTwoArgsNotFlagged() throws Exception {
+        List<AuditEvent> violations = run("simplify/valid/RedundantConstantAliasMutationKiller.java");
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("TWO_ARG")),
+            "Pattern.compile with two args should not be flagged: " + format(violations));
+    }
+
+    @Test
+    void patternCompileConcatNotFlagged() throws Exception {
+        List<AuditEvent> violations = run("simplify/valid/RedundantConstantAliasMutationKiller.java");
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("FROM_EXPR")),
+            "Pattern.compile with concatenated arg should not be flagged: " + format(violations));
+    }
+
+    @Test
+    void simpleIdentInitializerReturnsNullForNonIdentExpr() throws Exception {
+        // COMPUTED field uses String.valueOf(42) as initializer — not a simple IDENT
+        List<AuditEvent> violations = run("simplify/valid/RedundantConstantAliasMutationKiller.java");
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("COMPUTED")),
+            "Non-IDENT initializer should not be treated as alias: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(RedundantConstantAliasCheck.class, resource, NO_PROPS);
     }

@@ -203,6 +203,34 @@ class DuplicateMethodBodyCheckTest {
         assertTrue(msg.contains("walkTypeNode"), "Should mention first method: " + msg);
     }
 
+    @Test
+    void isOverrideChecksBothAnnotationAndIdent() throws Exception {
+        // Tests isOverride lines 193, 197, 199:
+        // - modifiers != null
+        // - mod.getType() == ANNOTATION
+        // - ident != null && "Override".equals(ident.getText())
+        // Verified by: @Override methods skipped, non-Override annotations NOT skipped
+        List<AuditEvent> annotatedViolations = runSingle("quality/invalid/DuplicateMethodBodyAnnotatedPair.java");
+        // Non-Override annotated methods should still be compared
+        assertTrue(annotatedViolations.size() == 1,
+            "Only non-Override duplicate pair should produce violation: " + formatWithFile(annotatedViolations));
+        // Ensure @Override method toString() is skipped
+        assertTrue(annotatedViolations.stream().noneMatch(v -> v.getMessage().contains("toString")),
+            "Override methods must be skipped: " + formatWithFile(annotatedViolations));
+    }
+
+    @Test
+    void extractEnclosingClassNameIncludedInMessage() throws Exception {
+        List<AuditEvent> violations = runSingle(INVALID_A);
+        assertFalse(violations.isEmpty(), "Should have violations");
+        String msg = violations.get(0).getMessage();
+        // The class name should be non-empty and not "<unknown>"
+        assertFalse(msg.contains("<unknown>"),
+            "extractEnclosingClassName should return actual class name: " + msg);
+        assertTrue(msg.contains("DuplicateMethodBodyInvalid"),
+            "Message should contain the class name: " + msg);
+    }
+
     private static List<AuditEvent> runSingle(String resource) throws Exception {
         return runTreeWalkerCheck(DuplicateMethodBodyCheck.class, resource, NO_PROPS);
     }

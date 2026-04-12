@@ -69,4 +69,34 @@ class UnusedPrivateMembersCheckTest {
         assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("toString")),
             "Override-annotated methods should not be flagged: " + format(violations));
     }
+
+    @Test
+    void unusedMemberInNestedClassIsFlagged() throws Exception {
+        // collectAllPrivateDeclarations lines 76-77: recursion into nested types
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class,
+            "quality/invalid/UnusedPrivateMembersNested.java", NO_PROPS);
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("nestedUnused")),
+            "Unused private in nested class should be flagged: " + format(violations));
+        // nestedUsed is used by getNestedUsed() — should NOT be flagged
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("nestedUsed")),
+            "Used private in nested class should not be flagged: " + format(violations));
+    }
+
+    @Test
+    void overrideInNestedIsNotFlagged() throws Exception {
+        // isPrivateNonAnnotated lines 109-111: @Override detection
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class,
+            "quality/invalid/UnusedPrivateMembersNested.java", NO_PROPS);
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("toString")),
+            "Override-annotated methods in nested should not be flagged: " + format(violations));
+    }
+
+    @Test
+    void deprecatedAnnotationDoesNotExempt() throws Exception {
+        // isPrivateNonAnnotated: only @Override exempts, not @Deprecated
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class,
+            "quality/invalid/UnusedPrivateMembersNested.java", NO_PROPS);
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("annotatedButNotOverride")),
+            "Deprecated but not Override should be flagged: " + format(violations));
+    }
 }

@@ -49,6 +49,23 @@ class UnrelatedNestedEnumCheckTest {
         assertTrue(tokens.length > 0, "Should have at least one token");
     }
 
+    @Test
+    void enumWithSameNamedLocalVarIsStillUnrelated() throws Exception {
+        // Exercises collectOwnDeclaredNames and isIdentReference edge cases
+        List<AuditEvent> violations = run("quality/invalid/UnrelatedNestedEnumMutationKiller.java");
+        // Standalone enum declares 'name' as parameter, which shadows outer 'name' field
+        // But the enum is still unrelated because it only references its own 'name'
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Standalone")),
+            "Standalone enum with shadowed name should be flagged: " + format(violations));
+    }
+
+    @Test
+    void violationCountForMutationKiller() throws Exception {
+        List<AuditEvent> violations = run("quality/invalid/UnrelatedNestedEnumMutationKiller.java");
+        assertEquals(1, violations.size(),
+            "Expected exactly 1 violation for mutation killer: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(UnrelatedNestedEnumCheck.class, resource, NO_PROPS);
     }

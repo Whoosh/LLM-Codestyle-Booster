@@ -41,4 +41,41 @@ class InlineRegexConstantCheckTest {
             assertTrue(event.getLine() > 0, "Line should be positive");
         }
     }
+
+    @Test
+    void fieldLevelRegexIsNotFlagged() throws Exception {
+        // isInsideMethodBody returns false for field initializers (VARIABLE_DEF with OBJBLOCK grandparent)
+        List<AuditEvent> violations = runTreeWalkerCheck(InlineRegexConstantCheck.class,
+            "simplify/valid/InlineRegexFieldLevel.java", Map.of());
+        assertTrue(violations.isEmpty(),
+            "Field-level regex usage should not be flagged: " + format(violations));
+    }
+
+    @Test
+    void mutationKillerExercisesExtractMethodNameWithDot() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(InlineRegexConstantCheck.class,
+            "simplify/invalid/InlineRegexMutationKiller.java", Map.of());
+        // Should flag inline regex constants in method bodies (qualifiedCall and unqualifiedCall)
+        // but NOT in field initializer (fieldSplit)
+        assertTrue(violations.size() >= 2,
+            "Inline regex in method body should be flagged: " + format(violations));
+        // Field initializer should NOT be flagged (isInsideMethodBody returns false)
+        assertTrue(violations.stream().noneMatch(v -> v.getLine() == 8),
+            "Field-level regex should not be flagged: " + format(violations));
+    }
+
+    @Test
+    void fieldLevelRegexNotFlaggedButMethodLevelIs() throws Exception {
+        // Exercises isInsideMethodBody lines 56-58:
+        // VARIABLE_DEF with OBJBLOCK grandparent returns false (field)
+        // VARIABLE_DEF with SLIST grandparent continues traversal (local var in method)
+        List<AuditEvent> violations = runTreeWalkerCheck(InlineRegexConstantCheck.class,
+            "simplify/invalid/InlineRegexMutationKiller.java", Map.of());
+        // qualifiedCall() line 14: s.matches("\\d+") — flagged
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 14),
+            "Qualified regex call in method should be flagged: " + format(violations));
+        // unqualifiedCall() line 19: input.replaceAll("\\w+", ...) — flagged
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 19),
+            "Unqualified replaceAll in method should be flagged: " + format(violations));
+    }
 }

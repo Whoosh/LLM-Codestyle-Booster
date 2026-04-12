@@ -52,8 +52,12 @@ class ForbiddenGenericCatchCheckTest {
     @Test
     void multiCatchWithGenericTypeIsFlagged() throws Exception {
         List<AuditEvent> violations = runTreeWalkerCheck(ForbiddenGenericCatchCheck.class, "forbidden/invalid/ForbiddenGenericCatchInvalid.java", NO_PROPS);
-        // Line 32 has multi-catch with Exception
+        // Line 32 has multi-catch with Exception — BOR handling is required
         assertTrue(violations.stream().anyMatch(v -> v.getLine() == 32),
             "Multi-catch with generic type should be flagged on line 32: " + format(violations));
+        // BOR child (line 63): if negated, Exception inside multi-catch would not be detected
+        // Verify exact count to catch any change in BOR behavior
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(),
+            "Exact violation count ensures BOR handling works: " + format(violations));
     }
 }

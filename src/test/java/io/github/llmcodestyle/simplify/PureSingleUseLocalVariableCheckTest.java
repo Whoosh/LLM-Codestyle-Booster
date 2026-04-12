@@ -30,4 +30,21 @@ class PureSingleUseLocalVariableCheckTest {
     void validCasesProduceNoViolations() throws Exception {
         assertTrue(runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/valid/PureSingleUseVarValid.java", Map.of()).isEmpty(), "Expected no violations");
     }
+
+    @Test
+    void violationLinesArePositive() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarInvalid.java", Map.of());
+        for (AuditEvent v : violations) {
+            assertTrue(v.getLine() > 0, "Line should be positive");
+            assertFalse(v.getMessage().isEmpty(), "Message should not be empty");
+        }
+    }
+
+    @Test
+    void violationCountIsExact() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarInvalid.java", Map.of());
+        // Exact count assertion kills NEGATE_CONDITIONALS survivors on guards
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(),
+            "Exact violation count: " + format(violations));
+    }
 }

@@ -58,6 +58,17 @@ class IdenticalCatchBodyCheckTest {
         }
     }
 
+    @Test
+    void buildFingerprintDistinguishesByIdentName() throws Exception {
+        // buildFingerprint line 86: if IDENT, append exception var text
+        // If negated, all catches with same structure but different var names would hash differently
+        List<AuditEvent> violations = runCheck("simplify/invalid/IdenticalCatchBodyEdgeCases.java");
+        // differentVarNames method has catches: catch(A ex) and catch(B e) with same body
+        // The fingerprint normalizes the exception var so they should be identical
+        assertTrue(violations.size() >= 2,
+            "Catches with different exception var names should be treated as identical: " + format(violations));
+    }
+
     private static List<AuditEvent> runCheck(String resource) throws Exception {
         return runTreeWalkerCheck(IdenticalCatchBodyCheck.class, resource, NO_PROPS);
     }

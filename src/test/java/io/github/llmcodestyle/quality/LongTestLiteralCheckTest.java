@@ -121,4 +121,77 @@ class LongTestLiteralCheckTest {
         assertTrue(violations.stream().noneMatch(v -> v.getLine() == 40),
             "Helper method without @Test should be exempt: " + format(violations));
     }
+
+    @Test
+    void mutationKillerFlagsBodyLiteralsNotFieldsOrMessages() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(LongTestLiteralCheck.class,
+            "quality/invalid/LongTestLiteralMutationKiller.java", NO_PROPS);
+        // Should flag: lambda body literal(17), assertEquals first arg(25), direct body(39), local var(46)
+        assertEquals(4, violations.size(),
+            "Expected exactly 4 violations in mutation killer fixture: " + format(violations));
+        // Lambda body literal (line 17)
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 17),
+            "Lambda body literal should be flagged: " + format(violations));
+        // assertEquals first arg (line 25)
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 25),
+            "assertEquals first arg should be flagged: " + format(violations));
+        // Direct body literal (line 39)
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 39),
+            "Direct body literal should be flagged: " + format(violations));
+        // Local var (line 46) — grandparent is SLIST not OBJBLOCK
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 46),
+            "Local var in test body should be flagged: " + format(violations));
+    }
+
+    @Test
+    void assertionMessageExemptInMutationKiller() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(LongTestLiteralCheck.class,
+            "quality/invalid/LongTestLiteralMutationKiller.java", NO_PROPS);
+        // assertEquals last arg message (line 33) should be exempt
+        assertTrue(violations.stream().noneMatch(v -> v.getLine() == 33),
+            "assertEquals last arg message should be exempt: " + format(violations));
+    }
+
+    @Test
+    void nestedFieldInsideInnerClassIsExempt() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(LongTestLiteralCheck.class,
+            "quality/invalid/LongTestLiteralMutationKiller.java", NO_PROPS);
+        // Nested class field (line 9) should be exempt — isFieldInitializer returns true
+        assertTrue(violations.stream().noneMatch(v -> v.getLine() == 9),
+            "Nested class field should be exempt: " + format(violations));
+    }
+
+    @Test
+    void isFieldInitializerWalksUpToMethodDef() throws Exception {
+        // Tests that isFieldInitializer breaks at METHOD_DEF (line 79)
+        // Local var inside test method has VARIABLE_DEF -> SLIST -> METHOD_DEF
+        // If the break at METHOD_DEF were negated, it would incorrectly treat local vars as field initializers
+        List<AuditEvent> violations = runTreeWalkerCheck(LongTestLiteralCheck.class,
+            "quality/invalid/LongTestLiteralMutationKiller.java", NO_PROPS);
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 39),
+            "Local var in test method should be flagged, not treated as field: " + format(violations));
+    }
+
+    @Test
+    void fieldInsideLocalClassInTestMethodIsExempt() throws Exception {
+        // A field initializer inside a local class within a @Test method
+        // isInsideTestMethod returns true, but isFieldInitializer MUST return true to exempt
+        // This kills NEGATE_CONDITIONALS on lines 72, 75 (parent traversal and OBJBLOCK check)
+        List<AuditEvent> violations = runTreeWalkerCheck(LongTestLiteralCheck.class,
+            "quality/valid/LongTestLiteralFieldInTestMethod.java", NO_PROPS);
+        assertTrue(violations.isEmpty(),
+            "Field initializer inside local class in test method should be exempt: " + format(violations));
+    }
+
+    @Test
+    void isAssertionMessageWhileLoopHandlesLambdaParent() throws Exception {
+        // isAssertionMessage line 106: while (node != null && node.getType() != EXPR && != METHOD_DEF && != LAMBDA)
+        // Lambda parent should stop the traversal
+        List<AuditEvent> violations = runTreeWalkerCheck(LongTestLiteralCheck.class,
+            "quality/invalid/LongTestLiteralMutationKiller.java", NO_PROPS);
+        // Lambda body literal (line 17) is inside a lambda, which stops isAssertionMessage traversal
+        // This means it's NOT treated as an assertion message and IS flagged
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 17),
+            "Lambda body literal should be flagged (lambda stops assertion message traversal): " + format(violations));
+    }
 }

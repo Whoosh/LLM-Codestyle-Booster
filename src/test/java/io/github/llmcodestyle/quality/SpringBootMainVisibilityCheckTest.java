@@ -73,6 +73,17 @@ class SpringBootMainVisibilityCheckTest {
         assertTrue(run("quality/valid/SpringBootMainQualifiedAnnotation.java").isEmpty());
     }
 
+    @Test
+    void violationMessageContainsClassName() throws Exception {
+        // Tests classIdent extraction (line 63) — if negated, className would be ""
+        List<AuditEvent> violations = run("quality/invalid/SpringBootMainPackagePrivate.java");
+        assertEquals(1, violations.size());
+        String msg = violations.get(0).getMessage();
+        // The message should contain the actual class name
+        assertFalse(msg.contains("''") || msg.endsWith(" "),
+            "Message should contain actual class name, not empty: " + msg);
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(SpringBootMainVisibilityCheck.class, resource, NO_PROPS);
     }

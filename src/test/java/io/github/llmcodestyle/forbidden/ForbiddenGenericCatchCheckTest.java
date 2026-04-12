@@ -15,6 +15,9 @@ class ForbiddenGenericCatchCheckTest {
 
     private static final int EXPECTED_VIOLATIONS = 6;
     private static final Map<String, String> NO_PROPS = Map.of();
+    private static final int FQ_EXCEPTION_LINE = 41;
+    private static final int FQ_THROWABLE_LINE = 49;
+    private static final int MULTI_CATCH_LINE = 32;
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
@@ -32,8 +35,10 @@ class ForbiddenGenericCatchCheckTest {
 
     @Test
     void allThreeForbiddenTypesAreCaught() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(ForbiddenGenericCatchCheck.class, "forbidden/invalid/ForbiddenGenericCatchInvalid.java", NO_PROPS);
-        Set<String> messages = violations.stream().map(AuditEvent::getMessage).collect(Collectors.toSet());
+        Set<String> messages = runTreeWalkerCheck(ForbiddenGenericCatchCheck.class, "forbidden/invalid/ForbiddenGenericCatchInvalid.java", NO_PROPS)
+            .stream()
+            .map(AuditEvent::getMessage)
+            .collect(Collectors.toSet());
         assertTrue(messages.stream().anyMatch(m -> m.contains("Exception")), "Should detect Exception: " + messages);
         assertTrue(messages.stream().anyMatch(m -> m.contains("Throwable")), "Should detect Throwable: " + messages);
         assertTrue(messages.stream().anyMatch(m -> m.contains("RuntimeException")), "Should detect RuntimeException: " + messages);
@@ -43,18 +48,15 @@ class ForbiddenGenericCatchCheckTest {
     void fullyQualifiedCatchTypeIsFlagged() throws Exception {
         List<AuditEvent> violations = runTreeWalkerCheck(ForbiddenGenericCatchCheck.class, "forbidden/invalid/ForbiddenGenericCatchInvalid.java", NO_PROPS);
         // Lines 41 and 49 have fully qualified catches
-        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 41),
-            "Fully-qualified java.lang.Exception should be flagged on line 41: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 49),
-            "Fully-qualified java.lang.Throwable should be flagged on line 49: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == FQ_EXCEPTION_LINE), "Fully-qualified java.lang.Exception should be flagged on line 41: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == FQ_THROWABLE_LINE), "Fully-qualified java.lang.Throwable should be flagged on line 49: " + format(violations));
     }
 
     @Test
     void multiCatchWithGenericTypeIsFlagged() throws Exception {
         List<AuditEvent> violations = runTreeWalkerCheck(ForbiddenGenericCatchCheck.class, "forbidden/invalid/ForbiddenGenericCatchInvalid.java", NO_PROPS);
         // Line 32 has multi-catch with Exception — BOR handling is required
-        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 32),
-            "Multi-catch with generic type should be flagged on line 32: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == MULTI_CATCH_LINE), "Multi-catch with generic type should be flagged on line 32: " + format(violations));
         // BOR child (line 63): if negated, Exception inside multi-catch would not be detected
         // Verify exact count to catch any change in BOR behavior
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Exact violation count ensures BOR handling works: " + format(violations));
@@ -65,21 +67,15 @@ class ForbiddenGenericCatchCheckTest {
         // L63 SURVIVED: `child.getType() == BOR` — if negated, BOR children are not recursed
         // This fixture has ONLY forbidden types INSIDE BOR (after the pipe),
         // so BOR recursion is the ONLY way to detect them.
-        List<AuditEvent> violations = runTreeWalkerCheck(ForbiddenGenericCatchCheck.class,
-            "forbidden/invalid/ForbiddenGenericCatchBor.java", NO_PROPS);
-        assertEquals(2, violations.size(),
-            "Both multi-catch forbidden types should be detected via BOR recursion: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("RuntimeException")),
-            "RuntimeException in multi-catch should be detected: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Throwable")),
-            "Throwable in multi-catch should be detected: " + format(violations));
+        List<AuditEvent> violations = runTreeWalkerCheck(ForbiddenGenericCatchCheck.class, "forbidden/invalid/ForbiddenGenericCatchBor.java", NO_PROPS);
+        assertEquals(2, violations.size(), "Both multi-catch forbidden types should be detected via BOR recursion: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("RuntimeException")), "RuntimeException in multi-catch should be detected: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Throwable")), "Throwable in multi-catch should be detected: " + format(violations));
     }
 
     @Test
     void borBranchSafeMultiCatchProducesNoViolations() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(ForbiddenGenericCatchCheck.class,
-            "forbidden/valid/ForbiddenGenericCatchBorSafe.java", NO_PROPS);
-        assertTrue(violations.isEmpty(),
-            "Safe multi-catch should produce no violations: " + format(violations));
+        List<AuditEvent> violations = runTreeWalkerCheck(ForbiddenGenericCatchCheck.class, "forbidden/valid/ForbiddenGenericCatchBorSafe.java", NO_PROPS);
+        assertTrue(violations.isEmpty(), "Safe multi-catch should produce no violations: " + format(violations));
     }
 }

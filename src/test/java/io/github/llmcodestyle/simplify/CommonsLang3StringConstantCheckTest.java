@@ -13,6 +13,7 @@ class CommonsLang3StringConstantCheckTest {
 
     private static final Map<String, String> NO_PROPS = Map.of();
     private static final int EXPECTED_VIOLATIONS = 4;
+    private static final int EXPECTED_MUT_KILL_VIOLATIONS = 3;
 
     @Test
     void emptySpaceLfCrConstantsAreFlagged() throws Exception {
@@ -27,8 +28,7 @@ class CommonsLang3StringConstantCheckTest {
 
     @Test
     void violationMessageContainsConstantInfo() throws Exception {
-        List<AuditEvent> violations = run("simplify/invalid/CommonsLang3StringConstantInvalid.java");
-        for (AuditEvent event : violations) {
+        for (AuditEvent event : run("simplify/invalid/CommonsLang3StringConstantInvalid.java")) {
             assertNotNull(event.getMessage(), "Message should not be null");
             assertFalse(event.getMessage().isEmpty(), "Message should not be empty");
         }
@@ -40,22 +40,19 @@ class CommonsLang3StringConstantCheckTest {
         // L93 NO_COVERAGE: `return null` when expr == null
         // Precise check that the message contains the field name and equivalent
         List<AuditEvent> violations = run("simplify/invalid/CommonsLang3MutKill.java");
-        assertEquals(3, violations.size(),
-            "BLANK, SEPARATOR, and NEWLINE should be flagged: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("BLANK") && v.getMessage().contains("EMPTY")),
-            "BLANK should suggest EMPTY: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("SEPARATOR") && v.getMessage().contains("SPACE")),
+        assertEquals(EXPECTED_MUT_KILL_VIOLATIONS, violations.size(), "BLANK, SEPARATOR, and NEWLINE should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("BLANK") && v.getMessage().contains("EMPTY")), "BLANK should suggest EMPTY: " + format(violations));
+        assertTrue(
+            violations.stream().anyMatch(v -> v.getMessage().contains("SEPARATOR") && v.getMessage().contains("SPACE")),
             "SEPARATOR should suggest SPACE: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("NEWLINE") && v.getMessage().contains("LF")),
-            "NEWLINE should suggest LF: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("NEWLINE") && v.getMessage().contains("LF")), "NEWLINE should suggest LF: " + format(violations));
     }
 
     @Test
     void nonLiteralInitializerNotFlagged() throws Exception {
         // Exercises stringLiteralInitText returning null for non-string-literal initializers
         List<AuditEvent> violations = run("simplify/valid/CommonsLang3NoAssign.java");
-        assertTrue(violations.isEmpty(),
-            "Non-literal, concat, non-String, and mutable fields should not be flagged: " + format(violations));
+        assertTrue(violations.isEmpty(), "Non-literal, concat, non-String, and mutable fields should not be flagged: " + format(violations));
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {

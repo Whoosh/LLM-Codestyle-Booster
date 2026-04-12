@@ -23,26 +23,21 @@ class CompactableParameterListCheckTest {
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        assertTrue(
-            runTreeWalkerCheck(CompactableParameterListCheck.class, "layout/valid/CompactableParamValid.java", DEFAULT_PROPS).isEmpty(),
-            "Expected no violations");
+        assertTrue(runTreeWalkerCheck(CompactableParameterListCheck.class, "layout/valid/CompactableParamValid.java", DEFAULT_PROPS).isEmpty(), "Expected no violations");
     }
 
     @Test
     void setMaxLineLengthAffectsThreshold() throws Exception {
         new CompactableParameterListCheck().setMaxLineLength(Integer.parseInt(SHORT_MAX_LINE));
-        List<AuditEvent> violations = runTreeWalkerCheck(CompactableParameterListCheck.class,
-            "layout/invalid/CompactableParamInvalid.java", Map.of("maxLineLength", SHORT_MAX_LINE));
+        List<AuditEvent> violations = runTreeWalkerCheck(
+            CompactableParameterListCheck.class, "layout/invalid/CompactableParamInvalid.java", Map.of("maxLineLength", SHORT_MAX_LINE));
         assertFalse(violations.isEmpty(), "Smaller max line length should still produce some violations");
-        assertNotEquals(EXPECTED_VIOLATIONS, violations.size(),
-            "Different threshold should change the violation count: " + format(violations));
+        assertNotEquals(EXPECTED_VIOLATIONS, violations.size(), "Different threshold should change the violation count: " + format(violations));
     }
 
     @Test
     void violationMessageContainsSpaceInfo() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(CompactableParameterListCheck.class,
-            "layout/invalid/CompactableParamInvalid.java", DEFAULT_PROPS);
-        for (AuditEvent event : violations) {
+        for (AuditEvent event : runTreeWalkerCheck(CompactableParameterListCheck.class, "layout/invalid/CompactableParamInvalid.java", DEFAULT_PROPS)) {
             assertNotNull(event.getMessage(), "Message should not be null");
             assertFalse(event.getMessage().isEmpty(), "Message should not be empty");
         }

@@ -38,15 +38,13 @@ class UtilClassNamingCheckTest {
     void nonStaticNestedClassIsNotFlagged() throws Exception {
         // isNonStaticNestedClass (line 88) checks isNestedType && !hasModifier(LITERAL_STATIC)
         // Non-static nested classes are skipped because they can't be util classes
-        List<AuditEvent> violations = run("quality/valid/UtilClassNamingValid.java");
-        assertTrue(violations.isEmpty(), "Non-static nested classes should not be flagged");
+        assertTrue(run("quality/valid/UtilClassNamingValid.java").isEmpty(), "Non-static nested classes should not be flagged");
     }
 
     @Test
     void nonStaticNestedWithStaticMethodsNotFlagged() throws Exception {
         List<AuditEvent> violations = run("quality/valid/UtilClassNamingMutKiller.java");
-        assertTrue(violations.isEmpty(),
-            "Non-static nested class should not be flagged: " + format(violations));
+        assertTrue(violations.isEmpty(), "Non-static nested class should not be flagged: " + format(violations));
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {

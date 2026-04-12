@@ -95,13 +95,10 @@ class DuplicateRegexConstantCheckTest {
         // L122 NO_COVERAGE: extractPatternCompileArg returns null when not Pattern.compile
         // L154 NO_COVERAGE: extractEnclosingClassName returns UNKNOWN when no parent type
         // This test uses nested classes to exercise both paths
-        List<AuditEvent> violations = runMulti(
-            "quality/invalid/DuplicateRegexNestedClass.java",
-            "quality/invalid/DuplicateRegexConstantInvalidA.java");
+        List<AuditEvent> violations = runMulti("quality/invalid/DuplicateRegexNestedClass.java", "quality/invalid/DuplicateRegexConstantInvalidA.java");
         // InnerA.DIGITS and InnerB.DIGITS_DUP are in same file and have same regex
         // The within-file duplicate should be detected via cross-class accumulation
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("DIGITS")),
-            "Duplicate Pattern in nested classes should be detected: " + formatWithFile(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("DIGITS")), "Duplicate Pattern in nested classes should be detected: " + formatWithFile(violations));
     }
 
     private static List<AuditEvent> runSingle(String resource) throws Exception {

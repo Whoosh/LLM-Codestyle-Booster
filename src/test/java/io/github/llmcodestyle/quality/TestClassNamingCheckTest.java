@@ -36,7 +36,6 @@ class TestClassNamingCheckTest {
     @Test
     void innerClassesAreNotFlagged() throws Exception {
         // Valid fixture likely contains inner classes — they should not be flagged
-        List<AuditEvent> violations = runTreeWalkerCheck(TestClassNamingCheck.class, "quality/valid/TestClassNamingValid.java", NO_PROPS);
-        assertTrue(violations.isEmpty(), "Inner classes should not be flagged");
+        assertTrue(runTreeWalkerCheck(TestClassNamingCheck.class, "quality/valid/TestClassNamingValid.java", NO_PROPS).isEmpty(), "Inner classes should not be flagged");
     }
 }

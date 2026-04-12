@@ -53,14 +53,12 @@ class NoSystemOutInProductionCheckTest {
 
     @Test
     void applicationClassIsExempt() throws Exception {
-        assertTrue(runCheck("forbidden/valid/NoSystemOutApplicationClass.java").isEmpty(),
-            "Classes ending with 'Application' should be exempt");
+        assertTrue(runCheck("forbidden/valid/NoSystemOutApplicationClass.java").isEmpty(), "Classes ending with 'Application' should be exempt");
     }
 
     @Test
     void mainPrefixClassIsExempt() throws Exception {
-        assertTrue(runCheck("forbidden/valid/NoSystemOutMainPrefixClass.java").isEmpty(),
-            "Classes starting with 'Main' should be exempt");
+        assertTrue(runCheck("forbidden/valid/NoSystemOutMainPrefixClass.java").isEmpty(), "Classes starting with 'Main' should be exempt");
     }
 
     @Test
@@ -71,8 +69,7 @@ class NoSystemOutInProductionCheckTest {
 
     @Test
     void violationReportsCorrectLineAndColumn() throws Exception {
-        List<AuditEvent> violations = runCheck("forbidden/invalid/NoSystemOutProductionClass.java");
-        for (AuditEvent event : violations) {
+        for (AuditEvent event : runCheck("forbidden/invalid/NoSystemOutProductionClass.java")) {
             assertTrue(event.getLine() > 0, "Line should be positive");
             assertTrue(event.getColumn() >= 0, "Column should be non-negative");
         }

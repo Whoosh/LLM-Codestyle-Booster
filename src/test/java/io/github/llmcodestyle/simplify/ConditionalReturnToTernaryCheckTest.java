@@ -38,15 +38,13 @@ class ConditionalReturnToTernaryCheckTest {
         // containsType with METHOD_CALL nested inside condition -> returns true -> not flagged
         // depth > 3 in condition -> not flagged
         List<AuditEvent> violations = runCheck("simplify/valid/ConditionalReturnToTernaryValid.java");
-        assertTrue(violations.isEmpty(),
-            "Complex conditions should not be flagged: " + format(violations));
+        assertTrue(violations.isEmpty(), "Complex conditions should not be flagged: " + format(violations));
     }
 
     @Test
     void nestedTernaryAndDeepExpressionAreNotFlagged() throws Exception {
         List<AuditEvent> violations = runCheck("simplify/valid/ConditionalReturnToTernaryMutKiller.java");
-        assertTrue(violations.isEmpty(),
-            "Nested ternary and deep expression should not be flagged: " + format(violations));
+        assertTrue(violations.isEmpty(), "Nested ternary and deep expression should not be flagged: " + format(violations));
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {

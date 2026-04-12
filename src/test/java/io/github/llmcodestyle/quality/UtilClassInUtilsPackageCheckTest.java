@@ -25,10 +25,8 @@ class UtilClassInUtilsPackageCheckTest {
 
     @Test
     void utilsSuffixClassInWrongPackageIsFlagged() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(UtilClassInUtilsPackageCheck.class,
-            "quality/invalid/UtilClassInUtilsPackageMutKiller.java", Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(UtilClassInUtilsPackageCheck.class, "quality/invalid/UtilClassInUtilsPackageMutKiller.java", Map.of());
         assertEquals(1, violations.size(), "DataUtils in wrong package should be flagged: " + format(violations));
-        assertTrue(violations.get(0).getMessage().contains("DataUtils"),
-            "Message should contain class name: " + violations.get(0).getMessage());
+        assertTrue(violations.get(0).getMessage().contains("DataUtils"), "Message should contain class name: " + violations.get(0).getMessage());
     }
 }

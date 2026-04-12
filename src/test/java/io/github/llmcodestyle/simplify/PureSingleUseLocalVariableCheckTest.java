@@ -12,6 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class PureSingleUseLocalVariableCheckTest {
 
     private static final int EXPECTED_VIOLATIONS = 4;
+    private static final int MUTATION_KILLER_VIOLATIONS = 5;
+    private static final int FLOW_BLOCK_MIN_VIOLATIONS = 4;
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
@@ -33,8 +35,7 @@ class PureSingleUseLocalVariableCheckTest {
 
     @Test
     void violationLinesArePositive() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarInvalid.java", Map.of());
-        for (AuditEvent v : violations) {
+        for (AuditEvent v : runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarInvalid.java", Map.of())) {
             assertTrue(v.getLine() > 0, "Line should be positive");
             assertFalse(v.getMessage().isEmpty(), "Message should not be empty");
         }
@@ -44,63 +45,49 @@ class PureSingleUseLocalVariableCheckTest {
     void violationCountIsExact() throws Exception {
         List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarInvalid.java", Map.of());
         // Exact count assertion kills NEGATE_CONDITIONALS survivors on guards
-        assertEquals(EXPECTED_VIOLATIONS, violations.size(),
-            "Exact violation count: " + format(violations));
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Exact violation count: " + format(violations));
     }
 
     @Test
     void mutationKillerProducesViolations() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class,
-            "simplify/invalid/PureSingleUseVarMutationKiller.java", Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarMutationKiller.java", Map.of());
         // dotMethodCall(len), bareMethodCall(num), varInIfBody(val), varInForBody(val), varInLambda(len)
-        assertEquals(5, violations.size(),
-            "Mutation killer should produce 5 violations: " + format(violations));
+        assertEquals(MUTATION_KILLER_VIOLATIONS, violations.size(), "Mutation killer should produce 5 violations: " + format(violations));
     }
 
     @Test
     void dotMethodCallExtractMethodName() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class,
-            "simplify/invalid/PureSingleUseVarMutationKiller.java", Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarMutationKiller.java", Map.of());
         // dotMethodCall: len = input.length() — extractMethodName line 153 with DOT
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("len")),
-            "DOT method call should be detected: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("len")), "DOT method call should be detected: " + format(violations));
     }
 
     @Test
     void bareMethodCallExtractMethodName() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class,
-            "simplify/invalid/PureSingleUseVarMutationKiller.java", Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarMutationKiller.java", Map.of());
         // bareMethodCall: num = Integer.parseInt(text) — isPureExpression and extractMethodName with no DOT
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("num")),
-            "Bare method call should be detected: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("num")), "Bare method call should be detected: " + format(violations));
     }
 
     @Test
     void flowBlockEligibility() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class,
-            "simplify/invalid/PureSingleUseVarMutationKiller.java", Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseVarMutationKiller.java", Map.of());
         // Variables in if-body and for-body are also eligible (isFlowBlock)
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("val")),
-            "Variables in flow blocks should be detected: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("val")), "Variables in flow blocks should be detected: " + format(violations));
     }
 
     @Test
     void extractMethodNameAndIsFlowBlock() throws Exception {
         // L158 SURVIVED: `nameIdent != null ? nameIdent.getText() : ""` — extractMethodName with DOT
         // L199 SURVIVED: `isLoopOrCondition(type) || isExceptionBlock(type)` — isFlowBlock
-        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class,
-            "simplify/invalid/PureSingleUseMutKill.java", Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class, "simplify/invalid/PureSingleUseMutKill.java", Map.of());
         // dotPureCall: val = input.length() — DOT method call
         // insideIfBlock: inner = text.substring(1) — exercises isFlowBlock for LITERAL_IF
         // insideForLoop: item = text.trim() — exercises isFlowBlock for LITERAL_FOR (loop)
         // insideTryBlock: inner = text.strip() — exercises isFlowBlock for LITERAL_TRY
-        assertTrue(violations.size() >= 4,
-            "Expected at least 4 violations for flow-block paths: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("val")),
-            "DOT pure call should flag 'val': " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("inner")),
-            "If-block or try-block variable should flag 'inner': " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("item")),
-            "For-loop variable should flag 'item': " + format(violations));
+        assertTrue(violations.size() >= FLOW_BLOCK_MIN_VIOLATIONS, "Expected at least 4 violations for flow-block paths: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("val")), "DOT pure call should flag 'val': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("inner")), "If-block or try-block variable should flag 'inner': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("item")), "For-loop variable should flag 'item': " + format(violations));
     }
 }

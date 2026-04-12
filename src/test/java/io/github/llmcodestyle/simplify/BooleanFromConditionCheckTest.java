@@ -13,6 +13,10 @@ class BooleanFromConditionCheckTest {
 
     private static final Map<String, String> NO_PROPS = Map.of();
     private static final int EXPECTED_VIOLATIONS = 4;
+    private static final int LINE_IS_POSITIVE = 8;
+    private static final int LINE_IS_NON_ZERO = 16;
+    private static final int LINE_WITH_SINGLE_STATEMENT = 24;
+    private static final int LINE_IN_MIDDLE_OF_BLOCK = 31;
 
     @Test
     void booleanFlipPatternProducesViolations() throws Exception {
@@ -35,15 +39,13 @@ class BooleanFromConditionCheckTest {
             assertFalse(msg.isEmpty(), "Message should not be empty");
         }
         // Check that at least one violation mentions a specific variable
-        assertTrue(violations.stream().anyMatch(v -> v.getLine() > 0),
-            "Violations should report positive line numbers: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() > 0), "Violations should report positive line numbers: " + format(violations));
     }
 
     @Test
     void mutationKillerValidProducesNoViolations() throws Exception {
         List<AuditEvent> violations = run("simplify/valid/BooleanFromConditionMutationKiller.java");
-        assertTrue(violations.isEmpty(),
-            "Mutation killer valid should produce no violations: " + format(violations));
+        assertTrue(violations.isEmpty(), "Mutation killer valid should produce no violations: " + format(violations));
     }
 
     @Test
@@ -51,27 +53,19 @@ class BooleanFromConditionCheckTest {
         List<AuditEvent> violations = run("simplify/invalid/BooleanFromConditionInvalid.java");
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), format(violations));
         // isPositive: line 8, isNonZero: line 16, withSingleStatement: line 24, inMiddleOfBlock: line 31
-        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 8),
-            "isPositive should be flagged: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 16),
-            "isNonZero should be flagged: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 24),
-            "withSingleStatement should be flagged: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 31),
-            "inMiddleOfBlock should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == LINE_IS_POSITIVE), "isPositive should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == LINE_IS_NON_ZERO), "isNonZero should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == LINE_WITH_SINGLE_STATEMENT), "withSingleStatement should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == LINE_IN_MIDDLE_OF_BLOCK), "inMiddleOfBlock should be flagged: " + format(violations));
     }
 
     @Test
     void violationMessagesContainSpecificVarNames() throws Exception {
         List<AuditEvent> violations = run("simplify/invalid/BooleanFromConditionInvalid.java");
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("positive")),
-            "Should mention 'positive': " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("nonZero")),
-            "Should mention 'nonZero': " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("flag")),
-            "Should mention 'flag': " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("done")),
-            "Should mention 'done': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("positive")), "Should mention 'positive': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("nonZero")), "Should mention 'nonZero': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("flag")), "Should mention 'flag': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("done")), "Should mention 'done': " + format(violations));
     }
 
     @Test
@@ -81,8 +75,7 @@ class BooleanFromConditionCheckTest {
         // If mutated to return "", non-eligible statements would pass the null check and potentially
         // produce false violations.
         List<AuditEvent> violations = run("simplify/valid/BooleanFromConditionNotVar.java");
-        assertEquals(0, violations.size(),
-            "Non-variable-def and non-boolean var should produce ZERO violations: " + format(violations));
+        assertEquals(0, violations.size(), "Non-variable-def and non-boolean var should produce ZERO violations: " + format(violations));
     }
 
     @Test
@@ -90,12 +83,9 @@ class BooleanFromConditionCheckTest {
         // Kill EMPTY_RETURNS mutation on booleanLiteralVarName:
         // if replaced with "", the message would contain empty instead of var name
         List<AuditEvent> violations = run("simplify/invalid/BooleanFromConditionMutKill.java");
-        assertEquals(2, violations.size(),
-            "Expected 2 boolean-from-condition violations: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("positive")),
-            "Should mention 'positive': " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("negative")),
-            "Should mention 'negative': " + format(violations));
+        assertEquals(2, violations.size(), "Expected 2 boolean-from-condition violations: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("positive")), "Should mention 'positive': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("negative")), "Should mention 'negative': " + format(violations));
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {

@@ -41,8 +41,7 @@ class MethodMayBeStaticCheckTest {
     @Test
     void recordMethodReferencingComponentIsNotFlagged() throws Exception {
         List<AuditEvent> violations = run("quality/valid/MethodMayBeStaticMutKiller.java");
-        assertTrue(violations.isEmpty(),
-            "Record methods referencing components should not be flagged: " + format(violations));
+        assertTrue(violations.isEmpty(), "Record methods referencing components should not be flagged: " + format(violations));
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {

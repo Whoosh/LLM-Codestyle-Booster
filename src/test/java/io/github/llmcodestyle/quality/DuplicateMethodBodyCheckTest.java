@@ -171,26 +171,22 @@ class DuplicateMethodBodyCheckTest {
         List<AuditEvent> violations = runSingle("quality/invalid/DuplicateMethodBodyAnnotatedPair.java");
         assertEquals(1, violations.size(), "Annotated non-Override methods should be compared: " + formatWithFile(violations));
         String msg = violations.get(0).getMessage();
-        assertTrue(msg.contains("processBeta") || msg.contains("processAlpha"),
-            "Should detect processAlpha/processBeta duplication: " + msg);
+        assertTrue(msg.contains("processBeta") || msg.contains("processAlpha"), "Should detect processAlpha/processBeta duplication: " + msg);
     }
 
     @Test
     void overrideAnnotationSkipsMethod() throws Exception {
         List<AuditEvent> violations = runSingle("quality/invalid/DuplicateMethodBodyAnnotatedPair.java");
         // toString() has @Override, so even though its body matches, it should be skipped
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("toString")),
-            "Override methods should be skipped: " + formatWithFile(violations));
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("toString")), "Override methods should be skipped: " + formatWithFile(violations));
     }
 
     @Test
     void violationMessageContainsClassName() throws Exception {
-        List<AuditEvent> violations = runMulti(INVALID_A, INVALID_B);
         // Cross-file violations should contain the class name of the first occurrence
-        for (AuditEvent v : violations) {
+        for (AuditEvent v : runMulti(INVALID_A, INVALID_B)) {
             String msg = v.getMessage();
-            assertTrue(msg.contains("DuplicateMethodBodyInvalid"),
-                "Message should contain class name: " + msg);
+            assertTrue(msg.contains("DuplicateMethodBodyInvalid"), "Message should contain class name: " + msg);
         }
     }
 
@@ -212,11 +208,9 @@ class DuplicateMethodBodyCheckTest {
         // Verified by: @Override methods skipped, non-Override annotations NOT skipped
         List<AuditEvent> annotatedViolations = runSingle("quality/invalid/DuplicateMethodBodyAnnotatedPair.java");
         // Non-Override annotated methods should still be compared
-        assertTrue(annotatedViolations.size() == 1,
-            "Only non-Override duplicate pair should produce violation: " + formatWithFile(annotatedViolations));
+        assertTrue(annotatedViolations.size() == 1, "Only non-Override duplicate pair should produce violation: " + formatWithFile(annotatedViolations));
         // Ensure @Override method toString() is skipped
-        assertTrue(annotatedViolations.stream().noneMatch(v -> v.getMessage().contains("toString")),
-            "Override methods must be skipped: " + formatWithFile(annotatedViolations));
+        assertTrue(annotatedViolations.stream().noneMatch(v -> v.getMessage().contains("toString")), "Override methods must be skipped: " + formatWithFile(annotatedViolations));
     }
 
     @Test
@@ -225,17 +219,14 @@ class DuplicateMethodBodyCheckTest {
         assertFalse(violations.isEmpty(), "Should have violations");
         String msg = violations.get(0).getMessage();
         // The class name should be non-empty and not "<unknown>"
-        assertFalse(msg.contains("<unknown>"),
-            "extractEnclosingClassName should return actual class name: " + msg);
-        assertTrue(msg.contains("DuplicateMethodBodyInvalid"),
-            "Message should contain the class name: " + msg);
+        assertFalse(msg.contains("<unknown>"), "extractEnclosingClassName should return actual class name: " + msg);
+        assertTrue(msg.contains("DuplicateMethodBodyInvalid"), "Message should contain the class name: " + msg);
     }
 
     @Test
     void swappedParameterOrderIsNotDuplicate() throws Exception {
         List<AuditEvent> violations = runSingle("quality/valid/DuplicateMethodBodySwappedParams.java");
-        assertTrue(violations.isEmpty(),
-            "Methods with swapped parameter usage should not be duplicates: " + formatWithFile(violations));
+        assertTrue(violations.isEmpty(), "Methods with swapped parameter usage should not be duplicates: " + formatWithFile(violations));
     }
 
     @Test
@@ -244,8 +235,7 @@ class DuplicateMethodBodyCheckTest {
         // 'same' and 'equals' have structurally identical bodies. But equals has @Override, so only
         // 'same' should be stored as first occurrence, and equals should be SKIPPED entirely.
         // If isOverride is broken, both methods are compared, producing a violation for equals.
-        assertTrue(violations.isEmpty(),
-            "Override method with same body as non-override should not produce violation: " + formatWithFile(violations));
+        assertTrue(violations.isEmpty(), "Override method with same body as non-override should not produce violation: " + formatWithFile(violations));
     }
 
     @Test
@@ -253,13 +243,10 @@ class DuplicateMethodBodyCheckTest {
         // L220 NO_COVERAGE: `return "<unknown>"` when no enclosing type found
         // This test uses nested inner classes to ensure extractEnclosingClassName is reached
         List<AuditEvent> violations = runSingle("quality/invalid/DuplicateMethodBodyNestedClass.java");
-        assertEquals(1, violations.size(),
-            "Duplicate methods in nested classes should be detected: " + formatWithFile(violations));
+        assertEquals(1, violations.size(), "Duplicate methods in nested classes should be detected: " + formatWithFile(violations));
         String msg = violations.get(0).getMessage();
-        assertTrue(msg.contains("InnerA") || msg.contains("InnerB"),
-            "Message should contain nested class name: " + msg);
-        assertFalse(msg.contains("<unknown>"),
-            "extractEnclosingClassName should return actual class name: " + msg);
+        assertTrue(msg.contains("InnerA") || msg.contains("InnerB"), "Message should contain nested class name: " + msg);
+        assertFalse(msg.contains("<unknown>"), "extractEnclosingClassName should return actual class name: " + msg);
     }
 
     private static List<AuditEvent> runSingle(String resource) throws Exception {

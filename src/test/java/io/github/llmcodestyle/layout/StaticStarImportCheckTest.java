@@ -14,6 +14,8 @@ class StaticStarImportCheckTest {
     private static final Map<String, String> NO_PROPS = Map.of();
     private static final String INVALID = "layout/invalid/StaticStarImportInvalid.java";
     private static final int EXPECTED_VIOLATIONS = 3;
+    private static final int IMPORT_LINE_START = 3;
+    private static final int IMPORT_LINE_END = 5;
 
     @Test
     void explicitStaticImportsProduceViolations() throws Exception {
@@ -33,10 +35,8 @@ class StaticStarImportCheckTest {
 
     @Test
     void violationsPointToImportLines() throws Exception {
-        List<AuditEvent> violations = runCheck(INVALID);
-        for (AuditEvent event : violations) {
-            assertTrue(event.getLine() >= 3 && event.getLine() <= 5,
-                "Violation should be on an import line (3-5), got line " + event.getLine());
+        for (AuditEvent event : runCheck(INVALID)) {
+            assertTrue(event.getLine() >= IMPORT_LINE_START && event.getLine() <= IMPORT_LINE_END, "Violation should be on an import line (3-5), got line " + event.getLine());
         }
     }
 
@@ -53,8 +53,7 @@ class StaticStarImportCheckTest {
         // L105 NO_COVERAGE: `return parentDot.getText()`
         // Two-part static import `import static SomeClass.MEMBER;` — DOT's first child is IDENT, not DOT.
         List<AuditEvent> violations = runCheck("layout/invalid/StaticStarImportSingleIdent.java");
-        assertEquals(1, violations.size(),
-            "Two-part static import should be flagged: " + format(violations));
+        assertEquals(1, violations.size(), "Two-part static import should be flagged: " + format(violations));
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {

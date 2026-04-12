@@ -13,6 +13,7 @@ class IdenticalCatchBodyCheckTest {
 
     private static final Map<String, String> NO_PROPS = Map.of();
     private static final int EXPECTED_VIOLATIONS = 2;
+    private static final int EXPECTED_EDGE_CASE_VIOLATIONS = 5;
 
     @Test
     void identicalCatchBodiesProduceViolations() throws Exception {
@@ -30,7 +31,8 @@ class IdenticalCatchBodyCheckTest {
         List<AuditEvent> violations = runCheck("simplify/invalid/IdenticalCatchBodyEdgeCases.java");
         // threeCatches: 3 identical catches, differentVarNames: 2 identical catches = 5 total
         // differentLiterals: not flagged (different string literals)
-        assertTrue(violations.size() >= 5,
+        assertTrue(
+            violations.size() >= EXPECTED_EDGE_CASE_VIOLATIONS,
             "Three identical catches + two different-var-name catches should produce 5+ violations: " + format(violations));
     }
 
@@ -38,22 +40,19 @@ class IdenticalCatchBodyCheckTest {
     void differentVarNamesSameBodyStructureIsFlagged() throws Exception {
         List<AuditEvent> violations = runCheck("simplify/invalid/IdenticalCatchBodyEdgeCases.java");
         // The differentVarNames method should have 2 violations (catches with different names but same structure)
-        assertTrue(violations.size() >= 2,
-            "Catches with different variable names but same body should be flagged: " + format(violations));
+        assertTrue(violations.size() >= 2, "Catches with different variable names but same body should be flagged: " + format(violations));
     }
 
     @Test
     void differentLiteralsAreNotFlagged() throws Exception {
         List<AuditEvent> violations = runCheck("simplify/invalid/IdenticalCatchBodyEdgeCases.java");
         // Only threeCatches (3) and differentVarNames (2) should be flagged, not differentLiterals
-        assertEquals(5, violations.size(),
-            "Different string literals should not be treated as identical: " + format(violations));
+        assertEquals(EXPECTED_EDGE_CASE_VIOLATIONS, violations.size(), "Different string literals should not be treated as identical: " + format(violations));
     }
 
     @Test
     void violationsReportCatchLineNumbers() throws Exception {
-        List<AuditEvent> violations = runCheck("simplify/invalid/IdenticalCatchBodyInvalid.java");
-        for (AuditEvent event : violations) {
+        for (AuditEvent event : runCheck("simplify/invalid/IdenticalCatchBodyInvalid.java")) {
             assertTrue(event.getLine() > 0, "Violation should report a positive line number");
         }
     }
@@ -65,16 +64,14 @@ class IdenticalCatchBodyCheckTest {
         List<AuditEvent> violations = runCheck("simplify/invalid/IdenticalCatchBodyEdgeCases.java");
         // differentVarNames method has catches: catch(A ex) and catch(B e) with same body
         // The fingerprint normalizes the exception var so they should be identical
-        assertTrue(violations.size() >= 2,
-            "Catches with different exception var names should be treated as identical: " + format(violations));
+        assertTrue(violations.size() >= 2, "Catches with different exception var names should be treated as identical: " + format(violations));
     }
 
     @Test
     void differentMethodCallsInCatchBodiesAreNotIdentical() throws Exception {
         // buildFingerprint IDENT check: if negated, method name differences are lost
         List<AuditEvent> violations = runCheck("simplify/valid/IdenticalCatchBodyMutKiller.java");
-        assertTrue(violations.isEmpty(),
-            "Catches calling different methods should not be treated as identical: " + format(violations));
+        assertTrue(violations.isEmpty(), "Catches calling different methods should not be treated as identical: " + format(violations));
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {

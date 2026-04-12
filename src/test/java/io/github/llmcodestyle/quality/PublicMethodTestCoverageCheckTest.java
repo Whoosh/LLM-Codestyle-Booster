@@ -191,8 +191,7 @@ class PublicMethodTestCoverageCheckTest {
         assertEquals(TWO_VIOLATIONS, violations.size(), format(violations));
         for (AuditEvent v : violations) {
             assertFalse(v.getMessage().isEmpty(), "Violation message should not be empty");
-            assertTrue(v.getMessage().contains("untested") || v.getMessage().contains("not tested"),
-                "Violation should mention untested: " + v.getMessage());
+            assertTrue(v.getMessage().contains("untested") || v.getMessage().contains("not tested"), "Violation should mention untested: " + v.getMessage());
         }
     }
 

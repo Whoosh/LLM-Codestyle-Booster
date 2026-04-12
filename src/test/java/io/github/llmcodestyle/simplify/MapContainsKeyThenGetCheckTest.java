@@ -11,6 +11,7 @@ class MapContainsKeyThenGetCheckTest {
 
     private static final Map<String, String> NO_PROPS = Map.of();
     private static final int EXPECTED_VIOLATIONS = 2;
+    private static final int LINE_ELSE_BRANCH = 19;
 
     @Test
     void containsKeyThenGetProducesViolations() throws Exception {
@@ -27,8 +28,7 @@ class MapContainsKeyThenGetCheckTest {
         // containsGetCallOnSameReceiver line 77: else branch path
         List<AuditEvent> violations = runCheck("simplify/invalid/MapContainsKeyThenGetElse.java");
         // negatedContainsKey has get in else block — should be flagged
-        assertTrue(violations.stream().anyMatch(v -> v.getLine() >= 19),
-            "get in else branch should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() >= LINE_ELSE_BRANCH), "get in else branch should be flagged: " + format(violations));
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {

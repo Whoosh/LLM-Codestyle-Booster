@@ -53,8 +53,7 @@ class MissingNullableParameterCheckTest {
     void typecastNullLiteralArgIsFlagged() throws Exception {
         List<AuditEvent> violations = run("quality/invalid/MissingNullableParameterCast.java");
         // (String) null exercises isNullLiteralExpr TYPECAST path (line 285)
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Null literal")),
-            "Cast null literal should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Null literal")), "Cast null literal should be flagged: " + format(violations));
     }
 
     @Test

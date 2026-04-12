@@ -80,8 +80,7 @@ class SpringBootMainVisibilityCheckTest {
         assertEquals(1, violations.size());
         String msg = violations.get(0).getMessage();
         // The message should contain the actual class name
-        assertFalse(msg.contains("''") || msg.endsWith(" "),
-            "Message should contain actual class name, not empty: " + msg);
+        assertFalse(msg.contains("''") || msg.endsWith(" "), "Message should contain actual class name, not empty: " + msg);
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {

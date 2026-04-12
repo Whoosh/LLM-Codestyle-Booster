@@ -50,11 +50,9 @@ class UnrelatedNestedRecordCheckTest {
         // We need a nested record that ONLY references outer members (not declares same-named ones).
         List<AuditEvent> violations = run("quality/invalid/UnrelatedNestedIdentRef.java");
         // UnrelatedRecord has no reference to outerField or outerMethod -> should be flagged
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("UnrelatedRecord")),
-            "Unrelated nested record should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("UnrelatedRecord")), "Unrelated nested record should be flagged: " + format(violations));
         // RelatedRecord references outerField -> should NOT be flagged
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("RelatedRecord")),
-            "Related nested record should not be flagged: " + format(violations));
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("RelatedRecord")), "Related nested record should not be flagged: " + format(violations));
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {

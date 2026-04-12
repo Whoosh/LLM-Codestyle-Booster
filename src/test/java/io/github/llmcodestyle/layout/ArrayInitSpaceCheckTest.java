@@ -44,8 +44,7 @@ class ArrayInitSpaceCheckTest {
 
     @Test
     void eachViolationReportsCorrectLine() throws Exception {
-        List<AuditEvent> violations = runCheck(INVALID);
-        for (AuditEvent event : violations) {
+        for (AuditEvent event : runCheck(INVALID)) {
             assertTrue(event.getLine() > 0, "Line number should be positive: " + event.getLine());
         }
     }

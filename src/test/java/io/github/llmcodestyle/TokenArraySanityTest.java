@@ -96,7 +96,6 @@ class TokenArraySanityTest {
         assertTrue(requiredTokens.length > 0, name + ": getRequiredTokens() returned empty array");
 
         // Default and acceptable should be the same (convention in this project)
-        assertArrayEquals(defaultTokens, acceptableTokens,
-            name + ": getDefaultTokens and getAcceptableTokens should match");
+        assertArrayEquals(defaultTokens, acceptableTokens, name + ": getDefaultTokens and getAcceptableTokens should match");
     }
 }

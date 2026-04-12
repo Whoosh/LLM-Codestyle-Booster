@@ -13,6 +13,8 @@ class ForbidAssertKeywordCheckTest {
 
     private static final int EXPECTED_VIOLATIONS = 2;
     private static final Map<String, String> NO_PROPS = Map.of();
+    private static final int FIRST_ASSERT_LINE = 6;
+    private static final int SECOND_ASSERT_LINE = 10;
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
@@ -36,8 +38,8 @@ class ForbidAssertKeywordCheckTest {
     void violationsReportCorrectLineNumbers() throws Exception {
         List<AuditEvent> violations = runTreeWalkerCheck(ForbidAssertKeywordCheck.class, "forbidden/invalid/ForbidAssertKeywordInvalid.java", NO_PROPS);
         assertEquals(2, violations.size());
-        assertTrue(violations.get(0).getLine() == 6, "First assert should be on line 6: " + violations.get(0).getLine());
-        assertTrue(violations.get(1).getLine() == 10, "Second assert should be on line 10: " + violations.get(1).getLine());
+        assertTrue(violations.get(0).getLine() == FIRST_ASSERT_LINE, "First assert should be on line 6: " + violations.get(0).getLine());
+        assertTrue(violations.get(1).getLine() == SECOND_ASSERT_LINE, "Second assert should be on line 10: " + violations.get(1).getLine());
     }
 
     @Test

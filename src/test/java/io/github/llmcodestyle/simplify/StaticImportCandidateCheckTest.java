@@ -57,26 +57,20 @@ class StaticImportCandidateCheckTest {
 
     @Test
     void ambiguousConstantsOnlyFireForWinner() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class,
-            "simplify/invalid/StaticImportCandidateMutationKiller.java", Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateMutationKiller.java", Map.of());
         // Beta.VALUE has 2 refs, Alpha.VALUE has 1 — Beta wins, Alpha skipped
         // Gamma.____ is underscore-only, not upper-case constant — not flagged
         // Delta.V_1 has 2 refs — should be flagged
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Beta")),
-            "Beta.VALUE (winner) should be flagged: " + format(violations));
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("Alpha")),
-            "Alpha.VALUE (loser) should not be flagged: " + format(violations));
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("Gamma")),
-            "Gamma.____ (underscore-only) should not be flagged: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Delta")),
-            "Delta.V_1 should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Beta")), "Beta.VALUE (winner) should be flagged: " + format(violations));
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("Alpha")), "Alpha.VALUE (loser) should not be flagged: " + format(violations));
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("Gamma")), "Gamma.____ (underscore-only) should not be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Delta")), "Delta.V_1 should be flagged: " + format(violations));
     }
 
     @Test
     void starImportExercisedFindLastIdent() throws Exception {
         // The star import in MutationKiller fixture exercises findLastIdent with STAR child
-        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class,
-            "simplify/invalid/StaticImportCandidateMutationKiller.java", Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateMutationKiller.java", Map.of());
         // Star import should not crash, and constant refs should still be found
         assertNotNull(violations, "Should not throw");
         assertFalse(violations.isEmpty(), "Should detect qualified refs: " + format(violations));
@@ -85,18 +79,14 @@ class StaticImportCandidateCheckTest {
     @Test
     void isInsideImportPreventsFlaggerOnImportDots() throws Exception {
         // DOTs inside import statements should be skipped (isInsideImport line 176)
-        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class,
-            "simplify/invalid/StaticImportCandidateInvalid.java", Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateInvalid.java", Map.of());
         // No violation should reference "java" or "util" or "regex" from import DOTs
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("java")),
-            "Import DOTs should not be flagged: " + format(violations));
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("java")), "Import DOTs should not be flagged: " + format(violations));
     }
 
     @Test
     void violationMessageContainsClassName() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class,
-            "simplify/invalid/StaticImportCandidateInvalid.java", Map.of());
-        for (AuditEvent v : violations) {
+        for (AuditEvent v : runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateInvalid.java", Map.of())) {
             assertFalse(v.getMessage().isEmpty(), "Message should not be empty");
             assertTrue(v.getLine() > 0, "Line should be positive");
         }
@@ -107,24 +97,19 @@ class StaticImportCandidateCheckTest {
         // L118 SURVIVED: `child.getType() == DOT || child.getType() == STAR`
         // The findLastIdent method recurses into DOT and STAR children.
         // If negated: star imports would not be properly handled.
-        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class,
-            "simplify/invalid/StaticImportCandidateMutationKiller.java", Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateMutationKiller.java", Map.of());
         // The fixture has star imports — findLastIdent must handle STAR/DOT properly.
         // Beta.VALUE should still be flagged (star import of SomeClass.* should add "VALUE" to staticImports)
-        assertFalse(violations.isEmpty(),
-            "Qualified refs should still be detected alongside star imports: " + format(violations));
+        assertFalse(violations.isEmpty(), "Qualified refs should still be detected alongside star imports: " + format(violations));
     }
 
     @Test
     void isInsideImportWithParentWalk() throws Exception {
         // L176 SURVIVED: `while (parent != null)` in isInsideImport
         // If negated: first iteration would exit, treating import DOTs as normal code DOTs.
-        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class,
-            "simplify/invalid/StaticImportCandidateInvalid.java", Map.of());
+        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class, "simplify/invalid/StaticImportCandidateInvalid.java", Map.of());
         // Verify that import-internal DOTs are NOT treated as qualified references
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("tools")),
-            "DOTs inside imports should not be flagged: " + format(violations));
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("api")),
-            "DOTs inside imports should not be flagged: " + format(violations));
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("tools")), "DOTs inside imports should not be flagged: " + format(violations));
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("api")), "DOTs inside imports should not be flagged: " + format(violations));
     }
 }

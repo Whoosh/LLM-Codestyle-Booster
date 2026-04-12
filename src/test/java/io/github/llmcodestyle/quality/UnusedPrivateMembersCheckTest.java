@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UnusedPrivateMembersCheckTest {
 
     private static final int EXPECTED_VIOLATIONS = 2;
+    private static final int MIN_EDGE_CASE_VIOLATIONS = 3;
     private static final Map<String, String> NO_PROPS = Map.of();
 
     @Test
@@ -28,76 +29,60 @@ class UnusedPrivateMembersCheckTest {
     @Test
     void violationMessageContainsMemberName() throws Exception {
         List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/invalid/UnusedPrivateMembersInvalid.java", NO_PROPS);
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("unusedField")),
-            "Should report unused field name: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("unusedMethod")),
-            "Should report unused method name: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("unusedField")), "Should report unused field name: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("unusedMethod")), "Should report unused method name: " + format(violations));
     }
 
     @Test
     void edgeCasesProduceCorrectViolations() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class,
-            "quality/invalid/UnusedPrivateMembersEdgeCases.java", NO_PROPS);
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/invalid/UnusedPrivateMembersEdgeCases.java", NO_PROPS);
         // neverUsed, neverCalled, UnusedInner, deprecatedUnused should be flagged
-        assertTrue(violations.size() >= 3, "Expected at least 3 violations for unused members: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("neverUsed")),
-            "Should flag neverUsed field: " + format(violations));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("neverCalled")),
-            "Should flag neverCalled method: " + format(violations));
+        assertTrue(violations.size() >= MIN_EDGE_CASE_VIOLATIONS, "Expected at least 3 violations for unused members: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("neverUsed")), "Should flag neverUsed field: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("neverCalled")), "Should flag neverCalled method: " + format(violations));
     }
 
     @Test
     void deprecatedPrivateMethodIsStillFlagged() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class,
-            "quality/invalid/UnusedPrivateMembersEdgeCases.java", NO_PROPS);
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("deprecatedUnused")),
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/invalid/UnusedPrivateMembersEdgeCases.java", NO_PROPS);
+        assertTrue(
+            violations.stream().anyMatch(v -> v.getMessage().contains("deprecatedUnused")),
             "Deprecated private unused method should be flagged (only @Override exempts): " + format(violations));
     }
 
     @Test
     void serialVersionUIDIsNeverFlagged() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class,
-            "quality/invalid/UnusedPrivateMembersEdgeCases.java", NO_PROPS);
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("serialVersionUID")),
-            "serialVersionUID should never be flagged: " + format(violations));
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/invalid/UnusedPrivateMembersEdgeCases.java", NO_PROPS);
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("serialVersionUID")), "serialVersionUID should never be flagged: " + format(violations));
     }
 
     @Test
     void overrideAnnotatedMethodIsNotFlagged() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class,
-            "quality/invalid/UnusedPrivateMembersEdgeCases.java", NO_PROPS);
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("toString")),
-            "Override-annotated methods should not be flagged: " + format(violations));
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/invalid/UnusedPrivateMembersEdgeCases.java", NO_PROPS);
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("toString")), "Override-annotated methods should not be flagged: " + format(violations));
     }
 
     @Test
     void unusedMemberInNestedClassIsFlagged() throws Exception {
         // collectAllPrivateDeclarations lines 76-77: recursion into nested types
-        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class,
-            "quality/invalid/UnusedPrivateMembersNested.java", NO_PROPS);
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("nestedUnused")),
-            "Unused private in nested class should be flagged: " + format(violations));
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/invalid/UnusedPrivateMembersNested.java", NO_PROPS);
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("nestedUnused")), "Unused private in nested class should be flagged: " + format(violations));
         // nestedUsed is used by getNestedUsed() — should NOT be flagged
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("nestedUsed")),
-            "Used private in nested class should not be flagged: " + format(violations));
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("nestedUsed")), "Used private in nested class should not be flagged: " + format(violations));
     }
 
     @Test
     void overrideInNestedIsNotFlagged() throws Exception {
         // isPrivateNonAnnotated lines 109-111: @Override detection
-        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class,
-            "quality/invalid/UnusedPrivateMembersNested.java", NO_PROPS);
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("toString")),
-            "Override-annotated methods in nested should not be flagged: " + format(violations));
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/invalid/UnusedPrivateMembersNested.java", NO_PROPS);
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("toString")), "Override-annotated methods in nested should not be flagged: " + format(violations));
     }
 
     @Test
     void deprecatedAnnotationDoesNotExempt() throws Exception {
         // isPrivateNonAnnotated: only @Override exempts, not @Deprecated
-        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class,
-            "quality/invalid/UnusedPrivateMembersNested.java", NO_PROPS);
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("annotatedButNotOverride")),
-            "Deprecated but not Override should be flagged: " + format(violations));
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/invalid/UnusedPrivateMembersNested.java", NO_PROPS);
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("annotatedButNotOverride")), "Deprecated but not Override should be flagged: " + format(violations));
     }
 
     @Test
@@ -105,16 +90,12 @@ class UnusedPrivateMembersCheckTest {
         // L109 SURVIVED: `mod.getType() == ANNOTATION`
         // L111 SURVIVED: `annotIdent != null && "Override".equals(annotIdent.getText())`
         // Tests that @Override-annotated private methods are exempt, while @Deprecated private methods are NOT.
-        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class,
-            "quality/invalid/UnusedPrivateAnnotated.java", NO_PROPS);
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/invalid/UnusedPrivateAnnotated.java", NO_PROPS);
         // unusedMethod: private, no annotation, unused -> flagged
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("unusedMethod")),
-            "Unannotated unused private method should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("unusedMethod")), "Unannotated unused private method should be flagged: " + format(violations));
         // deprecatedUnused: private, @Deprecated (not @Override), unused -> flagged
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("deprecatedUnused")),
-            "Deprecated unused private should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("deprecatedUnused")), "Deprecated unused private should be flagged: " + format(violations));
         // overrideMethod: private, @Override -> NOT flagged (isPrivateNonAnnotated returns false)
-        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("overrideMethod")),
-            "Override-annotated private should not be flagged: " + format(violations));
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("overrideMethod")), "Override-annotated private should not be flagged: " + format(violations));
     }
 }

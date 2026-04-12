@@ -30,8 +30,7 @@ class TestMethodNameCheckTest {
 
     @Test
     void violationMessagesContainMethodName() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(TestMethodNameCheck.class, "quality/invalid/TestMethodNameInvalid.java", NO_PROPS);
-        for (AuditEvent event : violations) {
+        for (AuditEvent event : runTreeWalkerCheck(TestMethodNameCheck.class, "quality/invalid/TestMethodNameInvalid.java", NO_PROPS)) {
             String msg = event.getMessage();
             assertTrue(msg.contains("_"), "Message should contain the offending method name with underscore: " + msg);
         }
@@ -39,7 +38,7 @@ class TestMethodNameCheckTest {
 
     @Test
     void nonTestMethodsWithUnderscoresAreNotFlagged() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(TestMethodNameCheck.class, "quality/valid/TestMethodNameValid.java", NO_PROPS);
-        assertTrue(violations.isEmpty(), "Non-test methods with underscores should not be flagged");
+        assertTrue(runTreeWalkerCheck(TestMethodNameCheck.class, "quality/valid/TestMethodNameValid.java", NO_PROPS).isEmpty(),
+            "Non-test methods with underscores should not be flagged");
     }
 }

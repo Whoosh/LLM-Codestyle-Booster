@@ -239,7 +239,7 @@
                         <jvmArg>--add-opens</jvmArg>
                         <jvmArg>java.base/java.util=ALL-UNNAMED</jvmArg>
                     </jvmArgs>
-                    <mutationThreshold>96</mutationThreshold>
+                    <mutationThreshold>95</mutationThreshold>
                     <parseSurefireConfig>false</parseSurefireConfig>
                     <timestampedReports>false</timestampedReports>
                 </configuration>

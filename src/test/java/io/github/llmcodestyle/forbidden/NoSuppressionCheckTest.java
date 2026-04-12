@@ -69,4 +69,25 @@ class NoSuppressionCheckTest {
         assertEquals(3, violations.size(),
             "Suppression comments after escaped strings should be detected: " + format(violations));
     }
+
+    @Test
+    void charAndStringEdgeCasesDetected() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/invalid/NoSuppressionCharAndStringEdge.java", NO_PROPS);
+        // 5 comment suppressions after various char/string edge cases
+        assertEquals(5, violations.size(),
+            "All suppression comments after char/string edge cases should be detected: " + format(violations));
+        // Verify specific lines are detected
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 6), "char backslash: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 9), "string dq: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 12), "char sq: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 15), "mixed: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 18), "multi: " + format(violations));
+    }
+
+    @Test
+    void suppressionKeywordsInsideStringsAndCharsNotFlagged() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/valid/NoSuppressionCharStringValid.java", NO_PROPS);
+        assertTrue(violations.isEmpty(),
+            "Suppression keywords inside strings/chars should not be flagged: " + format(violations));
+    }
 }

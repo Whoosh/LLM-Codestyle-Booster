@@ -166,6 +166,43 @@ class DuplicateMethodBodyCheckTest {
         assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("walkBorNode")), "2-statement methods skipped: " + formatWithFile(violations));
     }
 
+    @Test
+    void nonOverrideAnnotationsDoNotSkipMethods() throws Exception {
+        List<AuditEvent> violations = runSingle("quality/invalid/DuplicateMethodBodyAnnotatedPair.java");
+        assertEquals(1, violations.size(), "Annotated non-Override methods should be compared: " + formatWithFile(violations));
+        String msg = violations.get(0).getMessage();
+        assertTrue(msg.contains("processBeta") || msg.contains("processAlpha"),
+            "Should detect processAlpha/processBeta duplication: " + msg);
+    }
+
+    @Test
+    void overrideAnnotationSkipsMethod() throws Exception {
+        List<AuditEvent> violations = runSingle("quality/invalid/DuplicateMethodBodyAnnotatedPair.java");
+        // toString() has @Override, so even though its body matches, it should be skipped
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("toString")),
+            "Override methods should be skipped: " + formatWithFile(violations));
+    }
+
+    @Test
+    void violationMessageContainsClassName() throws Exception {
+        List<AuditEvent> violations = runMulti(INVALID_A, INVALID_B);
+        // Cross-file violations should contain the class name of the first occurrence
+        for (AuditEvent v : violations) {
+            String msg = v.getMessage();
+            assertTrue(msg.contains("DuplicateMethodBodyInvalid"),
+                "Message should contain class name: " + msg);
+        }
+    }
+
+    @Test
+    void singleFileViolationMentionsBothMethodNames() throws Exception {
+        List<AuditEvent> violations = runSingle(INVALID_A);
+        assertEquals(1, violations.size(), formatWithFile(violations));
+        String msg = violations.get(0).getMessage();
+        assertTrue(msg.contains("walkBorNode"), "Should mention second method: " + msg);
+        assertTrue(msg.contains("walkTypeNode"), "Should mention first method: " + msg);
+    }
+
     private static List<AuditEvent> runSingle(String resource) throws Exception {
         return runTreeWalkerCheck(DuplicateMethodBodyCheck.class, resource, NO_PROPS);
     }

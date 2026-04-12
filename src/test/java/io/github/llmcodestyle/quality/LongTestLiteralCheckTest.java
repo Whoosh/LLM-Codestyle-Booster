@@ -79,4 +79,46 @@ class LongTestLiteralCheckTest {
             "quality/valid/LongTestLiteralEdgeCases.java", NO_PROPS);
         assertTrue(violations.isEmpty(), "Long literals in non-test methods should be exempt");
     }
+
+    @Test
+    void fieldInitializerExemptAndBodyLiteralFlagged() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(LongTestLiteralCheck.class,
+            "quality/invalid/LongTestLiteralFieldAndAssert.java", NO_PROPS);
+        // Field constant should be exempt, helper non-test method exempt,
+        // body literals in @Test should be flagged, assertion messages exempt
+        // Line 13: long literal in test body = flagged
+        // Line 19: long expected value in assertEquals = flagged
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 13),
+            "Long literal in test body should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 19 || v.getLine() == 20),
+            "Long expected value in assertEquals should be flagged: " + format(violations));
+        // Field on line 8 should NOT be flagged
+        assertTrue(violations.stream().noneMatch(v -> v.getLine() == 8),
+            "Field initializer should be exempt: " + format(violations));
+        // Assertion messages should NOT be flagged (they are the last args)
+        long flaggedCount = violations.size();
+        assertEquals(2, flaggedCount,
+            "Only body literal and assertEquals expected value should be flagged: " + format(violations));
+    }
+
+    @Test
+    void assertionMessageLastArgIsExempt() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(LongTestLiteralCheck.class,
+            "quality/invalid/LongTestLiteralFieldAndAssert.java", NO_PROPS);
+        // assertTrue message on line 27 should be exempt
+        assertTrue(violations.stream().noneMatch(v -> v.getLine() == 27),
+            "assertTrue message should be exempt: " + format(violations));
+        // fail message on line 34 should be exempt
+        assertTrue(violations.stream().noneMatch(v -> v.getLine() == 34),
+            "fail message should be exempt: " + format(violations));
+    }
+
+    @Test
+    void helperMethodNotAnnotatedIsExempt() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(LongTestLiteralCheck.class,
+            "quality/invalid/LongTestLiteralFieldAndAssert.java", NO_PROPS);
+        // Line 40: helper method not annotated with @Test should be exempt
+        assertTrue(violations.stream().noneMatch(v -> v.getLine() == 40),
+            "Helper method without @Test should be exempt: " + format(violations));
+    }
 }

@@ -158,6 +158,44 @@ class PublicMethodTestCoverageCheckTest {
         return dest;
     }
 
+    @Test
+    void interfaceAbstractMethodsExcludedDefaultMethodChecked() throws Exception {
+        copyToTest("InterfaceTest.java", "test/MyInterfaceTest.java");
+        List<AuditEvent> violations = runCheck(copyToMain("InterfaceMain.java", "test/MyInterface.java"));
+        // abstractMethod should be excluded (interface method without default)
+        // defaultMethod should be covered by the test
+        assertTrue(violations.isEmpty(), "Interface default method should be covered: " + format(violations));
+    }
+
+    @Test
+    void recordWithMultipleComponentsExcludesAccessors() throws Exception {
+        copyToTest("RecordMultiCompTest.java", "test/RecordMultiCompTest.java");
+        List<AuditEvent> violations = runCheck(copyToMain("RecordMultiCompMain.java", "test/RecordMultiComp.java"));
+        // name(), value(), active() are record accessors — should be excluded
+        // customAction() is covered by the test
+        assertTrue(violations.isEmpty(), "Record accessors should be excluded: " + format(violations));
+    }
+
+    @Test
+    void nestedClassMethodsExcluded() throws Exception {
+        copyToTest("NestedTest.java", "test/NestedTest.java");
+        List<AuditEvent> violations = runCheck(copyToMain("NestedMain.java", "test/Nested.java"));
+        // outerMethod should be covered, innerMethod should be excluded (nesting depth > 1)
+        assertTrue(violations.isEmpty(), "Nested class methods should be excluded: " + format(violations));
+    }
+
+    @Test
+    void violationMessageContainsMethodName() throws Exception {
+        copyToTest("FooTest.java", "test/FooTest.java");
+        List<AuditEvent> violations = runCheck(copyToMain("FooMain.java", "test/Foo.java"));
+        assertEquals(TWO_VIOLATIONS, violations.size(), format(violations));
+        for (AuditEvent v : violations) {
+            assertFalse(v.getMessage().isEmpty(), "Violation message should not be empty");
+            assertTrue(v.getMessage().contains("untested") || v.getMessage().contains("not tested"),
+                "Violation should mention untested: " + v.getMessage());
+        }
+    }
+
     private List<AuditEvent> runCheck(Path file) throws Exception {
         DefaultConfiguration checkConfig = new DefaultConfiguration(PublicMethodTestCoverageCheck.class.getName());
         DefaultConfiguration twConfig = new DefaultConfiguration(TreeWalker.class.getName());

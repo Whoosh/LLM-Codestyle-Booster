@@ -106,4 +106,71 @@ class UnnecessaryLineWrapCheckTest {
             assertTrue(event.getLine() > 0, "Line should be positive: " + event.getLine());
         }
     }
+
+    @Test
+    void tryResourceEdgeCasesProduceViolations() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(UnnecessaryLineWrapCheck.class,
+            "layout/invalid/UnnecessaryLineWrapTryResource.java", DEFAULT_PROPS);
+        assertFalse(violations.isEmpty(), "Try-resource edge cases should produce violations: " + format(violations));
+    }
+
+    @Test
+    void abstractMethodWithSemiDetected() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(UnnecessaryLineWrapCheck.class,
+            "layout/invalid/UnnecessaryLineWrapEdgeCases.java", DEFAULT_PROPS);
+        // The abstract method process(String a, String b) should be detected (uses SEMI in findSignatureLastLine)
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() >= 12 && v.getLine() <= 13),
+            "Abstract method with wrapped params should be detected: " + format(violations));
+    }
+
+    @Test
+    void annotatedClassDetectedWithFirstNonAnnotationLine() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(UnnecessaryLineWrapCheck.class,
+            "layout/invalid/UnnecessaryLineWrapEdgeCases.java", DEFAULT_PROPS);
+        // @Deprecated static class AnnotatedClass extends Thread should be detected
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() >= 23 && v.getLine() <= 26),
+            "Annotated class with extends should be detected: " + format(violations));
+    }
+
+    @Test
+    void needsSpaceInsertsSpaceCorrectly() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(UnnecessaryLineWrapCheck.class,
+            "layout/invalid/UnnecessaryLineWrapNeedsSpace.java", DEFAULT_PROPS);
+        // All three cases should produce violations: closing paren, opening paren, trailing space
+        assertTrue(violations.size() >= 3,
+            "All needsSpace edge cases should produce violations: " + format(violations));
+        // Verify the combined line length is reported correctly
+        for (AuditEvent v : violations) {
+            assertTrue(v.getMessage().contains("180"), "Message should mention max line length: " + v.getMessage());
+        }
+    }
+
+    @Test
+    void constructorWrappingDetected() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(UnnecessaryLineWrapCheck.class,
+            "layout/invalid/UnnecessaryLineWrapEdgeCases.java", DEFAULT_PROPS);
+        // Constructor wrapping on line 6 should be detected
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() >= 6 && v.getLine() <= 7),
+            "Constructor wrapping should be detected: " + format(violations));
+    }
+
+    @Test
+    void violationMessageContainsActualLength() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(UnnecessaryLineWrapCheck.class,
+            "layout/invalid/UnnecessaryLineWrapInvalid.java", DEFAULT_PROPS);
+        for (AuditEvent event : violations) {
+            String msg = event.getMessage();
+            // Message should contain both the actual combined length and the max
+            assertTrue(msg.matches(".*\\d+.*\\d+.*"), "Message should contain length numbers: " + msg);
+        }
+    }
+
+    @Test
+    void tryResourceWrappingDetected() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(UnnecessaryLineWrapCheck.class,
+            "layout/invalid/UnnecessaryLineWrapTryResource.java", DEFAULT_PROPS);
+        // The try-with-resources resource that wraps should be detected
+        assertTrue(violations.size() >= 2,
+            "Try-resource wrapping should produce violations: " + format(violations));
+    }
 }

@@ -17,7 +17,8 @@ class StaticStarImportCheckTest {
 
     @Test
     void explicitStaticImportsProduceViolations() throws Exception {
-        assertEquals(EXPECTED_VIOLATIONS, runCheck(INVALID).size());
+        List<AuditEvent> violations = runCheck(INVALID);
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 3 violations: " + format(violations));
     }
 
     @Test
@@ -28,6 +29,23 @@ class StaticStarImportCheckTest {
     @Test
     void collisionAllowsExplicitImports() throws Exception {
         assertTrue(runCheck("layout/valid/StaticStarImportCollisionValid.java").isEmpty());
+    }
+
+    @Test
+    void violationsPointToImportLines() throws Exception {
+        List<AuditEvent> violations = runCheck(INVALID);
+        for (AuditEvent event : violations) {
+            assertTrue(event.getLine() >= 3 && event.getLine() <= 5,
+                "Violation should be on an import line (3-5), got line " + event.getLine());
+        }
+    }
+
+    @Test
+    void collisionWithSameClassDoesNotSuppressViolation() throws Exception {
+        // The collision file has PI from two different classes, which IS a collision.
+        // But the star import for Collections is still valid.
+        List<AuditEvent> violations = runCheck("layout/valid/StaticStarImportCollisionValid.java");
+        assertTrue(violations.isEmpty(), "Name collision should allow explicit imports: " + format(violations));
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {

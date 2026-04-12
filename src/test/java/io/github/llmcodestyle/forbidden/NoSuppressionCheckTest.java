@@ -12,15 +12,61 @@ import static org.junit.jupiter.api.Assertions.*;
 class NoSuppressionCheckTest {
 
     private static final int EXPECTED_VIOLATIONS = 4;
+    private static final Map<String, String> NO_PROPS = Map.of();
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/invalid/NoSuppressionInvalid.java", Map.of());
-        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 4 suppression violations (2 comments + 2 annotations), got: " + violations.size());
+        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/invalid/NoSuppressionInvalid.java", NO_PROPS);
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 4 suppression violations (2 comments + 2 annotations), got: " + format(violations));
     }
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
-        assertTrue(runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/valid/NoSuppressionValid.java", Map.of()).isEmpty(), "Expected no violations");
+        assertTrue(runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/valid/NoSuppressionValid.java", NO_PROPS).isEmpty(), "Expected no violations");
+    }
+
+    @Test
+    void suppressionKeywordsInStringLiteralsAreNotFlagged() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/valid/NoSuppressionEdgeCases.java", NO_PROPS);
+        assertTrue(violations.isEmpty(), "Suppression keywords inside string literals should not be flagged: " + format(violations));
+    }
+
+    @Test
+    void edgeCaseInvalidFixtureProducesViolations() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/invalid/NoSuppressionEdgeCases.java", NO_PROPS);
+        // 3 comment suppressions (NOPMD, CHECKSTYLE:OFF, SUPPRESSFBWARNINGS) + 2 annotations
+        assertEquals(5, violations.size(), "Expected 5 violations in edge case fixture: " + format(violations));
+    }
+
+    @Test
+    void commentViolationsReportCorrectLineNumbers() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/invalid/NoSuppressionInvalid.java", NO_PROPS);
+        // Lines 3 and 4 have comment suppressions, lines 7 and 11 have annotation suppressions
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 3), "Should detect NOPMD on line 3: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 4), "Should detect CHECKSTYLE:OFF on line 4: " + format(violations));
+    }
+
+    @Test
+    void annotationViolationMessageContainsAnnotationName() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/invalid/NoSuppressionInvalid.java", NO_PROPS);
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("SuppressWarnings")),
+            "Should mention SuppressWarnings in message: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("SuppressFBWarnings")),
+            "Should mention SuppressFBWarnings in message: " + format(violations));
+    }
+
+    @Test
+    void escapedQuoteInsideStringDoesNotBreakParsing() throws Exception {
+        // The edge case valid fixture has escaped quotes, backslashes, and char literals
+        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/valid/NoSuppressionEdgeCases.java", NO_PROPS);
+        assertTrue(violations.isEmpty(), "Escaped characters should not confuse the comment parser: " + format(violations));
+    }
+
+    @Test
+    void suppressionCommentsAfterStringEscapesAreDetected() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/invalid/NoSuppressionStringEscape.java", NO_PROPS);
+        // 3 comment suppressions: NOPMD, CHECKSTYLE:OFF, SUPPRESSFBWARNINGS
+        assertEquals(3, violations.size(),
+            "Suppression comments after escaped strings should be detected: " + format(violations));
     }
 }

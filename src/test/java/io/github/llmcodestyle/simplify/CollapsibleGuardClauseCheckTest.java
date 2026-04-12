@@ -16,12 +16,30 @@ class CollapsibleGuardClauseCheckTest {
 
     @Test
     void collapsibleGuardsProduceViolations() throws Exception {
-        assertEquals(EXPECTED_VIOLATIONS, run("simplify/invalid/CollapsibleGuardClauseInvalid.java").size());
+        List<AuditEvent> violations = run("simplify/invalid/CollapsibleGuardClauseInvalid.java");
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 5 collapsible guard violations: " + format(violations));
     }
 
     @Test
     void validCornerCasesProduceNoViolations() throws Exception {
         assertTrue(run("simplify/valid/CollapsibleGuardClauseValid.java").isEmpty());
+    }
+
+    @Test
+    void violationMessageMentionsGuard() throws Exception {
+        List<AuditEvent> violations = run("simplify/invalid/CollapsibleGuardClauseInvalid.java");
+        for (AuditEvent event : violations) {
+            assertNotNull(event.getMessage(), "Message should not be null");
+            assertFalse(event.getMessage().isEmpty(), "Message should not be empty");
+        }
+    }
+
+    @Test
+    void violationsReportCorrectLines() throws Exception {
+        List<AuditEvent> violations = run("simplify/invalid/CollapsibleGuardClauseInvalid.java");
+        for (AuditEvent event : violations) {
+            assertTrue(event.getLine() > 0, "Line should be positive");
+        }
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {

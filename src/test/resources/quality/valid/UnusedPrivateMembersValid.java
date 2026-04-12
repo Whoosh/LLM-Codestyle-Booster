@@ -28,5 +28,12 @@ public class UnusedPrivateMembersValid {
 
     private static final class Inner {
         private static final int INNER_VALUE = 42;
+
+        // Edge case: @Override in private inner class — should NOT be flagged as unused
+        // even though nobody calls "run" by name. The @Override annotation exempts it.
+        @Override
+        public String toString() {
+            return "inner";
+        }
     }
 }

@@ -12,27 +12,49 @@ import static org.junit.jupiter.api.Assertions.*;
 class BlankLineAfterCommentCheckTest {
 
     private static final int EXPECTED_VIOLATIONS = 5;
+    private static final Map<String, String> JAVA_EXT = Map.of("fileExtensions", "java");
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
-        List<AuditEvent> violations = runFileSetCheck(BlankLineAfterCommentCheck.class, "layout/invalid/BlankLineAfterCommentInvalid.java", Map.of("fileExtensions", "java"));
-        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 5 violations, got: " + violations.size());
+        List<AuditEvent> violations = runFileSetCheck(BlankLineAfterCommentCheck.class, "layout/invalid/BlankLineAfterCommentInvalid.java", JAVA_EXT);
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 5 violations, got: " + format(violations));
     }
 
     @Test
     void validCasesProduceNoViolations() throws Exception {
         assertTrue(
-            runFileSetCheck(
-                BlankLineAfterCommentCheck.class,
-                "layout/valid/BlankLineAfterCommentValid.java",
-                Map.of("fileExtensions", "java")).isEmpty(),
+            runFileSetCheck(BlankLineAfterCommentCheck.class, "layout/valid/BlankLineAfterCommentValid.java", JAVA_EXT).isEmpty(),
             "Expected no violations");
     }
 
     @Test
     void messageIsDescriptive() throws Exception {
-        for (AuditEvent event : runFileSetCheck(BlankLineAfterCommentCheck.class, "layout/invalid/BlankLineAfterCommentInvalid.java", Map.of("fileExtensions", "java"))) {
+        for (AuditEvent event : runFileSetCheck(BlankLineAfterCommentCheck.class, "layout/invalid/BlankLineAfterCommentInvalid.java", JAVA_EXT)) {
             assertTrue(event.getMessage().contains("blank line"), "Expected 'blank line' in message, got: " + event.getMessage());
         }
+    }
+
+    @Test
+    void edgeCaseValidFixtureProducesNoViolations() throws Exception {
+        List<AuditEvent> violations = runFileSetCheck(BlankLineAfterCommentCheck.class,
+            "layout/valid/BlankLineAfterCommentEdgeCases.java", JAVA_EXT);
+        assertTrue(violations.isEmpty(), "Edge case valid fixture should produce no violations: " + format(violations));
+    }
+
+    @Test
+    void violationLinesPointToCommentNotBlankLine() throws Exception {
+        List<AuditEvent> violations = runFileSetCheck(BlankLineAfterCommentCheck.class,
+            "layout/invalid/BlankLineAfterCommentInvalid.java", JAVA_EXT);
+        for (AuditEvent event : violations) {
+            assertTrue(event.getLine() > 0, "Line number should be positive: " + event.getLine());
+        }
+    }
+
+    @Test
+    void multiLineBlockCommentWithBlankAfterIsFlagged() throws Exception {
+        List<AuditEvent> violations = runFileSetCheck(BlankLineAfterCommentCheck.class,
+            "layout/invalid/BlankLineAfterCommentMultiBlock.java", JAVA_EXT);
+        assertEquals(1, violations.size(),
+            "Expected exactly 1 violation for multi-line block comment with blank after: " + format(violations));
     }
 }

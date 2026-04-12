@@ -16,12 +16,18 @@ class UnrelatedNestedRecordCheckTest {
 
     @Test
     void unrelatedNestedRecordsProduceViolations() throws Exception {
-        assertEquals(EXPECTED_VIOLATIONS, run("quality/invalid/UnrelatedNestedRecordInvalid.java").size());
+        List<AuditEvent> violations = run("quality/invalid/UnrelatedNestedRecordInvalid.java");
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 7 violations: " + format(violations));
+        for (AuditEvent event : violations) {
+            assertNotNull(event.getMessage(), "Message should not be null");
+            assertFalse(event.getMessage().isEmpty(), "Message should not be empty");
+        }
     }
 
     @Test
     void recordsThatReferenceOuterAreIgnored() throws Exception {
-        assertTrue(run("quality/valid/UnrelatedNestedRecordValid.java").isEmpty());
+        List<AuditEvent> violations = run("quality/valid/UnrelatedNestedRecordValid.java");
+        assertTrue(violations.isEmpty(), "Records referencing outer should not be flagged: " + format(violations));
     }
 
     @Test

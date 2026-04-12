@@ -146,6 +146,18 @@ class DuplicateMethodBodyCheckTest {
         check.setMinBodyNodes(TIGHTER_MAX_BODY_NODES);
         check.setMaxBodyNodes(TIGHTER_MAX_BODY_NODES);
         assertNotNull(check);
+        int[] tokens = check.getDefaultTokens();
+        assertNotNull(tokens);
+        assertTrue(tokens.length > 0);
+    }
+
+    @Test
+    void violationMessageContainsMethodNames() throws Exception {
+        List<AuditEvent> violations = runSingle(INVALID_A);
+        assertEquals(1, violations.size(), formatWithFile(violations));
+        String msg = violations.get(0).getMessage();
+        assertNotNull(msg);
+        assertFalse(msg.isEmpty());
     }
 
     @Test

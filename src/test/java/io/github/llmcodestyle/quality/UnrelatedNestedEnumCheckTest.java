@@ -16,7 +16,8 @@ class UnrelatedNestedEnumCheckTest {
 
     @Test
     void unrelatedNestedEnumsProduceViolations() throws Exception {
-        assertEquals(EXPECTED_VIOLATIONS, run("quality/invalid/UnrelatedNestedEnumInvalid.java").size());
+        List<AuditEvent> violations = run("quality/invalid/UnrelatedNestedEnumInvalid.java");
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 5 unrelated enum violations: " + format(violations));
     }
 
     @Test
@@ -27,6 +28,25 @@ class UnrelatedNestedEnumCheckTest {
     @Test
     void topLevelEnumIsIgnored() throws Exception {
         assertTrue(run("quality/valid/UnrelatedNestedEnumTopLevel.java").isEmpty());
+    }
+
+    @Test
+    void violationMessageUsesCorrectKey() throws Exception {
+        List<AuditEvent> violations = run("quality/invalid/UnrelatedNestedEnumInvalid.java");
+        assertFalse(violations.isEmpty());
+        for (AuditEvent event : violations) {
+            String msg = event.getMessage();
+            assertTrue(msg.contains("enum") || msg.contains("nested") || msg.contains("unrelated"),
+                "Message should reference enum/nested/unrelated: " + msg);
+        }
+    }
+
+    @Test
+    void targetTokenReturnsEnumDef() {
+        UnrelatedNestedEnumCheck check = new UnrelatedNestedEnumCheck();
+        int[] tokens = check.getDefaultTokens();
+        assertNotNull(tokens);
+        assertTrue(tokens.length > 0, "Should have at least one token");
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {

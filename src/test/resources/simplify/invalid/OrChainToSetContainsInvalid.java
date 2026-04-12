@@ -42,6 +42,22 @@ public class OrChainToSetContainsInvalid {
         return type == ALPHA || type == BETA || type == GAMMA || type == DELTA;
     }
 
+    // Case: dotted path as LHS (exercises renderExpression DOT branch)
+    public boolean dottedPathLhs(int[] arr) {
+        return arr.length == 1 || arr.length == 2 || arr.length == 3;
+    }
+
+    // Case: method call as LHS (exercises renderExpression METHOD_CALL branch)
+    public boolean methodCallLhs(String s) {
+        return s.length() == 1 || s.length() == 2 || s.length() == 3;
+    }
+
+    // Case: this.field as LHS (exercises renderExpression LITERAL_THIS branch)
+    private int field;
+    public boolean thisFieldLhs() {
+        return this.field == 10 || this.field == 20 || this.field == 30;
+    }
+
     private static final int ALPHA = 1;
     private static final int BETA = 2;
     private static final int GAMMA = 3;

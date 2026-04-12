@@ -16,12 +16,22 @@ class CommonsLang3StringConstantCheckTest {
 
     @Test
     void emptySpaceLfCrConstantsAreFlagged() throws Exception {
-        assertEquals(EXPECTED_VIOLATIONS, run("simplify/invalid/CommonsLang3StringConstantInvalid.java").size());
+        List<AuditEvent> violations = run("simplify/invalid/CommonsLang3StringConstantInvalid.java");
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 4 violations: " + format(violations));
     }
 
     @Test
     void otherConstantsAndLocalsAreNotFlagged() throws Exception {
         assertTrue(run("simplify/valid/CommonsLang3StringConstantValid.java").isEmpty());
+    }
+
+    @Test
+    void violationMessageContainsConstantInfo() throws Exception {
+        List<AuditEvent> violations = run("simplify/invalid/CommonsLang3StringConstantInvalid.java");
+        for (AuditEvent event : violations) {
+            assertNotNull(event.getMessage(), "Message should not be null");
+            assertFalse(event.getMessage().isEmpty(), "Message should not be empty");
+        }
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {

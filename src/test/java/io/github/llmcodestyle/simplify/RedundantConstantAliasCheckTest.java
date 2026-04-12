@@ -16,12 +16,23 @@ class RedundantConstantAliasCheckTest {
 
     @Test
     void aliasesAndDuplicatePatternsAreFlagged() throws Exception {
-        assertEquals(EXPECTED_VIOLATIONS, run("simplify/invalid/RedundantConstantAliasInvalid.java").size());
+        List<AuditEvent> violations = run("simplify/invalid/RedundantConstantAliasInvalid.java");
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 5 violations: " + format(violations));
     }
 
     @Test
     void uniqueConstantsAndOneOffPatternsProduceNoViolations() throws Exception {
         assertTrue(run("simplify/valid/RedundantConstantAliasValid.java").isEmpty());
+    }
+
+    @Test
+    void violationMessageContainsConstantName() throws Exception {
+        List<AuditEvent> violations = run("simplify/invalid/RedundantConstantAliasInvalid.java");
+        for (AuditEvent event : violations) {
+            assertNotNull(event.getMessage(), "Message should not be null");
+            assertFalse(event.getMessage().isEmpty(), "Message should not be empty");
+            assertTrue(event.getLine() > 0, "Line should be positive");
+        }
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {

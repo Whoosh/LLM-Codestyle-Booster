@@ -48,6 +48,15 @@ class StaticStarImportCheckTest {
         assertTrue(violations.isEmpty(), "Name collision should allow explicit imports: " + format(violations));
     }
 
+    @Test
+    void extractParentClassSingleIdentPath() throws Exception {
+        // L105 NO_COVERAGE: `return parentDot.getText()`
+        // Two-part static import `import static SomeClass.MEMBER;` — DOT's first child is IDENT, not DOT.
+        List<AuditEvent> violations = runCheck("layout/invalid/StaticStarImportSingleIdent.java");
+        assertEquals(1, violations.size(),
+            "Two-part static import should be flagged: " + format(violations));
+    }
+
     private static List<AuditEvent> runCheck(String resource) throws Exception {
         return runTreeWalkerCheck(StaticStarImportCheck.class, resource, NO_PROPS);
     }

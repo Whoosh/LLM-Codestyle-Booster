@@ -34,6 +34,30 @@ class CommonsLang3StringConstantCheckTest {
         }
     }
 
+    @Test
+    void stringLiteralInitTextReturnsCorrectValue() throws Exception {
+        // L89 SURVIVED: `return null` when assign == null
+        // L93 NO_COVERAGE: `return null` when expr == null
+        // Precise check that the message contains the field name and equivalent
+        List<AuditEvent> violations = run("simplify/invalid/CommonsLang3MutKill.java");
+        assertEquals(3, violations.size(),
+            "BLANK, SEPARATOR, and NEWLINE should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("BLANK") && v.getMessage().contains("EMPTY")),
+            "BLANK should suggest EMPTY: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("SEPARATOR") && v.getMessage().contains("SPACE")),
+            "SEPARATOR should suggest SPACE: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("NEWLINE") && v.getMessage().contains("LF")),
+            "NEWLINE should suggest LF: " + format(violations));
+    }
+
+    @Test
+    void nonLiteralInitializerNotFlagged() throws Exception {
+        // Exercises stringLiteralInitText returning null for non-string-literal initializers
+        List<AuditEvent> violations = run("simplify/valid/CommonsLang3NoAssign.java");
+        assertTrue(violations.isEmpty(),
+            "Non-literal, concat, non-String, and mutable fields should not be flagged: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(CommonsLang3StringConstantCheck.class, resource, NO_PROPS);
     }

@@ -42,6 +42,21 @@ class UnrelatedNestedRecordCheckTest {
         assertTrue(violations.get(0).getMessage().contains("ValidationResult"), format(violations));
     }
 
+    @Test
+    void isIdentReferenceDistinguishesDeclarationsFromReferences() throws Exception {
+        // L163 SURVIVED in UnrelatedNestedTypeCheckBase.isIdentReference:
+        // `!DECLARATION_PARENT_TYPES.contains(parent.getType()) || !node.equals(parent.findFirstToken(IDENT))`
+        // If negated: declaration IDENTs would be treated as references, causing false negatives.
+        // We need a nested record that ONLY references outer members (not declares same-named ones).
+        List<AuditEvent> violations = run("quality/invalid/UnrelatedNestedIdentRef.java");
+        // UnrelatedRecord has no reference to outerField or outerMethod -> should be flagged
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("UnrelatedRecord")),
+            "Unrelated nested record should be flagged: " + format(violations));
+        // RelatedRecord references outerField -> should NOT be flagged
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("RelatedRecord")),
+            "Related nested record should not be flagged: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(UnrelatedNestedRecordCheck.class, resource, NO_PROPS);
     }

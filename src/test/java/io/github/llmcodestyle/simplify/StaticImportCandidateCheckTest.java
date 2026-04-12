@@ -101,4 +101,30 @@ class StaticImportCandidateCheckTest {
             assertTrue(v.getLine() > 0, "Line should be positive");
         }
     }
+
+    @Test
+    void findLastIdentWithStarAndDot() throws Exception {
+        // L118 SURVIVED: `child.getType() == DOT || child.getType() == STAR`
+        // The findLastIdent method recurses into DOT and STAR children.
+        // If negated: star imports would not be properly handled.
+        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class,
+            "simplify/invalid/StaticImportCandidateMutationKiller.java", Map.of());
+        // The fixture has star imports — findLastIdent must handle STAR/DOT properly.
+        // Beta.VALUE should still be flagged (star import of SomeClass.* should add "VALUE" to staticImports)
+        assertFalse(violations.isEmpty(),
+            "Qualified refs should still be detected alongside star imports: " + format(violations));
+    }
+
+    @Test
+    void isInsideImportWithParentWalk() throws Exception {
+        // L176 SURVIVED: `while (parent != null)` in isInsideImport
+        // If negated: first iteration would exit, treating import DOTs as normal code DOTs.
+        List<AuditEvent> violations = runTreeWalkerCheck(StaticImportCandidateCheck.class,
+            "simplify/invalid/StaticImportCandidateInvalid.java", Map.of());
+        // Verify that import-internal DOTs are NOT treated as qualified references
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("tools")),
+            "DOTs inside imports should not be flagged: " + format(violations));
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("api")),
+            "DOTs inside imports should not be flagged: " + format(violations));
+    }
 }

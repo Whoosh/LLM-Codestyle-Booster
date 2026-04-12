@@ -55,4 +55,24 @@ class UnicodeEscapeCheckTest {
         assertEquals(4, violations.size(),
             "Uppercase hex digit escapes should be recognized: " + format(violations));
     }
+
+    @Test
+    void isHexDigitAllRanges() throws Exception {
+        // L74 NO_COVERAGE: `c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F'`
+        // Exercises all three hex digit ranges plus non-hex characters.
+        List<AuditEvent> violations = runFileSetCheck(UnicodeEscapeCheck.class,
+            "forbidden/invalid/UnicodeEscapeHexEdge.java", NO_PROPS);
+        // Each of the 4 unicode escapes in strings should be flagged (all are printable, non-control)
+        assertEquals(4, violations.size(),
+            "All hex ranges (0-9, a-f, A-F) should be recognized: " + format(violations));
+    }
+
+    @Test
+    void nonHexCharsAreNotRecognized() throws Exception {
+        // File contains backslash-u-ZZZZ (non-hex) and truncated sequences
+        List<AuditEvent> violations = runFileSetCheck(UnicodeEscapeCheck.class,
+            "forbidden/valid/UnicodeEscapeNonHex.java", NO_PROPS);
+        assertTrue(violations.isEmpty(),
+            "Non-hex chars after backslash-u should not be flagged: " + format(violations));
+    }
 }

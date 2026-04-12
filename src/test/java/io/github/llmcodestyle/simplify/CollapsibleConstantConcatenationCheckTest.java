@@ -195,4 +195,25 @@ class CollapsibleConstantConcatenationCheckTest {
             "Short concat should be flagged: " + format(violations));
     }
 
+    @Test
+    void findArrayInitWithLiteralNew() throws Exception {
+        // L197 NO_COVERAGE: `return node` (ARRAY_INIT path) and LITERAL_NEW -> findFirstToken(ARRAY_INIT) path
+        List<AuditEvent> violations = runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class,
+            "simplify/invalid/CollapsibleConstantArrayInit.java", Map.of());
+        // ITEMS = new String[] {"a" + "b", "c"} — should detect the array element concatenation
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Array element")),
+            "Array init via LITERAL_NEW should detect concatenation: " + format(violations));
+    }
+
+    @Test
+    void scanForCollapsibleRunsTopLevelPlus() throws Exception {
+        // L250 SURVIVED: `node.getType() == PLUS && !(node.getParent() != null && node.getParent().getType() == PLUS)`
+        // Exercises the top-level PLUS detection in method bodies
+        List<AuditEvent> violations = runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class,
+            "simplify/invalid/CollapsibleConstantArrayInit.java", Map.of());
+        // methodWithConcats: "hello" + " " + "world" + compute() — run of 3 literals before compute()
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("consecutive")),
+            "Method body with collapsible literal run should be flagged: " + format(violations));
+    }
+
 }

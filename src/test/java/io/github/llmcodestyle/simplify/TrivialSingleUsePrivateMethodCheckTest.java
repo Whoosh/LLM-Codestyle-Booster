@@ -35,6 +35,17 @@ class TrivialSingleUsePrivateMethodCheckTest {
         }
     }
 
+    @Test
+    void violationMessageContainsMethodName() throws Exception {
+        // L97 SURVIVED: `ident != null ? ident.getText() : "?"`
+        // If mutated to return "", the message would contain empty instead of method name
+        List<AuditEvent> violations = run("simplify/invalid/TrivialSingleUseMutKill.java");
+        assertEquals(1, violations.size(),
+            "Expected 1 trivial single-use private method violation: " + format(violations));
+        assertTrue(violations.get(0).getMessage().contains("helper"),
+            "Message should contain method name 'helper': " + violations.get(0).getMessage());
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(TrivialSingleUsePrivateMethodCheck.class, resource, NO_PROPS);
     }

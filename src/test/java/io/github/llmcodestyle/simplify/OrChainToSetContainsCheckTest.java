@@ -177,6 +177,20 @@ class OrChainToSetContainsCheckTest {
             "Equals chain should report receiver 'name': " + equalsViolation.getMessage());
     }
 
+    @Test
+    void renderExpressionLiteralThisPath() throws Exception {
+        // L224 SURVIVED: `node.getType() == LITERAL_THIS`
+        // If negated: `this` keyword would fall through to the default getText() path,
+        // returning "this" anyway (equivalent mutant), OR producing "?" if getText() is null.
+        // L213 NO_COVERAGE: `return "?"` (null node)
+        // L227 NO_COVERAGE: `node.getText() == null ? "?" : node.getText()`
+        // Exercise renderExpression with this.field chain
+        List<AuditEvent> violations = run("simplify/invalid/OrChainRenderExpression.java");
+        // this.value == 1 || this.value == 2 || this.value == 3
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("this")),
+            "renderExpression should handle LITERAL_THIS: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(OrChainToSetContainsCheck.class, resource, NO_PROPS);
     }

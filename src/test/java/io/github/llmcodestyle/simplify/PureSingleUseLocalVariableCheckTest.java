@@ -83,4 +83,24 @@ class PureSingleUseLocalVariableCheckTest {
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("val")),
             "Variables in flow blocks should be detected: " + format(violations));
     }
+
+    @Test
+    void extractMethodNameAndIsFlowBlock() throws Exception {
+        // L158 SURVIVED: `nameIdent != null ? nameIdent.getText() : ""` — extractMethodName with DOT
+        // L199 SURVIVED: `isLoopOrCondition(type) || isExceptionBlock(type)` — isFlowBlock
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class,
+            "simplify/invalid/PureSingleUseMutKill.java", Map.of());
+        // dotPureCall: val = input.length() — DOT method call
+        // insideIfBlock: inner = text.substring(1) — exercises isFlowBlock for LITERAL_IF
+        // insideForLoop: item = text.trim() — exercises isFlowBlock for LITERAL_FOR (loop)
+        // insideTryBlock: inner = text.strip() — exercises isFlowBlock for LITERAL_TRY
+        assertTrue(violations.size() >= 4,
+            "Expected at least 4 violations for flow-block paths: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("val")),
+            "DOT pure call should flag 'val': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("inner")),
+            "If-block or try-block variable should flag 'inner': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("item")),
+            "For-loop variable should flag 'item': " + format(violations));
+    }
 }

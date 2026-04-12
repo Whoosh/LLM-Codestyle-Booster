@@ -248,6 +248,20 @@ class DuplicateMethodBodyCheckTest {
             "Override method with same body as non-override should not produce violation: " + formatWithFile(violations));
     }
 
+    @Test
+    void extractEnclosingClassNameInNestedClass() throws Exception {
+        // L220 NO_COVERAGE: `return "<unknown>"` when no enclosing type found
+        // This test uses nested inner classes to ensure extractEnclosingClassName is reached
+        List<AuditEvent> violations = runSingle("quality/invalid/DuplicateMethodBodyNestedClass.java");
+        assertEquals(1, violations.size(),
+            "Duplicate methods in nested classes should be detected: " + formatWithFile(violations));
+        String msg = violations.get(0).getMessage();
+        assertTrue(msg.contains("InnerA") || msg.contains("InnerB"),
+            "Message should contain nested class name: " + msg);
+        assertFalse(msg.contains("<unknown>"),
+            "extractEnclosingClassName should return actual class name: " + msg);
+    }
+
     private static List<AuditEvent> runSingle(String resource) throws Exception {
         return runTreeWalkerCheck(DuplicateMethodBodyCheck.class, resource, NO_PROPS);
     }

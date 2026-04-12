@@ -33,7 +33,21 @@ class SplitDeclarationAssignmentCheckTest {
         for (AuditEvent v : violations) {
             assertFalse(v.getMessage().isEmpty(), "Message should not be empty");
             assertTrue(v.getLine() > 0, "Line should be positive");
+            // Each message should mention a specific variable name (not empty string)
+            assertTrue(v.getMessage().length() > 20,
+                "Message should be descriptive with variable name: " + v.getMessage());
         }
+    }
+
+    @Test
+    void uninitializedVarNameReturnsNonEmptyName() throws Exception {
+        // L79 SURVIVED: `return ident != null ? ident.getText() : null`
+        // If mutated to return "", the violation message would contain empty name
+        List<AuditEvent> violations = run("simplify/invalid/SplitDeclAssignMutKill.java");
+        assertEquals(1, violations.size(),
+            "Expected 1 split decl-assign violation: " + format(violations));
+        assertTrue(violations.get(0).getMessage().contains("name"),
+            "Violation message should contain variable name 'name': " + violations.get(0).getMessage());
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {

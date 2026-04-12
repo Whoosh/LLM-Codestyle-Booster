@@ -66,4 +66,25 @@ class BlankLineAfterCommentCheckTest {
         assertTrue(violations.isEmpty(),
             "Block comment body with trailing content should not produce violations: " + format(violations));
     }
+
+    @Test
+    void handleBlockCommentBodyClosingLineEmpty() throws Exception {
+        // L50 SURVIVED: `stripped.substring(stripped.indexOf("*/") + 2).strip().isEmpty()`
+        // Multi-line block comment ending with `*/` on its own line (nothing after */)
+        // should mark as comment. If negated, this line would NOT be marked, missing the violation.
+        List<AuditEvent> violations = runFileSetCheck(BlankLineAfterCommentCheck.class,
+            "layout/invalid/BlankLineAfterBlockCommentEnd.java", JAVA_EXT);
+        assertTrue(violations.size() >= 1,
+            "Block comment with empty closing line followed by blank should be flagged: " + format(violations));
+    }
+
+    @Test
+    void blockCommentWithCodeAfterClosingNotFlagged() throws Exception {
+        // When `*/` is followed by code on the same line, it's NOT a pure comment line.
+        // If L50 is negated, this would be treated as comment, causing false positive.
+        List<AuditEvent> violations = runFileSetCheck(BlankLineAfterCommentCheck.class,
+            "layout/valid/BlankLineAfterBlockCommentWithCode.java", JAVA_EXT);
+        assertTrue(violations.isEmpty(),
+            "Block comment with code after */ should not produce violations: " + format(violations));
+    }
 }

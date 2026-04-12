@@ -49,6 +49,19 @@ class CollapsibleGuardClauseCheckTest {
             "Bare return guard should be detected: " + format(violations));
     }
 
+    @Test
+    void extractIfBodyHandlesThrowBody() throws Exception {
+        // L99 SURVIVED: extractIfBody while loop condition for LITERAL_THROW
+        // L100 NO_COVERAGE: body.getType() != EXPR && body.getType() != LITERAL_THROW
+        // A guard that uses `throw` has a LITERAL_THROW body type, not SLIST or LITERAL_RETURN.
+        // The extractIfBody while loop must handle LITERAL_THROW as a valid body.
+        // This is NOT a valid collapsible guard (throw != void return), so no violation expected.
+        List<AuditEvent> violations = run("simplify/invalid/CollapsibleGuardExtractBody.java");
+        // The guard with throw is NOT collapsible (isVoidReturnOnly checks for LITERAL_RETURN)
+        assertTrue(violations.isEmpty(),
+            "Guard with throw should not be collapsible: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(CollapsibleGuardClauseCheck.class, resource, NO_PROPS);
     }

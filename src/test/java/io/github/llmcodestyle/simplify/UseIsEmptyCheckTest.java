@@ -56,4 +56,21 @@ class UseIsEmptyCheckTest {
         long reversedCount = violations.stream().filter(v -> v.getLine() >= 47 && v.getLine() <= 65).count();
         assertTrue(reversedCount >= 4, "Expected at least 4 reversed-operand violations, got " + reversedCount);
     }
+
+    @Test
+    void unwrapExprNodeAndMethodNameExtraction() throws Exception {
+        // L106 SURVIVED: `node != null && node.getType() == EXPR` in unwrap
+        // L86 NO_COVERAGE: `methodName` return "?" path
+        // L107 NO_COVERAGE: `return node.getFirstChild()` in unwrap
+        // Exercises size()/length() comparisons that involve EXPR-wrapped nodes.
+        List<AuditEvent> violations = runTreeWalkerCheck(UseIsEmptyCheck.class,
+            "simplify/invalid/UseIsEmptyUnwrap.java", NO_PROPS);
+        assertEquals(2, violations.size(),
+            "Both size() > 0 and 0 < size() should be flagged: " + format(violations));
+        // Verify message contains "size" (not "?" which would indicate methodName failed)
+        for (AuditEvent v : violations) {
+            assertTrue(v.getMessage().contains("size"),
+                "Message should contain 'size' method name: " + v.getMessage());
+        }
+    }
 }

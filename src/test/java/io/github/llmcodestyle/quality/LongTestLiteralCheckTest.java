@@ -194,4 +194,23 @@ class LongTestLiteralCheckTest {
         assertTrue(violations.stream().anyMatch(v -> v.getLine() == 17),
             "Lambda body literal should be flagged (lambda stops assertion message traversal): " + format(violations));
     }
+
+    @Test
+    void isAssertionMessageExercisesAllPaths() throws Exception {
+        // L106 SURVIVED/NO_COVERAGE: the while loop in isAssertionMessage checks for
+        // EXPR, METHOD_DEF, and LAMBDA. We need to exercise assertion messages with:
+        // 1. Standard assert message (assertEquals last arg) - exempt
+        // 2. fail() message - exempt
+        // 3. Long string NOT in assert - flagged
+        // 4. String inside lambda (LAMBDA stops traversal) - flagged
+        List<AuditEvent> violations = runTreeWalkerCheck(LongTestLiteralCheck.class,
+            "quality/invalid/LongTestLiteralAssertMessage.java", NO_PROPS);
+        // Non-message string and lambda string should be flagged
+        // Assertion messages should be exempt
+        assertTrue(violations.size() >= 2,
+            "At least 2 non-assertion-message strings should be flagged: " + format(violations));
+        // Verify that fail() message is NOT flagged (it's the last arg of fail())
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("failure message")),
+            "fail() message should be exempt: " + format(violations));
+    }
 }

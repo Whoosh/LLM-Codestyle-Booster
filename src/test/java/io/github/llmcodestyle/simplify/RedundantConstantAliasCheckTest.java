@@ -146,6 +146,46 @@ class RedundantConstantAliasCheckTest {
     }
 
     @Test
+    void simpleIdentInitializerReturnsNullNotEmpty() throws Exception {
+        // L137 SURVIVED: simpleIdentInitializer returns null when assign == null
+        // L141 NO_COVERAGE: simpleIdentInitializer returns null when expr has > 1 child
+        // If mutated to return "", flagAliases would try fields.get("") which returns null.
+        // This is equivalent for the alias check, but for stringLiteralInitializer (L195),
+        // returning "" would pollute the string constants map.
+        // Verify the valid fixture has zero violations (catches "" pollution)
+        List<AuditEvent> violations = run("simplify/valid/RedundantConstantAliasMutationKiller.java");
+        assertEquals(0, violations.size(),
+            "No false positives from null->empty mutation: " + format(violations));
+    }
+
+    @Test
+    void patternCompileStringLiteralExactMessage() throws Exception {
+        // L156, L160 SURVIVED: patternCompileValue returns null early
+        // L173 SURVIVED: patternCompileValue returns null for non-STRING_LITERAL, non-IDENT arg
+        List<AuditEvent> violations = run("simplify/invalid/RedundantConstantAliasMutationKiller.java");
+        // Verify the exact duplicate pattern names in violation messages
+        AuditEvent patLiteralDup = violations.stream()
+            .filter(v -> v.getMessage().contains("PAT_LITERAL_DUP")).findFirst().orElse(null);
+        assertNotNull(patLiteralDup, "PAT_LITERAL_DUP should be flagged: " + format(violations));
+        assertTrue(patLiteralDup.getMessage().contains("PAT_LITERAL"),
+            "Message should reference PAT_LITERAL as original: " + patLiteralDup.getMessage());
+    }
+
+    @Test
+    void stringLiteralInitializerReturnsActualValue() throws Exception {
+        // L195 SURVIVED: stringLiteralInitializer returns null for non-STRING_LITERAL
+        // If mutated to return "", the string constants map would contain ("NAME", "")
+        // This could cause Pattern.compile duplicates to match on empty string
+        List<AuditEvent> violations = run("simplify/invalid/RedundantConstantAliasMutationKiller.java");
+        // PAT_X_DUP should reference PAT_X (which uses REGEX_X constant), not match on ""
+        AuditEvent patXDup = violations.stream()
+            .filter(v -> v.getMessage().contains("PAT_X_DUP")).findFirst().orElse(null);
+        assertNotNull(patXDup, "PAT_X_DUP should be flagged: " + format(violations));
+        assertTrue(patXDup.getMessage().contains("PAT_X"),
+            "PAT_X_DUP should reference PAT_X: " + patXDup.getMessage());
+    }
+
+    @Test
     void patternCompileStringLiteralPath() throws Exception {
         // PAT_LITERAL = Pattern.compile("\\d+") — patternCompileValue STRING_LITERAL branch (line 167)
         List<AuditEvent> violations = run("simplify/invalid/RedundantConstantAliasMutationKiller.java");

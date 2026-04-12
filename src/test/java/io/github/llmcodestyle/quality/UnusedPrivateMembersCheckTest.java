@@ -99,4 +99,22 @@ class UnusedPrivateMembersCheckTest {
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("annotatedButNotOverride")),
             "Deprecated but not Override should be flagged: " + format(violations));
     }
+
+    @Test
+    void isPrivateNonAnnotatedAnnotationBranch() throws Exception {
+        // L109 SURVIVED: `mod.getType() == ANNOTATION`
+        // L111 SURVIVED: `annotIdent != null && "Override".equals(annotIdent.getText())`
+        // Tests that @Override-annotated private methods are exempt, while @Deprecated private methods are NOT.
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class,
+            "quality/invalid/UnusedPrivateAnnotated.java", NO_PROPS);
+        // unusedMethod: private, no annotation, unused -> flagged
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("unusedMethod")),
+            "Unannotated unused private method should be flagged: " + format(violations));
+        // deprecatedUnused: private, @Deprecated (not @Override), unused -> flagged
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("deprecatedUnused")),
+            "Deprecated unused private should be flagged: " + format(violations));
+        // overrideMethod: private, @Override -> NOT flagged (isPrivateNonAnnotated returns false)
+        assertTrue(violations.stream().noneMatch(v -> v.getMessage().contains("overrideMethod")),
+            "Override-annotated private should not be flagged: " + format(violations));
+    }
 }

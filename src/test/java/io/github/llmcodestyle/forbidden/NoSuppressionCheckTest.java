@@ -90,4 +90,27 @@ class NoSuppressionCheckTest {
         assertTrue(violations.isEmpty(),
             "Suppression keywords inside strings/chars should not be flagged: " + format(violations));
     }
+
+    @Test
+    void findCommentStartCharQuoteToggling() throws Exception {
+        // L88-89 SURVIVED: `c == '\'' -> inChar = !inChar`
+        // L92 SURVIVED: `!inString && !inChar && c == '/' && line.charAt(i+1) == '/'`
+        // Tests single-quote escapes inside char literals, then suppression comment after.
+        // If inChar toggling is broken, the parser would think we're inside a char literal
+        // when we're not, and miss the comment.
+        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class,
+            "forbidden/invalid/NoSuppressionFindCommentEdge.java", NO_PROPS);
+        // 3 comment suppressions on lines 6, 8, 10
+        long commentViolations = violations.stream()
+            .filter(v -> v.getMessage().contains("comment")).count();
+        assertEquals(3, commentViolations,
+            "All 3 suppression comments after char/string edge cases should be detected: " + format(violations));
+        // Verify each specific line
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 6),
+            "NOPMD after char sq-escape: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 8),
+            "CHECKSTYLE:OFF after string dq-escape: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 10),
+            "SUPPRESSFBWARNINGS after char backslash: " + format(violations));
+    }
 }

@@ -78,4 +78,29 @@ class TestOnlyDelegateCheckTest {
         assertEquals(EXPECTED_VIOLATIONS, violations.size(),
             "Exact violation count should match: " + format(violations));
     }
+
+    @Test
+    void extractMethodNameReturnsActualName() throws Exception {
+        // L113 SURVIVED: `return null` when DOT is found (qualified call)
+        // extractMethodName returns null for qualified calls, so they're not flagged.
+        // For unqualified calls, it returns the method name.
+        List<AuditEvent> violations = runTreeWalkerCheck(TestOnlyDelegateCheck.class,
+            "quality/invalid/TestOnlyDelegateCountStmts.java", Map.of());
+        assertEquals(2, violations.size(),
+            "doWork and doAction should be flagged as thin delegates: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("doWork") && v.getMessage().contains("internalWork")),
+            "doWork -> internalWork delegate should be detected: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("doAction") && v.getMessage().contains("internalAction")),
+            "doAction -> internalAction delegate should be detected: " + format(violations));
+    }
+
+    @Test
+    void multiStatementMethodNotFlagged() throws Exception {
+        // L124 SURVIVED: `type != RCURLY && type != SEMI`
+        // If negated: RCURLY/SEMI would be counted as statements, giving count > 1
+        List<AuditEvent> violations = runTreeWalkerCheck(TestOnlyDelegateCheck.class,
+            "quality/valid/TestOnlyDelegateMultiStatement.java", Map.of());
+        assertTrue(violations.isEmpty(),
+            "Multi-statement method should not be flagged: " + format(violations));
+    }
 }

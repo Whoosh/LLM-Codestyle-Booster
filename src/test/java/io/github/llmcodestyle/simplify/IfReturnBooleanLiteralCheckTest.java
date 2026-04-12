@@ -43,6 +43,15 @@ class IfReturnBooleanLiteralCheckTest {
         }
     }
 
+    @Test
+    void followingReturnSkipsSemiAndRcurly() throws Exception {
+        // L78 SURVIVED: `siblingType != SEMI && siblingType != RCURLY`
+        // If negated: SEMI/RCURLY would NOT be skipped, returning null and missing the violation.
+        List<AuditEvent> violations = run("simplify/invalid/IfReturnBoolLitSemiKill.java");
+        assertEquals(1, violations.size(),
+            "Should find the if-return-boolean pattern despite SEMI/RCURLY siblings: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(IfReturnBooleanLiteralCheck.class, resource, NO_PROPS);
     }

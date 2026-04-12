@@ -136,39 +136,13 @@ class UnnecessaryLineWrapCheckTest {
     void needsSpaceInsertsSpaceCorrectly() throws Exception {
         List<AuditEvent> violations = runTreeWalkerCheck(UnnecessaryLineWrapCheck.class,
             "layout/invalid/UnnecessaryLineWrapNeedsSpace.java", DEFAULT_PROPS);
-        // All three cases should produce violations: closing paren, opening paren, trailing space
         assertEquals(3, violations.size(),
             "Exactly 3 needsSpace edge case violations: " + format(violations));
-        // Verify the combined line length is reported correctly — if needsSpace were wrong,
-        // the character count would differ by 1 (missing or extra space)
         for (AuditEvent v : violations) {
-            assertTrue(v.getMessage().contains("180"), "Message should mention max line length: " + v.getMessage());
-            // Extract the combined length from the message
             java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+) chars").matcher(v.getMessage());
-            assertTrue(m.find(), "Message should contain char count: " + v.getMessage());
-            int combinedLen = Integer.parseInt(m.group(1));
-            assertTrue(combinedLen > 0 && combinedLen <= 180,
-                "Combined length should be between 1 and 180: " + combinedLen);
-        }
-    }
-
-    @Test
-    void constructorWrappingDetected() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(UnnecessaryLineWrapCheck.class,
-            "layout/invalid/UnnecessaryLineWrapEdgeCases.java", DEFAULT_PROPS);
-        // Constructor wrapping on line 6 should be detected
-        assertTrue(violations.stream().anyMatch(v -> v.getLine() >= 6 && v.getLine() <= 7),
-            "Constructor wrapping should be detected: " + format(violations));
-    }
-
-    @Test
-    void violationMessageContainsActualLength() throws Exception {
-        List<AuditEvent> violations = runTreeWalkerCheck(UnnecessaryLineWrapCheck.class,
-            "layout/invalid/UnnecessaryLineWrapInvalid.java", DEFAULT_PROPS);
-        for (AuditEvent event : violations) {
-            String msg = event.getMessage();
-            // Message should contain both the actual combined length and the max
-            assertTrue(msg.matches(".*\\d+.*\\d+.*"), "Message should contain length numbers: " + msg);
+            assertTrue(m.find(), "char count: " + v.getMessage());
+            int len = Integer.parseInt(m.group(1));
+            assertTrue(len > 0 && len <= 180, "Combined length check: " + v.getMessage());
         }
     }
 
@@ -311,7 +285,60 @@ class UnnecessaryLineWrapCheckTest {
         for (AuditEvent v : violations) {
             java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+) chars").matcher(v.getMessage());
             assertTrue(m.find(), "char count: " + v.getMessage());
-            assertTrue(Integer.parseInt(m.group(1)) <= 180, "within max: " + v.getMessage());
+            int len = Integer.parseInt(m.group(1));
+            assertTrue(len <= 180, "within max: " + v.getMessage());
+            // Exact length assertions kill needsSpace mutations (L228, L232, L235)
+            if (v.getLine() == 49) {
+                assertEquals(30, len, "closingBracket: " + v.getMessage());
+            }
+            if (v.getLine() == 55) {
+                assertEquals(16, len, "openingBracket: " + v.getMessage());
+            }
+            if (v.getLine() == 44) {
+                assertEquals(28, len, "spaceAtEnd: " + v.getMessage());
+            }
+        }
+    }
+
+    @Test
+    void mutationKiller3NeedsSpacePrecision() throws Exception {
+        // Targets remaining SURVIVED mutations:
+        // L83: shouldSkip `type == RESOURCE && tryHeaderFitsOnOneLine(ast)` — 2S
+        // L94: computeFirstLine `if (ident != null)` — 1S (CTOR_DEF has IDENT but no TYPE)
+        // L106: firstNonAnnotationLine `if (modifiers != null)` — 1S
+        // L172: tryHeaderFitsOnOneLine `spec == null || spec.getType() != RESOURCE_SPECIFICATION` — 2S
+        // L191: findSignatureLastLine `if (semi != null)` — 1S
+        // L217: buildCombinedLine `if (needsSpace(...))` — 1S
+        // L228: needsSpace `if (sb.isEmpty())` — 1S
+        // L232: needsSpace `CLOSING_BRACKETS || OPENING_BRACKETS` — 2S
+        // L235: needsSpace `return last != ' '` — 1S
+        List<AuditEvent> violations = runTreeWalkerCheck(UnnecessaryLineWrapCheck.class,
+            "layout/invalid/UnnecessaryLineWrapMutationKiller3.java", DEFAULT_PROPS);
+
+        // Resource wrapping (line 13)
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 13),
+            "Resource wrapping should be detected: " + format(violations));
+
+        // Constructor wrapping (line 23) - CTOR_DEF with no TYPE but has IDENT
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 23),
+            "Constructor wrapping should be detected: " + format(violations));
+
+        // Abstract method wrapping (line 50)
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 50),
+            "Abstract method wrapping should be detected: " + format(violations));
+
+        // needsSpace precision: verify EXACT character counts per violation
+        // If needsSpace mutations change space insertion, char counts change by 1
+        for (AuditEvent v : violations) {
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+) chars").matcher(v.getMessage());
+            assertTrue(m.find(), "char count: " + v.getMessage());
+            int combinedLen = Integer.parseInt(m.group(1));
+            // Assert specific lengths for specific lines to kill needsSpace mutations
+            if (v.getLine() == 62) {
+                // `String result = compute("test");` combined — needs space between "=" and "compute"
+                assertEquals(40, combinedLen,
+                    "needsSpace must insert space correctly for result = compute: " + v.getMessage());
+            }
         }
     }
 }

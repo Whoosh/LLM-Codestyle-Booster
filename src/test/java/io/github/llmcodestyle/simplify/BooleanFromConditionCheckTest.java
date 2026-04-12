@@ -74,6 +74,30 @@ class BooleanFromConditionCheckTest {
             "Should mention 'done': " + format(violations));
     }
 
+    @Test
+    void booleanLiteralVarNameReturnsNullForNonVarDef() throws Exception {
+        // L64 SURVIVED: `stmt.getType() != VARIABLE_DEF` — replaced return null with ""
+        // L68 SURVIVED: `type == null || ... || literalKindOfInit == 0` — replaced return null with ""
+        // If mutated to return "", non-eligible statements would pass the null check and potentially
+        // produce false violations.
+        List<AuditEvent> violations = run("simplify/valid/BooleanFromConditionNotVar.java");
+        assertEquals(0, violations.size(),
+            "Non-variable-def and non-boolean var should produce ZERO violations: " + format(violations));
+    }
+
+    @Test
+    void booleanFromConditionPreciseViolationMessages() throws Exception {
+        // Kill EMPTY_RETURNS mutation on booleanLiteralVarName:
+        // if replaced with "", the message would contain empty instead of var name
+        List<AuditEvent> violations = run("simplify/invalid/BooleanFromConditionMutKill.java");
+        assertEquals(2, violations.size(),
+            "Expected 2 boolean-from-condition violations: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("positive")),
+            "Should mention 'positive': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("negative")),
+            "Should mention 'negative': " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(BooleanFromConditionCheck.class, resource, NO_PROPS);
     }

@@ -50,6 +50,8 @@
         <fb-contrib.version>7.6.8</fb-contrib.version>
         <findsecbugs.version>1.13.0</findsecbugs.version>
         <jacoco.version>0.8.14</jacoco.version>
+        <pitest.version>1.23.0</pitest.version>
+        <pitest-junit5.version>1.2.1</pitest-junit5.version>
     </properties>
 
     <dependencies>
@@ -200,6 +202,47 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- PITest: null-focused mutation testing (run: mvn pitest:mutationCoverage) -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>${pitest-junit5.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <targetClasses>
+                        <param>io.github.llmcodestyle.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>io.github.llmcodestyle.*</param>
+                    </targetTests>
+                    <excludedTestClasses>
+                        <param>**.*SlowTest</param>
+                    </excludedTestClasses>
+                    <mutators>
+                        <mutator>NULL_RETURNS</mutator>
+                        <mutator>EMPTY_RETURNS</mutator>
+                        <mutator>NEGATE_CONDITIONALS</mutator>
+                    </mutators>
+                    <jvmArgs>
+                        <jvmArg>--add-opens</jvmArg>
+                        <jvmArg>java.base/java.lang=ALL-UNNAMED</jvmArg>
+                        <jvmArg>--add-opens</jvmArg>
+                        <jvmArg>java.base/java.lang.reflect=ALL-UNNAMED</jvmArg>
+                        <jvmArg>--add-opens</jvmArg>
+                        <jvmArg>java.base/java.util=ALL-UNNAMED</jvmArg>
+                    </jvmArgs>
+                    <mutationThreshold>90</mutationThreshold>
+                    <parseSurefireConfig>false</parseSurefireConfig>
+                    <timestampedReports>false</timestampedReports>
+                </configuration>
             </plugin>
 
             <!-- JaCoCo: 85% line coverage -->

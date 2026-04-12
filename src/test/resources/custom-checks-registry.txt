@@ -60,3 +60,6 @@ TopLevelRecordInPojosPackageCheck — flags top-level record declarations whose 
 UnrelatedNestedEnumCheck — flags nested enums that don't reference any field or method of the enclosing type, no cross-rule interaction
 TopLevelEnumInEnumsPackageCheck — flags top-level enum declarations whose package does not end with the configured suffix (default 'enums'), no cross-rule interaction
 ExplicitNullReturnCheck — flags methods that return null explicitly or delegate to @Nullable methods without @Nullable annotation, no cross-rule interaction
+UnrelatedNestedClassCheck — flags nested classes that don't reference any field or method of the enclosing type, no cross-rule interaction
+UnrelatedNestedInterfaceCheck — flags nested interfaces that don't reference any field or method of the enclosing type, no cross-rule interaction
+ClassMayBeRecordCheck — flags final data-carrier classes with only private fields and no behavior, suggests record conversion, no cross-rule interaction

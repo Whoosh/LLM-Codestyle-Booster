@@ -295,4 +295,23 @@ class UnnecessaryLineWrapCheckTest {
         assertTrue(violations.stream().anyMatch(v -> v.getLine() == 31),
             "Abstract method with SEMI should use semi line: " + format(violations));
     }
+
+    @Test
+    void mutationKiller2ProducesExpectedViolations() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(UnnecessaryLineWrapCheck.class,
+            "layout/invalid/UnnecessaryLineWrapMutationKiller2.java", DEFAULT_PROPS);
+        assertTrue(violations.size() >= 9, "MutationKiller2 violations: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 12), "Resource: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 21), "VarDef: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 28), "ModifiedClass: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 35), "AllAnnotation: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 66), "Abstract: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 49), "ClosingBracket: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 55), "OpeningBracket: " + format(violations));
+        for (AuditEvent v : violations) {
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+) chars").matcher(v.getMessage());
+            assertTrue(m.find(), "char count: " + v.getMessage());
+            assertTrue(Integer.parseInt(m.group(1)) <= 180, "within max: " + v.getMessage());
+        }
+    }
 }

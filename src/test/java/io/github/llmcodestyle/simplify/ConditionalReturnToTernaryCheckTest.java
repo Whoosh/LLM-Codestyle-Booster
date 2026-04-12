@@ -42,6 +42,13 @@ class ConditionalReturnToTernaryCheckTest {
             "Complex conditions should not be flagged: " + format(violations));
     }
 
+    @Test
+    void nestedTernaryAndDeepExpressionAreNotFlagged() throws Exception {
+        List<AuditEvent> violations = runCheck("simplify/valid/ConditionalReturnToTernaryMutKiller.java");
+        assertTrue(violations.isEmpty(),
+            "Nested ternary and deep expression should not be flagged: " + format(violations));
+    }
+
     private static List<AuditEvent> runCheck(String resource) throws Exception {
         return runTreeWalkerCheck(ConditionalReturnToTernaryCheck.class, resource, NO_PROPS);
     }

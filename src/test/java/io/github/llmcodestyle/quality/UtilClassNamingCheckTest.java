@@ -42,6 +42,13 @@ class UtilClassNamingCheckTest {
         assertTrue(violations.isEmpty(), "Non-static nested classes should not be flagged");
     }
 
+    @Test
+    void nonStaticNestedWithStaticMethodsNotFlagged() throws Exception {
+        List<AuditEvent> violations = run("quality/valid/UtilClassNamingMutKiller.java");
+        assertTrue(violations.isEmpty(),
+            "Non-static nested class should not be flagged: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(UtilClassNamingCheck.class, resource, NO_PROPS);
     }

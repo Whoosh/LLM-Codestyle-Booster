@@ -42,6 +42,13 @@ class CollapsibleGuardClauseCheckTest {
         }
     }
 
+    @Test
+    void bareReturnGuardDetected() throws Exception {
+        List<AuditEvent> violations = run("simplify/invalid/CollapsibleGuardClauseMutKiller.java");
+        assertEquals(1, violations.size(),
+            "Bare return guard should be detected: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(CollapsibleGuardClauseCheck.class, resource, NO_PROPS);
     }

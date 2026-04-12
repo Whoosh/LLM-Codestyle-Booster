@@ -47,4 +47,40 @@ class PureSingleUseLocalVariableCheckTest {
         assertEquals(EXPECTED_VIOLATIONS, violations.size(),
             "Exact violation count: " + format(violations));
     }
+
+    @Test
+    void mutationKillerProducesViolations() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class,
+            "simplify/invalid/PureSingleUseVarMutationKiller.java", Map.of());
+        // dotMethodCall(len), bareMethodCall(num), varInIfBody(val), varInForBody(val), varInLambda(len)
+        assertEquals(5, violations.size(),
+            "Mutation killer should produce 5 violations: " + format(violations));
+    }
+
+    @Test
+    void dotMethodCallExtractMethodName() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class,
+            "simplify/invalid/PureSingleUseVarMutationKiller.java", Map.of());
+        // dotMethodCall: len = input.length() — extractMethodName line 153 with DOT
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("len")),
+            "DOT method call should be detected: " + format(violations));
+    }
+
+    @Test
+    void bareMethodCallExtractMethodName() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class,
+            "simplify/invalid/PureSingleUseVarMutationKiller.java", Map.of());
+        // bareMethodCall: num = Integer.parseInt(text) — isPureExpression and extractMethodName with no DOT
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("num")),
+            "Bare method call should be detected: " + format(violations));
+    }
+
+    @Test
+    void flowBlockEligibility() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(PureSingleUseLocalVariableCheck.class,
+            "simplify/invalid/PureSingleUseVarMutationKiller.java", Map.of());
+        // Variables in if-body and for-body are also eligible (isFlowBlock)
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("val")),
+            "Variables in flow blocks should be detected: " + format(violations));
+    }
 }

@@ -66,16 +66,27 @@ class InlineRegexConstantCheckTest {
 
     @Test
     void fieldLevelRegexNotFlaggedButMethodLevelIs() throws Exception {
-        // Exercises isInsideMethodBody lines 56-58:
-        // VARIABLE_DEF with OBJBLOCK grandparent returns false (field)
-        // VARIABLE_DEF with SLIST grandparent continues traversal (local var in method)
         List<AuditEvent> violations = runTreeWalkerCheck(InlineRegexConstantCheck.class,
             "simplify/invalid/InlineRegexMutationKiller.java", Map.of());
-        // qualifiedCall() line 14: s.matches("\\d+") — flagged
         assertTrue(violations.stream().anyMatch(v -> v.getLine() == 14),
             "Qualified regex call in method should be flagged: " + format(violations));
-        // unqualifiedCall() line 19: input.replaceAll("\\w+", ...) — flagged
         assertTrue(violations.stream().anyMatch(v -> v.getLine() == 19),
             "Unqualified replaceAll in method should be flagged: " + format(violations));
+    }
+
+    @Test
+    void nestedClassFieldRegexNotFlagged() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(InlineRegexConstantCheck.class,
+            "simplify/valid/InlineRegexMutKiller.java", Map.of());
+        assertTrue(violations.isEmpty(),
+            "Nested class field regex should not be flagged: " + format(violations));
+    }
+
+    @Test
+    void mutationKillerExactViolationCount() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(InlineRegexConstantCheck.class,
+            "simplify/invalid/InlineRegexMutationKiller.java", Map.of());
+        assertEquals(2, violations.size(),
+            "Exactly 2 method-body regex violations: " + format(violations));
     }
 }

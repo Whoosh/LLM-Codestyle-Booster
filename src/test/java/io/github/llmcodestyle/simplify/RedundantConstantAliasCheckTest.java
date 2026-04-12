@@ -122,6 +122,45 @@ class RedundantConstantAliasCheckTest {
             "Non-IDENT initializer should not be treated as alias: " + format(violations));
     }
 
+    @Test
+    void mutationKillerInvalidProducesExpectedViolations() throws Exception {
+        List<AuditEvent> violations = run("simplify/invalid/RedundantConstantAliasMutationKiller.java");
+        // PAT_X_DUP (dup pattern via constant ref), ALIAS_X (alias), PAT_LITERAL_DUP (dup pattern via literal), GREETING_ALIAS (alias)
+        assertEquals(4, violations.size(),
+            "Mutation killer should produce 4 violations: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("PAT_X_DUP")),
+            "Duplicate pattern via constant ref: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("ALIAS_X")),
+            "Simple ident alias: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("PAT_LITERAL_DUP")),
+            "Duplicate pattern via literal: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("GREETING_ALIAS")),
+            "String alias: " + format(violations));
+    }
+
+    @Test
+    void mutationKiller2ValidProducesNoViolations() throws Exception {
+        List<AuditEvent> violations = run("simplify/valid/RedundantConstantAliasMutationKiller2.java");
+        assertTrue(violations.isEmpty(),
+            "Mutation killer 2 valid fixture should produce no violations: " + format(violations));
+    }
+
+    @Test
+    void patternCompileStringLiteralPath() throws Exception {
+        // PAT_LITERAL = Pattern.compile("\\d+") — patternCompileValue STRING_LITERAL branch (line 167)
+        List<AuditEvent> violations = run("simplify/invalid/RedundantConstantAliasMutationKiller.java");
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("PAT_LITERAL_DUP")),
+            "Pattern compile with string literal arg should be detected: " + format(violations));
+    }
+
+    @Test
+    void patternCompileIdentPath() throws Exception {
+        // PAT_X_DUP = Pattern.compile(REGEX_X) — patternCompileValue IDENT branch (line 170)
+        List<AuditEvent> violations = run("simplify/invalid/RedundantConstantAliasMutationKiller.java");
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("PAT_X_DUP")),
+            "Pattern compile with constant ident arg should be detected: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(RedundantConstantAliasCheck.class, resource, NO_PROPS);
     }

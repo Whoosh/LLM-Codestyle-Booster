@@ -66,6 +66,18 @@ class UnrelatedNestedEnumCheckTest {
             "Expected exactly 1 violation for mutation killer: " + format(violations));
     }
 
+    @Test
+    void enumConstantMatchingOuterFieldStillFlagged() throws Exception {
+        // collectEnumConstantNames adds constant names to own-names.
+        // If broken, constants like "name" would not be filtered, and the
+        // enum would falsely appear to reference the outer "name" field.
+        List<AuditEvent> violations = run("quality/invalid/UnrelatedNestedEnumMutKiller2.java");
+        assertEquals(1, violations.size(),
+            "Enum with constant matching outer field should be flagged: " + format(violations));
+        assertTrue(violations.get(0).getMessage().contains("Status"),
+            "Should flag Status enum: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(UnrelatedNestedEnumCheck.class, resource, NO_PROPS);
     }

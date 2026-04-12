@@ -44,16 +44,16 @@ class CommentedOutCodeCheckTest {
 
     @Test
     void violationLineNumberPointsToStartOfBlock() throws Exception {
-        // processFiltered line 66: consecutiveCount == 0 sets consecutiveStart
-        // If negated, consecutiveStart would be set to the LAST line, not the FIRST
         List<AuditEvent> violations = runFileSetCheck(CommentedOutCodeCheck.class,
             "forbidden/invalid/CommentedOutCodeInvalid.java", Map.of("minConsecutiveLines", MIN_LINES_2));
         assertEquals(EXPECTED_VIOLATIONS, violations.size(), format(violations));
-        for (AuditEvent v : violations) {
-            assertTrue(v.getLine() > 0, "Line should be positive: " + v.getLine());
-            // The violation message should contain the count
-            assertTrue(v.getMessage().matches(".*\\d+.*"),
-                "Message should contain consecutive line count: " + v.getMessage());
-        }
+        // Block 1 starts at line 6, Block 2 at line 11, Block 3 at line 17
+        // If consecutiveCount == 0 is negated, start would be wrong (last line instead of first)
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 6),
+            "Block 1 should start at line 6: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 11),
+            "Block 2 should start at line 11: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 17),
+            "Block 3 should start at line 17: " + format(violations));
     }
 }

@@ -47,4 +47,12 @@ class UnicodeEscapeCheckTest {
         List<AuditEvent> violations = runFileSetCheck(UnicodeEscapeCheck.class, "forbidden/valid/UnicodeEscapeEdgeCases.java", NO_PROPS);
         assertTrue(violations.isEmpty(), "Truncated escapes and non-hex should not be flagged: " + format(violations));
     }
+
+    @Test
+    void uppercaseHexDigitsAreRecognized() throws Exception {
+        List<AuditEvent> violations = runFileSetCheck(UnicodeEscapeCheck.class,
+            "forbidden/invalid/UnicodeEscapeUpperHex.java", NO_PROPS);
+        assertEquals(4, violations.size(),
+            "Uppercase hex digit escapes should be recognized: " + format(violations));
+    }
 }

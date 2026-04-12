@@ -170,4 +170,29 @@ class CollapsibleConstantConcatenationCheckTest {
         }
     }
 
+    @Test
+    void methodBodyRunReportsFirstLeafPosition() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class, INVALID_RESOURCE, Map.of());
+        List<AuditEvent> runViolations = violations.stream().filter(e -> e.getMessage().contains("consecutive")).toList();
+        // checkForCollapsibleRun line 257: if runLength == 0 is negated, runStart is wrong
+        // The run-of-5 violation (line 71) should point to INSERT_PREFIX, not DEFAULT_TABLE
+        AuditEvent runOf5 = runViolations.stream().filter(v -> v.getMessage().contains("5")).findFirst().orElse(null);
+        assertNotNull(runOf5, "Should have run of 5: " + format(runViolations));
+        assertEquals(71, runOf5.getLine(), "Run of 5 should be on line 71: " + runOf5);
+        // INSERT_PREFIX is at column 15 (after "return "), not at DEFAULT_TABLE position
+        assertTrue(runOf5.getColumn() < 30,
+            "Run should start at INSERT_PREFIX position (early column): " + runOf5.getColumn());
+    }
+
+    @Test
+    void declarationPrefixLengthAffectsLineCheck() throws Exception {
+        // declarationPrefixLength line 49: eqIdx < 0. If the field has '=' sign (eqIdx >= 0),
+        // prefix = eqIdx + 2. If negated, prefix would be wrong for fields with '='.
+        List<AuditEvent> violations = runTreeWalkerCheck(CollapsibleConstantConcatenationCheck.class,
+            "simplify/invalid/CollapsibleConstantLineLengthEdge.java", Map.of());
+        // The SHORT field ("a" + "b") should be flagged because the merged literal fits on one line
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("SHORT")),
+            "Short concat should be flagged: " + format(violations));
+    }
+
 }

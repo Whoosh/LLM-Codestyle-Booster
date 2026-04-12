@@ -38,6 +38,13 @@ class MethodMayBeStaticCheckTest {
         assertTrue(run("quality/valid/MethodMayBeStaticValid.java").isEmpty(), "expected no violations for instance-referencing methods and overridable non-final-class methods");
     }
 
+    @Test
+    void recordMethodReferencingComponentIsNotFlagged() throws Exception {
+        List<AuditEvent> violations = run("quality/valid/MethodMayBeStaticMutKiller.java");
+        assertTrue(violations.isEmpty(),
+            "Record methods referencing components should not be flagged: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(MethodMayBeStaticCheck.class, resource, NO_PROPS);
     }

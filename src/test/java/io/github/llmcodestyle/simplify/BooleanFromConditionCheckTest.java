@@ -39,6 +39,41 @@ class BooleanFromConditionCheckTest {
             "Violations should report positive line numbers: " + format(violations));
     }
 
+    @Test
+    void mutationKillerValidProducesNoViolations() throws Exception {
+        List<AuditEvent> violations = run("simplify/valid/BooleanFromConditionMutationKiller.java");
+        assertTrue(violations.isEmpty(),
+            "Mutation killer valid should produce no violations: " + format(violations));
+    }
+
+    @Test
+    void violationLinesMatchExpectedPositions() throws Exception {
+        List<AuditEvent> violations = run("simplify/invalid/BooleanFromConditionInvalid.java");
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), format(violations));
+        // isPositive: line 8, isNonZero: line 16, withSingleStatement: line 24, inMiddleOfBlock: line 31
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 8),
+            "isPositive should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 16),
+            "isNonZero should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 24),
+            "withSingleStatement should be flagged: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == 31),
+            "inMiddleOfBlock should be flagged: " + format(violations));
+    }
+
+    @Test
+    void violationMessagesContainSpecificVarNames() throws Exception {
+        List<AuditEvent> violations = run("simplify/invalid/BooleanFromConditionInvalid.java");
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("positive")),
+            "Should mention 'positive': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("nonZero")),
+            "Should mention 'nonZero': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("flag")),
+            "Should mention 'flag': " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("done")),
+            "Should mention 'done': " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(BooleanFromConditionCheck.class, resource, NO_PROPS);
     }

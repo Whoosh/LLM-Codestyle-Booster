@@ -231,6 +231,23 @@ class DuplicateMethodBodyCheckTest {
             "Message should contain the class name: " + msg);
     }
 
+    @Test
+    void swappedParameterOrderIsNotDuplicate() throws Exception {
+        List<AuditEvent> violations = runSingle("quality/valid/DuplicateMethodBodySwappedParams.java");
+        assertTrue(violations.isEmpty(),
+            "Methods with swapped parameter usage should not be duplicates: " + formatWithFile(violations));
+    }
+
+    @Test
+    void overrideWithIdenticalBodyIsSkipped() throws Exception {
+        List<AuditEvent> violations = runSingle("quality/invalid/DuplicateMethodBodyOverridePair.java");
+        // 'same' and 'equals' have structurally identical bodies. But equals has @Override, so only
+        // 'same' should be stored as first occurrence, and equals should be SKIPPED entirely.
+        // If isOverride is broken, both methods are compared, producing a violation for equals.
+        assertTrue(violations.isEmpty(),
+            "Override method with same body as non-override should not produce violation: " + formatWithFile(violations));
+    }
+
     private static List<AuditEvent> runSingle(String resource) throws Exception {
         return runTreeWalkerCheck(DuplicateMethodBodyCheck.class, resource, NO_PROPS);
     }

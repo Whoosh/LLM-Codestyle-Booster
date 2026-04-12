@@ -69,6 +69,14 @@ class IdenticalCatchBodyCheckTest {
             "Catches with different exception var names should be treated as identical: " + format(violations));
     }
 
+    @Test
+    void differentMethodCallsInCatchBodiesAreNotIdentical() throws Exception {
+        // buildFingerprint IDENT check: if negated, method name differences are lost
+        List<AuditEvent> violations = runCheck("simplify/valid/IdenticalCatchBodyMutKiller.java");
+        assertTrue(violations.isEmpty(),
+            "Catches calling different methods should not be treated as identical: " + format(violations));
+    }
+
     private static List<AuditEvent> runCheck(String resource) throws Exception {
         return runTreeWalkerCheck(IdenticalCatchBodyCheck.class, resource, NO_PROPS);
     }

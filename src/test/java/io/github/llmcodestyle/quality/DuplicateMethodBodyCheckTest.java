@@ -21,6 +21,8 @@ class DuplicateMethodBodyCheckTest {
     private static final String STATEFUL_B = "quality/invalid/DuplicateMethodBodyStatefulB.java";
     private static final String PHYSICS_PROMPT_BUILDER = "quality/invalid/DuplicateMethodBodyPhysicsPromptBuilder.java";
     private static final String JAVA_PROMPT_BUILDER = "quality/invalid/DuplicateMethodBodyJavaPromptBuilder.java";
+    private static final String JAVA_BATCH_INSERTER = "quality/invalid/DuplicateMethodBodyJavaBatchInserter.java";
+    private static final String PHYSICS_BATCH_INSERTER = "quality/invalid/DuplicateMethodBodyPhysicsBatchInserter.java";
     private static final String VALID = "quality/valid/DuplicateMethodBodyValid.java";
 
     private static final int CROSS_FILE_DUPLICATES = 3;
@@ -91,6 +93,15 @@ class DuplicateMethodBodyCheckTest {
         assertEquals(1, violations.size(), formatWithFile(violations));
         String msg = violations.get(0).getMessage();
         assertTrue(msg.contains("readResource") && msg.contains("loadResource"), formatWithFile(violations));
+        assertTrue(msg.contains("extract into a shared utility class"), msg);
+    }
+
+    @Test
+    void crossFileJsonLineReaderDuplicateCaught() throws Exception {
+        List<AuditEvent> violations = runMulti(JAVA_BATCH_INSERTER, PHYSICS_BATCH_INSERTER);
+        assertEquals(1, violations.size(), formatWithFile(violations));
+        String msg = violations.get(0).getMessage();
+        assertTrue(msg.contains("parseJsonLines") && msg.contains("readJsonLines"), formatWithFile(violations));
         assertTrue(msg.contains("extract into a shared utility class"), msg);
     }
 

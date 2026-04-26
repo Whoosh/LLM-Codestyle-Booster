@@ -20,7 +20,8 @@ import static io.github.llmcodestyle.utils.AstUtil.*;
  * </ul>
  *
  * <p>Skipped: abstract classes, non-static nested classes, interfaces, enums,
- * records, and annotation types — none of which fit either category.
+ * records, annotation types, and classes that declare a {@code public static main}
+ * method (JVM entry points are not utilities).
  *
  * <p>Constructors are not counted as "methods" for either rule, so a private
  * default constructor is fine.
@@ -40,6 +41,7 @@ public class UtilClassNamingCheck extends AbstractCheck {
     private static final String CONSTANTS_SUFFIX = "Constants";
     private static final String UTIL_SUFFIX = "Util";
     private static final String UTILS_SUFFIX = "Utils";
+    private static final String MAIN_METHOD_NAME = "main";
     private static final int[] TOKENS = {CLASS_DEF};
 
     private int totalMethods;
@@ -74,6 +76,9 @@ public class UtilClassNamingCheck extends AbstractCheck {
         if (objBlock == null) {
             return;
         }
+        if (hasMainEntryPoint(objBlock)) {
+            return;
+        }
         countMethods(objBlock);
         String name = nameIdent.getText();
         if (name.endsWith(CONSTANTS_SUFFIX) && publicMethods > 0) {
@@ -86,6 +91,22 @@ public class UtilClassNamingCheck extends AbstractCheck {
 
     private static boolean isNonStaticNestedClass(DetailAST classDef) {
         return isNestedType(classDef) && !hasModifier(classDef, LITERAL_STATIC);
+    }
+
+    private static boolean hasMainEntryPoint(DetailAST objBlock) {
+        for (DetailAST child = objBlock.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child.getType() != METHOD_DEF) {
+                continue;
+            }
+            if (!hasModifier(child, LITERAL_PUBLIC) || !hasModifier(child, LITERAL_STATIC)) {
+                continue;
+            }
+            DetailAST nameIdent = child.findFirstToken(IDENT);
+            if (nameIdent != null && MAIN_METHOD_NAME.equals(nameIdent.getText())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void countMethods(DetailAST objBlock) {

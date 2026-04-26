@@ -47,6 +47,12 @@ class UtilClassNamingCheckTest {
         assertTrue(violations.isEmpty(), "Non-static nested class should not be flagged: " + format(violations));
     }
 
+    @Test
+    void mainEntryPointClassIsNotFlagged() throws Exception {
+        List<AuditEvent> violations = run("quality/valid/UtilClassNamingMainEntryPoint.java");
+        assertTrue(violations.isEmpty(), "Class with public static main is a JVM entry point, not a utility: " + format(violations));
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(UtilClassNamingCheck.class, resource, NO_PROPS);
     }

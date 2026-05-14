@@ -109,12 +109,15 @@ public class TrivialSingleUsePrivateMethodValid {
     }
 
     public int useViaNested() {
-        java.util.concurrent.Callable<Integer> callable = new java.util.concurrent.Callable<Integer>() {
-            @Override
-            public Integer call() {
-                return innerHelper() + 1;
-            }
-        };
-        return callable.toString().length();
+        java.util.concurrent.Callable<Integer> callable = makeCallable();
+        return callable.toString().length() + callable.hashCode();
+    }
+
+    public int useViaNestedSecond() {
+        return makeCallable().hashCode();
+    }
+
+    private java.util.concurrent.Callable<Integer> makeCallable() {
+        return () -> innerHelper() + 1;
     }
 }

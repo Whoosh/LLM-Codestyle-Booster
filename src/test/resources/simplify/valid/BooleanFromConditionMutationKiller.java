@@ -38,9 +38,10 @@ public class BooleanFromConditionMutationKiller {
     // Exercises ASSIGN == null check
     public boolean noInit() {
         boolean flag;
-        flag = value > 0;
         if (value > 100) {
             flag = false;
+        } else {
+            flag = value > 0;
         }
         return flag;
     }

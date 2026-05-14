@@ -11,8 +11,13 @@ public class UnnecessaryLineWrapValid {
 
     // Case 1: genuinely long method call — combined exceeds 180 chars
     void longMethodCall() {
-        LOG.info(String.format("Processing batch %s with very long description that makes this absolutely impossible to fit within one hundred eighty characters when combined together with arguments",
-                "batchId", "extra1", "extra2", "extra3", "extra4"));
+        LOG.info(String.format(
+            "Processing batch %s with very long description that makes this absolutely impossible to fit within one hundred eighty characters when combined together with arguments",
+            "batchId",
+            "extra1",
+            "extra2",
+            "extra3",
+            "extra4"));
     }
 
     // Case 2: single-line — no wrap
@@ -41,8 +46,13 @@ public class UnnecessaryLineWrapValid {
         boolean veryLongVariableNameThatTakesUpLotsOfSpaceInCode = true;
         boolean anotherExtremelyLongBooleanVariableNameForTestingPurposesHere = false;
         boolean yetAnotherVeryLongVariableNameToMakeThisExceedTheLimitDefinitely = true;
-        if (veryLongVariableNameThatTakesUpLotsOfSpaceInCode || anotherExtremelyLongBooleanVariableNameForTestingPurposesHere
-                || yetAnotherVeryLongVariableNameToMakeThisExceedTheLimitDefinitely) {
+        if (veryLongVariableNameThatTakesUpLotsOfSpaceInCode
+                || anotherExtremelyLongBooleanVariableNameForTestingPurposesHere
+                || yetAnotherVeryLongVariableNameToMakeThisExceedTheLimitDefinitely
+                || veryLongVariableNameThatTakesUpLotsOfSpaceInCode != anotherExtremelyLongBooleanVariableNameForTestingPurposesHere) {
+            // body
+        }
+        if (!yetAnotherVeryLongVariableNameToMakeThisExceedTheLimitDefinitely) {
             // body
         }
     }
@@ -77,14 +87,25 @@ public class UnnecessaryLineWrapValid {
     }
 
     private String computeValue() {
+        if (LOG == null) {
+            throw new IllegalStateException();
+        }
         return "value";
     }
 
+    @jakarta.annotation.Nullable
     private AutoCloseable createFirstConnectionAndPrepareInsertStatementWithParams(String a, String b) {
+        if (a.isEmpty() && b.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
         return null;
     }
 
+    @jakarta.annotation.Nullable
     private AutoCloseable createSecondConnectionAndPrepareUpdateStatementWithParams(String a, String b) {
+        if (a.isEmpty() && b.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
         return null;
     }
 }

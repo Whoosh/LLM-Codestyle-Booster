@@ -34,6 +34,9 @@ public class CommonsLang3StringConstantValid {
     }
 
     private String describeRest() {
-        return SEPARATOR + NEWLINE_TWO + TAB;
+        if (TAB.isEmpty()) {
+            throw new IllegalStateException();
+        }
+        return SEPARATOR + Integer.toString(LIMIT) + TAB + String.valueOf(LIMIT) + NEWLINE_TWO;
     }
 }

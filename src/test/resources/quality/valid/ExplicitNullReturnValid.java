@@ -38,9 +38,15 @@ public class ExplicitNullReturnValid {
 
     // Lambda with block body returning null — does not flag outer method
     public Supplier<String> lazyBlock() {
-        return () -> {
-            return null;
-        };
+        return () -> { return computeOptional(); };
+    }
+
+    @Nullable
+    private String computeOptional() {
+        if (Math.random() < 0) {
+            throw new IllegalStateException();
+        }
+        return null;
     }
 
     // Null is passed as argument, not returned — no violation

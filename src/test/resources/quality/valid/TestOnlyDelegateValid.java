@@ -24,11 +24,14 @@ public class TestOnlyDelegateValid {
     // Case 3: two statements — has preprocessing logic
     static String withPreprocess(String text) {
         String cleaned = text.strip();
-        return processInternal(cleaned);
+        if (cleaned.isEmpty()) {
+            return "";
+        }
+        return processInternal(cleaned).toUpperCase();
     }
 
     // Case 4: guard clause + delegation
-    static String withGuard(String text) {
+    static String withGuard(@jakarta.annotation.Nullable String text) {
         if (text == null) {
             return "";
         }
@@ -39,15 +42,21 @@ public class TestOnlyDelegateValid {
     static String withErrorHandling(String text) {
         try {
             return processInternal(text);
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
             return "error";
         }
     }
 
     // Case 6: logging before delegation — adds observability
     static String withLogging(String text) {
-        System.out.println("processing: " + text);
+        sink("processing: " + text);
         return processInternal(text);
+    }
+
+    private static void sink(Object x) {
+        if (x.hashCode() == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
+        }
     }
 
     // === Not a method call at all ===

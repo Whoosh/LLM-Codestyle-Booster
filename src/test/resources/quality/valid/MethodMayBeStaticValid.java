@@ -1,6 +1,6 @@
 package quality.valid;
 
-import static java.util.Arrays.asList;
+import static java.util.Arrays.*;
 
 public class MethodMayBeStaticValid {
 
@@ -13,9 +13,12 @@ public class MethodMayBeStaticValid {
         return this.counter;
     }
 
-    // Uses an instance field by name → keep instance.
+    // Uses an instance field by name → keep instance. Two statements to avoid trivial-single-use.
     private void inc() {
         counter++;
+        if (counter == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
+        }
     }
 
     // Calls another instance method without explicit receiver → keep instance.
@@ -47,8 +50,7 @@ public class MethodMayBeStaticValid {
 
     // Uses an instance field shadowed by a local — pessimistic skip.
     private int shadowed(int counter) {
-        int local = counter + 1;
-        return local;
+        return counter + 1;
     }
 
     // Default method in nested interface — see static-allowed test fixture.

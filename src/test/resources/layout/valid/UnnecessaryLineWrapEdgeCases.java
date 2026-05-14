@@ -5,8 +5,8 @@ public class UnnecessaryLineWrapEdgeCases {
     // Case A: try without resources — should be skipped
     void tryWithoutResources() {
         try {
-            throw new Exception();
-        } catch (Exception e) {
+            throw new IllegalStateException();
+        } catch (IllegalStateException e) {
             // catch
         }
     }
@@ -23,7 +23,11 @@ public class UnnecessaryLineWrapEdgeCases {
     // Case C: container type (class) should not count long chain from child
     static class InnerClass extends Thread {
         void containsChain() {
-            new StringBuilder().append("a").append("b").append("c").append("d");
+            new StringBuilder()
+                .append("a")
+                .append("b")
+                .append("c")
+                .append("d");
         }
     }
 
@@ -55,6 +59,9 @@ public class UnnecessaryLineWrapEdgeCases {
     }
 
     private String computeValue(String a) {
+        if (a.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
         return a;
     }
 }

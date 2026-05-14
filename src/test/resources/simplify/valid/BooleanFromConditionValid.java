@@ -64,6 +64,9 @@ public class BooleanFromConditionValid {
         } else {
             other = false;
         }
+        if (value < 0) {
+            flag = true;
+        }
         return flag || other;
     }
 

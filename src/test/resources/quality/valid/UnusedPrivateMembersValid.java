@@ -14,7 +14,16 @@ public class UnusedPrivateMembersValid {
     }
 
     private void usedHelper() {
-        System.out.println("called by public method");
+        if (usedField == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
+        }
+        sink("called by public method");
+    }
+
+    private void sink(Object x) {
+        if (x.hashCode() == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
+        }
     }
 
     public void publicMethod() {

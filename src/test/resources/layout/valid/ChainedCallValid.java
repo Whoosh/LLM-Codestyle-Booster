@@ -6,6 +6,7 @@ public class ChainedCallValid {
     void singleCall() {
         StringBuilder sb = new StringBuilder();
         sb.append("a");
+        sb.toString();
     }
 
     // Case 2: Chain already on separate lines — correct
@@ -14,6 +15,7 @@ public class ChainedCallValid {
         sb.append("a")
             .append("b")
             .append("c");
+        sb.toString();
     }
 
     // Case 3: Regular non-chain method call

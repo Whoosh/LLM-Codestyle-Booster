@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class LongTestLiteralEdgeCases {
+class LongTestLiteralEdgeCasesTest {
 
     // Field initializers with long strings — always exempt
     private static final String FIELD_LONG = "This is a very long field initializer string that should always be exempt";
@@ -19,13 +19,14 @@ public class LongTestLiteralEdgeCases {
     @DisplayName("A long display name that should be exempt from the check because it is inside DisplayName annotation")
     void testWithDisplayName() {
         String x = "short";
+        org.junit.jupiter.api.Assertions.assertNotNull(x);
+        org.junit.jupiter.api.Assertions.assertEquals("short", x);
     }
 
     // Assertion message (last arg) — exempt
     @Test
     void testAssertMessageExempt() {
-        org.junit.jupiter.api.Assertions.assertTrue(true,
-            "This very long assertion message is the last argument and should be exempt");
+        org.junit.jupiter.api.Assertions.assertTrue(true, "This very long assertion message is the last argument and should be exempt");
     }
 
     @ParameterizedTest

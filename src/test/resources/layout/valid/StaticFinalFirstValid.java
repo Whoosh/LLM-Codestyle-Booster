@@ -13,15 +13,17 @@ public class StaticFinalFirstValid {
 
     public void method() {
     }
-}
 
-// Record with proper ordering: static final declared BEFORE the canonical constructor — no violation.
-record StaticFinalFirstValidRecord(int value) {
+    // Nested record with proper ordering: static final declared BEFORE the canonical
+    // constructor — no violation. Made nested (was top-level) to avoid
+    // TopLevelRecordInPojosPackageCheck firing in the ping-pong matrix.
+    record StaticFinalFirstValidRecord(int value) {
 
-    static final String RECORD_PREFIX = "ok";
+        static final String RECORD_PREFIX = "ok";
 
-    StaticFinalFirstValidRecord(int value) {
-        this.value = value;
+        StaticFinalFirstValidRecord(int value) {
+            this.value = value;
+        }
     }
 }
 

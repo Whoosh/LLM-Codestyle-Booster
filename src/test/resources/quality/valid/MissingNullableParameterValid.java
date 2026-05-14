@@ -61,8 +61,7 @@ public class MissingNullableParameterValid {
 
     // Compound rejection: s == null && verbose -> still a rejection -> no violation
     public void compoundRejection(String s) {
-        boolean verbose = true;
-        if (s == null && verbose) {
+        if (s == null && Math.random() > 0) {
             throw new IllegalArgumentException();
         }
         s.length();
@@ -73,7 +72,7 @@ public class MissingNullableParameterValid {
         if (s == null) {
             try {
                 throw new IllegalArgumentException();
-            } catch (Exception e) {
+            } catch (IllegalArgumentException e) {
                 // ignored
             }
         }

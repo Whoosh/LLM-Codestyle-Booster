@@ -32,8 +32,8 @@ public class UnnecessaryLineWrapMutationKiller {
     // Case D: LITERAL_TRY without RESOURCE_SPECIFICATION — should be skipped
     void tryWithoutResources() {
         try {
-            throw new Exception();
-        } catch (Exception e) {
+            throw new IllegalStateException();
+        } catch (IllegalStateException e) {
             // catch
         }
     }
@@ -49,7 +49,25 @@ public class UnnecessaryLineWrapMutationKiller {
         return "ok";
     }
 
-    private Closeable open() { return null; }
-    private Closeable openSomethingVeryLongNamedThatIsWayTooLongToEverFitOnOneLine() { return null; }
-    private void use(Closeable c) { }
+    @jakarta.annotation.Nullable
+    private Closeable open() {
+        if (Math.random() < 0) {
+            throw new IllegalStateException();
+        }
+        return null;
+    }
+
+    @jakarta.annotation.Nullable
+    private Closeable openSomethingVeryLongNamedThatIsWayTooLongToEverFitOnOneLine() {
+        if (Math.random() < 0) {
+            throw new IllegalStateException();
+        }
+        return null;
+    }
+
+    private void use(Closeable c) {
+        if (c == null) {
+            throw new IllegalArgumentException();
+        }
+    }
 }

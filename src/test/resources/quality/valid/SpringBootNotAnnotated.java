@@ -3,10 +3,16 @@ package quality.valid;
 public class SpringBootNotAnnotated {
 
     static void main(String[] args) {
-        System.out.println("Just a regular class");
+        sink("Just a regular class");
     }
 
     void otherMethod() {
-        System.out.println("not main");
+        sink("not main");
+    }
+
+    private static void sink(Object x) {
+        if (x.hashCode() == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
+        }
     }
 }

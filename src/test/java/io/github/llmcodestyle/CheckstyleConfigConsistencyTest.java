@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class CheckstyleConfigConsistencyTest {
 
-    private static final Path CHECKSTYLE_XML = resolveConfig();
+    private static final @Nullable String CHECKSTYLE_XML = resolveConfig();
     private static final String ANNOTATION_CHECK = "com.puppycrawl.tools.checkstyle.checks.annotation.AnnotationLocationCheck";
     private static final String LEFT_CURLY_CHECK = "com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck";
     private static final String NEED_BRACES_CHECK = "com.puppycrawl.tools.checkstyle.checks.blocks.NeedBracesCheck";
@@ -255,8 +255,10 @@ class CheckstyleConfigConsistencyTest {
     // CrossAnalyzerConsistencyTest.everyCustomCheckParticipatesToConsistencyTest scans it
     // for class names and fails if any *Check class is missing from the registry.
     private List<AuditEvent> runFullConfig(String resourceFile, boolean testScope) throws Exception {
-        if (CHECKSTYLE_XML == null || !Files.exists(CHECKSTYLE_XML)) {
-            return List.of();
+        if (CHECKSTYLE_XML == null) {
+            throw new IllegalStateException(
+                "Bundled checkstyle.xml not found on classpath at io/github/llmcodestyle/config/checkstyle.xml. "
+                    + "Ensure src/main/resources is on the test classpath.");
         }
         URL resource = getClass().getClassLoader().getResource(resourceFile);
         if (resource == null) {
@@ -266,7 +268,7 @@ class CheckstyleConfigConsistencyTest {
         Files.createDirectories(targetDir);
         Path targetFile = targetDir.resolve(Path.of(resourceFile).getFileName().toString());
         Files.copy(Path.of(resource.toURI()), targetFile);
-        Configuration config = ConfigurationLoader.loadConfiguration(CHECKSTYLE_XML.toAbsolutePath().toString(), new PropertiesExpander(new Properties()));
+        Configuration config = ConfigurationLoader.loadConfiguration(CHECKSTYLE_XML, new PropertiesExpander(new Properties()));
         Checker checker = new Checker();
         checker.setModuleClassLoader(getClass().getClassLoader());
         checker.configure(config);
@@ -295,16 +297,10 @@ class CheckstyleConfigConsistencyTest {
     }
 
     @Nullable
-    private static Path resolveConfig() {
-        Path fromModule = Path.of("../checkstyle.xml");
-        if (Files.exists(fromModule)) {
-            return fromModule;
-        }
-        Path fromRoot = Path.of("checkstyle.xml");
-        if (Files.exists(fromRoot)) {
-            return fromRoot;
-        }
-        return null;
+    private static String resolveConfig() {
+        URL url = CheckstyleConfigConsistencyTest.class.getClassLoader()
+            .getResource("io/github/llmcodestyle/config/checkstyle.xml");
+        return url == null ? null : url.toString();
     }
 
 }

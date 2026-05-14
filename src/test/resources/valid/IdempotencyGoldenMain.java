@@ -5,7 +5,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-/** Golden main-scope file — must produce 0 violations when run through full checkstyle.xml. */
+/**
+ * Golden main-scope file — must produce 0 violations when run through full checkstyle.xml.
+ */
 public class IdempotencyGoldenMain {
 
     private static final String CONSTANT = "value";

@@ -5,7 +5,9 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
 
-/** Golden test-scope file — must produce 0 violations when run through full checkstyle.xml. */
+/**
+ * Golden test-scope file — must produce 0 violations when run through full checkstyle.xml.
+ */
 class IdempotencyGoldenTest {
 
     // AnnotationLocation strict: @TempDir on separate line for VARIABLE_DEF

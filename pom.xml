@@ -97,9 +97,6 @@
                         --add-opens java.base/java.lang.reflect=ALL-UNNAMED
                         --add-opens java.base/java.util=ALL-UNNAMED
                     </argLine>
-                    <excludes>
-                        <exclude>**/*SlowTest.java</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
 
@@ -223,9 +220,6 @@
                     <targetTests>
                         <param>io.github.llmcodestyle.*</param>
                     </targetTests>
-                    <excludedTestClasses>
-                        <param>**.*SlowTest</param>
-                    </excludedTestClasses>
                     <mutators>
                         <mutator>NULL_RETURNS</mutator>
                         <mutator>EMPTY_RETURNS</mutator>

@@ -190,8 +190,7 @@ class OrChainToSetContainsCheckTest {
     @Test
     void parenthesizedSubChainsAreFlattened() throws Exception {
         List<AuditEvent> violations = run("simplify/invalid/OrChainParenthesizedSubChain.java");
-        assertEquals(3, violations.size(),
-            "Three 3-operand chains (right-paren, left-paren, full-wrap) must be flagged: " + format(violations));
+        assertEquals(3, violations.size(), "Three 3-operand chains (right-paren, left-paren, full-wrap) must be flagged: " + format(violations));
     }
 
     @Test

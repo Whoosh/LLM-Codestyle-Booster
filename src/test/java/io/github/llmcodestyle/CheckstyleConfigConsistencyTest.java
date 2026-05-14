@@ -39,7 +39,9 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class CheckstyleConfigConsistencyTest {
 
+    private static final String CHECKSTYLE_RESOURCE = "io/github/llmcodestyle/config/checkstyle.xml";
     private static final @Nullable String CHECKSTYLE_XML = resolveConfig();
+    private static final String CHECKSTYLE_NOT_FOUND = "Bundled io/github/llmcodestyle/config/checkstyle.xml not found on classpath; ensure src/main/resources is included.";
     private static final String ANNOTATION_CHECK = "com.puppycrawl.tools.checkstyle.checks.annotation.AnnotationLocationCheck";
     private static final String LEFT_CURLY_CHECK = "com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck";
     private static final String NEED_BRACES_CHECK = "com.puppycrawl.tools.checkstyle.checks.blocks.NeedBracesCheck";
@@ -256,9 +258,7 @@ class CheckstyleConfigConsistencyTest {
     // for class names and fails if any *Check class is missing from the registry.
     private List<AuditEvent> runFullConfig(String resourceFile, boolean testScope) throws Exception {
         if (CHECKSTYLE_XML == null) {
-            throw new IllegalStateException(
-                "Bundled checkstyle.xml not found on classpath at io/github/llmcodestyle/config/checkstyle.xml. "
-                    + "Ensure src/main/resources is on the test classpath.");
+            throw new IllegalStateException(CHECKSTYLE_NOT_FOUND);
         }
         URL resource = getClass().getClassLoader().getResource(resourceFile);
         if (resource == null) {
@@ -298,8 +298,7 @@ class CheckstyleConfigConsistencyTest {
 
     @Nullable
     private static String resolveConfig() {
-        URL url = CheckstyleConfigConsistencyTest.class.getClassLoader()
-            .getResource("io/github/llmcodestyle/config/checkstyle.xml");
+        URL url = CheckstyleConfigConsistencyTest.class.getClassLoader().getResource(CHECKSTYLE_RESOURCE);
         return url == null ? null : url.toString();
     }
 

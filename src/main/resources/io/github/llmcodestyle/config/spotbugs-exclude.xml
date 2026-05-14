@@ -32,11 +32,6 @@
         <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
     </Match>
 
-    <!-- Project does not use nullability annotations -->
-    <Match>
-        <Bug pattern="AI_ANNOTATION_ISSUES_NEEDS_NULLABLE"/>
-    </Match>
-
     <!-- toString not needed for Spring-managed beans and domain models -->
     <Match>
         <Bug pattern="IMC_IMMATURE_CLASS_NO_TOSTRING"/>

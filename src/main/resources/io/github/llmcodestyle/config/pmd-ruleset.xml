@@ -82,7 +82,6 @@
     <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
         <properties>
             <property name="maxDuplicateLiterals" value="2"/>
-            <property name="minimumLength" value="5"/>
         </properties>
     </rule>
 

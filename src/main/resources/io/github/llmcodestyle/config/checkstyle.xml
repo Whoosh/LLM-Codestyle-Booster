@@ -41,12 +41,12 @@
     </module>
     <module name="LineLength">
         <property name="max" value="180"/>
-        <property name="ignorePattern" value="^package.*|^import.*|a]+ href|href|http://|https://|ftp://"/>
+        <property name="ignorePattern" value="^package.*|^import.*|href=|https?://|ftp://"/>
     </module>
 
     <module name="TreeWalker">
         <module name="MagicNumber">
-            <property name="ignoreNumbers" value="-9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9"/>
+            <property name="ignoreNumbers" value="-2, -1, 0, 1, 2"/>
             <property name="ignoreAnnotation" value="true"/>
         </module>
         <module name="MatchXpath">

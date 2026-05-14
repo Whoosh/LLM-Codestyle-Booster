@@ -16,6 +16,7 @@ import java.util.Set;
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
 import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 /**
  * Flags method/constructor parameters that are null-checked in the body without
@@ -42,7 +43,6 @@ public class MissingNullableParameterCheck extends AbstractCheck {
     private static final String NULLABLE = "Nullable";
     private static final Set<Integer> METHOD_DEF_TOKENS = Set.of(METHOD_DEF, CTOR_DEF);
     private static final Set<Integer> NULL_COMP_TOKENS = Set.of(EQUAL, NOT_EQUAL);
-    private static final Set<Integer> TYPE_DEF_TOKENS = Set.of(CLASS_DEF, ENUM_DEF, INTERFACE_DEF);
     private static final Set<Integer> SCOPE_BOUNDARY_TOKENS = Set.of(CLASS_DEF, RECORD_DEF, ENUM_DEF, INTERFACE_DEF, LAMBDA);
 
     private final Map<DetailAST, Map<String, List<MethodParamInfo>>> classMethodMap = new IdentityHashMap<>();
@@ -137,7 +137,7 @@ public class MissingNullableParameterCheck extends AbstractCheck {
         if (node == null) {
             return;
         }
-        if (TYPE_DEF_TOKENS.contains(node.getType()) && !isInsideRecord(node)) {
+        if (CLASS_LIKE_TYPES.contains(node.getType()) && !isInsideRecord(node)) {
             classMethodMap.put(node, buildMethodMap(node));
         }
         for (DetailAST c = node.getFirstChild(); c != null; c = c.getNextSibling()) {
@@ -309,7 +309,7 @@ public class MissingNullableParameterCheck extends AbstractCheck {
     @Nullable
     private static DetailAST findEnclosingTypeDef(DetailAST node) {
         for (DetailAST p = node.getParent(); p != null; p = p.getParent()) {
-            if (TYPE_DEF_TOKENS.contains(p.getType())) {
+            if (CLASS_LIKE_TYPES.contains(p.getType())) {
                 return p;
             }
         }

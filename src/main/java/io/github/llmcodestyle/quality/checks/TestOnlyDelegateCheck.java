@@ -6,6 +6,7 @@ import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.HashSet;
@@ -88,7 +89,7 @@ public class TestOnlyDelegateCheck extends AbstractCheck {
             return;
         }
 
-        String calledName = extractMethodName(methodCall);
+        String calledName = extractLocalMethodName(methodCall);
         if (calledName != null && privateMethods.contains(calledName)) {
             DetailAST ident = methodDef.findFirstToken(IDENT);
             log(methodDef.getLineNo(), MSG_KEY, ident != null ? ident.getText() : "?", calledName);
@@ -105,15 +106,6 @@ public class TestOnlyDelegateCheck extends AbstractCheck {
             return child;
         }
         return null;
-    }
-
-    @Nullable
-    private static String extractMethodName(DetailAST methodCall) {
-        if (methodCall.findFirstToken(DOT) != null) {
-            return null;
-        }
-        DetailAST ident = methodCall.findFirstToken(IDENT);
-        return ident != null ? ident.getText() : null;
     }
 
     private static int countStatements(DetailAST slist) {

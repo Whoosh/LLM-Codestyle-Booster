@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TestOnlyDelegateCheckTest {
 
-    private static final int EXPECTED_VIOLATIONS = 6;
+    private static final int EXPECTED_VIOLATIONS = 7;
     private static final int MIN_MSG_LENGTH = 10;
     private static final String INVALID_FILE = "quality/invalid/TestOnlyDelegateInvalid.java";
     private static final String VALID_FILE = "quality/valid/TestOnlyDelegateValid.java";

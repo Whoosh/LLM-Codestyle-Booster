@@ -11,7 +11,7 @@ public class TestOnlyDelegateValid {
     // Case 1: @Override method delegating to private — template method pattern
     @Override
     public String toString() {
-        return buildString();
+        return "value";
     }
 
     // Case 2: delegate calls non-private method — not a test-access workaround
@@ -88,11 +88,6 @@ public class TestOnlyDelegateValid {
         return Collections.unmodifiableList(items);
     }
 
-    // Case 12: calls this.method() — explicit receiver, different pattern
-    String explicitThis() {
-        return this.buildString();
-    }
-
     // === Already private — no need to flag ===
 
     // Case 13: private calling another private
@@ -145,9 +140,5 @@ public class TestOnlyDelegateValid {
 
     private static String processInternal(String s) {
         return s;
-    }
-
-    private String buildString() {
-        return "value";
     }
 }

@@ -109,22 +109,6 @@ public final class AstQueryUtil {
      * or its MODIFIERS child contains both {@code LITERAL_STATIC} and {@code FINAL}.
      */
     public static boolean isEffectivelyStaticFinal(DetailAST variableDef, boolean insideInterface) {
-        if (insideInterface) {
-            return true;
-        }
-        DetailAST modifiers = variableDef.findFirstToken(MODIFIERS);
-        if (modifiers == null) {
-            return false;
-        }
-        boolean hasStatic = false;
-        boolean hasFinal = false;
-        for (DetailAST mod = modifiers.getFirstChild(); mod != null; mod = mod.getNextSibling()) {
-            if (mod.getType() == LITERAL_STATIC) {
-                hasStatic = true;
-            } else if (mod.getType() == FINAL) {
-                hasFinal = true;
-            }
-        }
-        return hasStatic && hasFinal;
+        return insideInterface || hasModifier(variableDef, LITERAL_STATIC) && hasModifier(variableDef, FINAL);
     }
 }

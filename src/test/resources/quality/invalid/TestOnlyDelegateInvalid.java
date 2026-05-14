@@ -36,6 +36,15 @@ public class TestOnlyDelegateInvalid {
         return processInternal(a);
     }
 
+    // Case 7: explicit this.foo() delegate — semantically identical to bare foo()
+    String thisQualifiedDelegate() {
+        return this.privateThing();
+    }
+
+    private String privateThing() {
+        return "x";
+    }
+
     private static Map<String, String> buildProblems(String text) {
         return Map.of();
     }

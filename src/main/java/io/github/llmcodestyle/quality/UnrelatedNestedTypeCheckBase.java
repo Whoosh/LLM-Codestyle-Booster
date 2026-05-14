@@ -11,15 +11,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Shared heuristic for {@link UnrelatedNestedRecordCheck} and {@link UnrelatedNestedEnumCheck}:
- * given a nested {@code record} or {@code enum}, collect the names of fields and methods on the
- * immediately enclosing type, then walk the nested type's body for identifier references
- * matching any of those names. If none are found, the nested type is flagged as unrelated and
- * should be extracted to a dedicated package (pojos / enums).
+ * Shared heuristic for the four nested-type checks
+ * ({@link io.github.llmcodestyle.quality.checks.UnrelatedNestedRecordCheck},
+ * {@link io.github.llmcodestyle.quality.checks.UnrelatedNestedEnumCheck},
+ * {@link io.github.llmcodestyle.quality.checks.UnrelatedNestedClassCheck},
+ * {@link io.github.llmcodestyle.quality.checks.UnrelatedNestedInterfaceCheck}):
+ * given a nested type, collect the names of fields and methods on the immediately enclosing
+ * type, then walk the nested type's body for identifier references matching any of those
+ * names. If none are found, the nested type is flagged as unrelated and should be extracted
+ * to a top-level type (or a dedicated package for pojos / enums).
  *
- * <p>Subclasses supply the target token type ({@code RECORD_DEF} or {@code ENUM_DEF}), the
- * violation message key, and a way to collect the nested type's own declared names so that
- * internal self-references are not mistaken for references to the enclosing type.
+ * <p>Subclasses supply the target token type ({@code RECORD_DEF}, {@code ENUM_DEF},
+ * {@code CLASS_DEF}, or {@code INTERFACE_DEF}), the violation message key, and a way to
+ * collect the nested type's own declared names so that internal self-references are not
+ * mistaken for references to the enclosing type.
  */
 public abstract class UnrelatedNestedTypeCheckBase extends AbstractCheck {
 

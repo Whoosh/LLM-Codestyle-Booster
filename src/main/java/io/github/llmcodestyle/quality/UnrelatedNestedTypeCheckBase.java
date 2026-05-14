@@ -21,7 +21,7 @@ import java.util.Set;
  * violation message key, and a way to collect the nested type's own declared names so that
  * internal self-references are not mistaken for references to the enclosing type.
  */
-abstract class UnrelatedNestedTypeCheckBase extends AbstractCheck {
+public abstract class UnrelatedNestedTypeCheckBase extends AbstractCheck {
 
     private static final Set<Integer> DECL_NAME_TOKENS = Set.of(VARIABLE_DEF, METHOD_DEF, PARAMETER_DEF);
     private static final Set<Integer> DECLARATION_PARENT_TYPES = Set.of(

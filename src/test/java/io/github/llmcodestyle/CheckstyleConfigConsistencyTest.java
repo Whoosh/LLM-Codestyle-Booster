@@ -10,6 +10,7 @@ import org.junit.jupiter.api.io.TempDir;
 import io.github.llmcodestyle.forbidden.ForbidAssertKeywordCheck;
 import io.github.llmcodestyle.layout.BlankLineAfterCommentCheck;
 import io.github.llmcodestyle.layout.UnnecessaryLineWrapCheck;
+import io.github.llmcodestyle.utils.TestAuditListener;
 import jakarta.annotation.Nullable;
 
 import java.net.URL;

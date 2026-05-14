@@ -5,6 +5,7 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.TreeWalker;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+import io.github.llmcodestyle.utils.TestAuditListener;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -73,13 +74,13 @@ class PingPongInvariantTest {
      */
     private static final Map<String, Set<String>> FIXTURE_CHECK_EXCEPTIONS = Map.of(
         "TopLevelRecordInPojosPackageCustomSuffix.java",
-            Set.of("io.github.llmcodestyle.quality.TopLevelRecordInPojosPackageCheck"),
+            Set.of("io.github.llmcodestyle.quality.checks.TopLevelRecordInPojosPackageCheck"),
         "TopLevelEnumInEnumsPackageCustomSuffix.java",
-            Set.of("io.github.llmcodestyle.quality.TopLevelEnumInEnumsPackageCheck"),
+            Set.of("io.github.llmcodestyle.quality.checks.TopLevelEnumInEnumsPackageCheck"),
         "UnrelatedNestedEnumTopLevel.java",
-            Set.of("io.github.llmcodestyle.quality.TopLevelEnumInEnumsPackageCheck"),
+            Set.of("io.github.llmcodestyle.quality.checks.TopLevelEnumInEnumsPackageCheck"),
         "UnrelatedNestedRecordTopLevel.java",
-            Set.of("io.github.llmcodestyle.quality.TopLevelRecordInPojosPackageCheck"));
+            Set.of("io.github.llmcodestyle.quality.checks.TopLevelRecordInPojosPackageCheck"));
 
     /**
      * Checks that fire only in main scope; filtered out for test-scope fixtures.
@@ -90,33 +91,35 @@ class PingPongInvariantTest {
      * Checks that fire only in test scope; filtered out for main-scope fixtures.
      */
     private static final Set<String> TEST_ONLY = Set.of(
-        "io.github.llmcodestyle.quality.TestClassNamingCheck",
-        "io.github.llmcodestyle.quality.TestMethodNameCheck",
-        "io.github.llmcodestyle.quality.LongTestLiteralCheck");
+        "io.github.llmcodestyle.quality.checks.TestClassNamingCheck",
+        "io.github.llmcodestyle.quality.checks.TestMethodNameCheck",
+        "io.github.llmcodestyle.quality.checks.LongTestLiteralCheck");
 
     /**
      * Checks that fundamentally cannot be tested via single-file fixtures. Each excluded
      * check is still active in production via {@code mvn verify -Pself-check}.
      */
     private static final Map<String, String> EXCLUDED_FROM_MATRIX = Map.ofEntries(
-        Map.entry("io.github.llmcodestyle.quality.PublicMethodTestCoverageCheck",
+        Map.entry("io.github.llmcodestyle.quality.checks.PublicMethodTestCoverageCheck",
             "Requires test files to exist on the filesystem."),
-        Map.entry("io.github.llmcodestyle.quality.DuplicateMethodBodyCheck",
+        Map.entry("io.github.llmcodestyle.quality.checks.DuplicateMethodBodyCheck",
             "Cross-file structural similarity — fixtures intentionally have similar scenarios."),
-        Map.entry("io.github.llmcodestyle.quality.UnusedPrivateMembersCheck",
+        Map.entry("io.github.llmcodestyle.quality.checks.UnusedPrivateMembersCheck",
             "Fixtures contain private members as test data."),
-        Map.entry("io.github.llmcodestyle.quality.MethodMayBeStaticCheck",
+        Map.entry("io.github.llmcodestyle.quality.checks.MethodMayBeStaticCheck",
             "Fixtures have minimal instance methods that legitimately don't reference this/super."),
-        Map.entry("io.github.llmcodestyle.quality.TestOnlyDelegateCheck",
+        Map.entry("io.github.llmcodestyle.quality.checks.TestOnlyDelegateCheck",
             "Delegate detection requires call sites that exist in test code."),
-        Map.entry("io.github.llmcodestyle.quality.UnrelatedNestedClassCheck",
+        Map.entry("io.github.llmcodestyle.quality.checks.UnrelatedNestedClassCheck",
             "Fixtures use nested types as test scaffolding."),
-        Map.entry("io.github.llmcodestyle.quality.UnrelatedNestedEnumCheck",
+        Map.entry("io.github.llmcodestyle.quality.checks.UnrelatedNestedEnumCheck",
             "Same as UnrelatedNestedClassCheck."),
-        Map.entry("io.github.llmcodestyle.quality.UnrelatedNestedInterfaceCheck",
+        Map.entry("io.github.llmcodestyle.quality.checks.UnrelatedNestedInterfaceCheck",
             "Same as UnrelatedNestedClassCheck."),
-        Map.entry("io.github.llmcodestyle.quality.UnrelatedNestedRecordCheck",
+        Map.entry("io.github.llmcodestyle.quality.checks.UnrelatedNestedRecordCheck",
             "Same as UnrelatedNestedClassCheck."),
+        Map.entry("io.github.llmcodestyle.quality.checks.PackageGroupingByClassSuffixCheck",
+            "Operates on directory-level class layout; fixture directories intentionally mix many *Valid / *Killer suffixes by design."),
         Map.entry("io.github.llmcodestyle.simplify.StaticImportCandidateCheck",
             "Suggestion-only check (not a transformation)."));
 
@@ -130,7 +133,7 @@ class PingPongInvariantTest {
             Map.of("minChainLength", "4"),
         "io.github.llmcodestyle.layout.CompactableParameterListCheck",
             Map.of("maxLineLength", "180"),
-        "io.github.llmcodestyle.quality.LongTestLiteralCheck",
+        "io.github.llmcodestyle.quality.checks.LongTestLiteralCheck",
             Map.of("maxLength", "80"));
 
     enum FixtureScope {

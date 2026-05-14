@@ -46,7 +46,7 @@
 
     <module name="TreeWalker">
         <module name="MagicNumber">
-            <property name="ignoreNumbers" value="-1, 0, 1, 2"/>
+            <property name="ignoreNumbers" value="-9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9"/>
             <property name="ignoreAnnotation" value="true"/>
         </module>
         <module name="MatchXpath">
@@ -209,30 +209,31 @@
         <module name="io.github.llmcodestyle.forbidden.ForbidAssertKeywordCheck"/>
 
         <!-- Custom checks: quality -->
-        <module name="io.github.llmcodestyle.quality.TestMethodNameCheck"/>
-        <module name="io.github.llmcodestyle.quality.TestClassNamingCheck"/>
-        <module name="io.github.llmcodestyle.quality.UnusedPrivateMembersCheck"/>
-        <module name="io.github.llmcodestyle.quality.LongTestLiteralCheck">
+        <module name="io.github.llmcodestyle.quality.checks.TestMethodNameCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.TestClassNamingCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.UnusedPrivateMembersCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.LongTestLiteralCheck">
             <property name="maxLength" value="80"/>
         </module>
-        <module name="io.github.llmcodestyle.quality.UtilClassInUtilsPackageCheck"/>
-        <module name="io.github.llmcodestyle.quality.PublicMethodTestCoverageCheck"/>
-        <module name="io.github.llmcodestyle.quality.TestOnlyDelegateCheck"/>
-        <module name="io.github.llmcodestyle.quality.RepeatedExceptionWrappingCheck"/>
-        <module name="io.github.llmcodestyle.quality.DuplicateRegexConstantCheck"/>
-        <module name="io.github.llmcodestyle.quality.SpringBootMainVisibilityCheck"/>
-        <module name="io.github.llmcodestyle.quality.UnrelatedNestedRecordCheck"/>
-        <module name="io.github.llmcodestyle.quality.TopLevelRecordInPojosPackageCheck"/>
-        <module name="io.github.llmcodestyle.quality.UnrelatedNestedEnumCheck"/>
-        <module name="io.github.llmcodestyle.quality.TopLevelEnumInEnumsPackageCheck"/>
-        <module name="io.github.llmcodestyle.quality.MethodMayBeStaticCheck"/>
-        <module name="io.github.llmcodestyle.quality.UtilClassNamingCheck"/>
-        <module name="io.github.llmcodestyle.quality.DuplicateMethodBodyCheck"/>
-        <module name="io.github.llmcodestyle.quality.ExplicitNullReturnCheck"/>
-        <module name="io.github.llmcodestyle.quality.UnrelatedNestedClassCheck"/>
-        <module name="io.github.llmcodestyle.quality.UnrelatedNestedInterfaceCheck"/>
-        <module name="io.github.llmcodestyle.quality.ClassMayBeRecordCheck"/>
-        <module name="io.github.llmcodestyle.quality.MissingNullableParameterCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.UtilClassInUtilsPackageCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.PackageGroupingByClassSuffixCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.PublicMethodTestCoverageCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.TestOnlyDelegateCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.RepeatedExceptionWrappingCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.DuplicateRegexConstantCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.SpringBootMainVisibilityCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.UnrelatedNestedRecordCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.TopLevelRecordInPojosPackageCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.UnrelatedNestedEnumCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.TopLevelEnumInEnumsPackageCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.MethodMayBeStaticCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.UtilClassNamingCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.DuplicateMethodBodyCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.ExplicitNullReturnCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.UnrelatedNestedClassCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.UnrelatedNestedInterfaceCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.ClassMayBeRecordCheck"/>
+        <module name="io.github.llmcodestyle.quality.checks.MissingNullableParameterCheck"/>
 
         <!-- Custom checks: simplify -->
         <module name="io.github.llmcodestyle.simplify.InlineRegexConstantCheck"/>

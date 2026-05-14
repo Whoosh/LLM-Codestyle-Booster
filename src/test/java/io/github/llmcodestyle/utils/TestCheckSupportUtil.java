@@ -1,7 +1,5 @@
 package io.github.llmcodestyle.utils;
 
-import io.github.llmcodestyle.TestAuditListener;
-
 import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.TreeWalker;

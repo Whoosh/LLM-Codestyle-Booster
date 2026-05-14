@@ -58,28 +58,29 @@ class TokenArraySanityTest {
 
     @Test
     void qualityChecksReturnValidTokenArrays() {
-        verifyTokenArrays(new io.github.llmcodestyle.quality.ClassMayBeRecordCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.DuplicateMethodBodyCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.DuplicateRegexConstantCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.ExplicitNullReturnCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.LongTestLiteralCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.MethodMayBeStaticCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.MissingNullableParameterCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.PublicMethodTestCoverageCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.RepeatedExceptionWrappingCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.SpringBootMainVisibilityCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.TestClassNamingCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.TestMethodNameCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.TestOnlyDelegateCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.TopLevelEnumInEnumsPackageCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.TopLevelRecordInPojosPackageCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.UnrelatedNestedClassCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.UnrelatedNestedEnumCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.UnrelatedNestedInterfaceCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.UnrelatedNestedRecordCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.UnusedPrivateMembersCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.UtilClassInUtilsPackageCheck());
-        verifyTokenArrays(new io.github.llmcodestyle.quality.UtilClassNamingCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.ClassMayBeRecordCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.DuplicateMethodBodyCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.DuplicateRegexConstantCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.ExplicitNullReturnCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.LongTestLiteralCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.MethodMayBeStaticCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.MissingNullableParameterCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.PackageGroupingByClassSuffixCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.PublicMethodTestCoverageCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.RepeatedExceptionWrappingCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.SpringBootMainVisibilityCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.TestClassNamingCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.TestMethodNameCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.TestOnlyDelegateCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.TopLevelEnumInEnumsPackageCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.TopLevelRecordInPojosPackageCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.UnrelatedNestedClassCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.UnrelatedNestedEnumCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.UnrelatedNestedInterfaceCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.UnrelatedNestedRecordCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.UnusedPrivateMembersCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.UtilClassInUtilsPackageCheck());
+        verifyTokenArrays(new io.github.llmcodestyle.quality.checks.UtilClassNamingCheck());
     }
 
     private static void verifyTokenArrays(AbstractCheck check) {

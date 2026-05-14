@@ -12,8 +12,8 @@ import java.util.Set;
 
 /**
  * Helpers that decide whether a method body depends on instance state of its enclosing type.
- * Shared by {@link io.github.llmcodestyle.quality.MethodMayBeStaticCheck may-be-static detection}
- * and {@link io.github.llmcodestyle.quality.DuplicateMethodBodyCheck duplicate-extractable-to-util detection}.
+ * Shared by {@link io.github.llmcodestyle.quality.checks.MethodMayBeStaticCheck may-be-static detection}
+ * and {@link io.github.llmcodestyle.quality.checks.DuplicateMethodBodyCheck duplicate-extractable-to-util detection}.
  *
  * <p>The heuristic intentionally errs on the side of under-flagging:
  * <ul>

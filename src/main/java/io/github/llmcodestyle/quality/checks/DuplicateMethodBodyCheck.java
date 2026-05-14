@@ -1,0 +1,262 @@
+package io.github.llmcodestyle.quality.checks;
+
+import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.pojos.DuplicateMethodOccurrence;
+
+import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static com.puppycrawl.tools.checkstyle.utils.TokenUtil.*;
+import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
+import static io.github.llmcodestyle.utils.AstInstanceStateUtil.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
+import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Detects methods with structurally identical bodies after normalizing local variable
+ * and parameter names. Catches duplicates that CPD and PMD miss when only the identifier
+ * names differ — e.g. {@code checkTypeNode(DetailAST typeNode)} and
+ * {@code checkBorNode(DetailAST bor)}.
+ *
+ * <p>Detection accumulates across all files in a single Checkstyle run (TreeWalker reuses
+ * the check instance), so cross-class duplicates surface during {@code mvn verify}.
+ *
+ * <p>The check is deliberately conservative:
+ * <ul>
+ *   <li>abstract methods, constructors, compact constructors — skipped (no body / contextual wiring)</li>
+ *   <li>{@code @Override}-annotated methods — skipped (interface/contract-driven)</li>
+ *   <li>bodies with more than {@code maxBodyNodes} AST nodes — skipped (asymptotic safety)</li>
+ *   <li>bodies that are trivial by both measures — skipped. A body is trivial when it has
+ *       fewer than {@code minStatements} top-level statements <em>and</em> fewer than
+ *       {@code minBodyNodes} total AST nodes. This AND (rather than OR) keeps single
+ *       top-level {@code try}/{@code switch}/{@code for}/{@code while} statements with
+ *       non-trivial nested bodies in scope — e.g. a {@code loadResource(String)} helper
+ *       whose entire body is one try-with-resources is still compared across files.</li>
+ * </ul>
+ *
+ * <p>Normalization:
+ * <ul>
+ *   <li>All parameter and local variable names, in declaration order, are mapped to positional
+ *       placeholders ({@code $n0}, {@code $n1}, ...).</li>
+ *   <li>Literal values (strings, numbers, booleans) are preserved verbatim — differing literals
+ *       yield different hashes.</li>
+ *   <li>Method names, type names, and field references are preserved verbatim — differing calls
+ *       yield different hashes.</li>
+ *   <li>Operators and structural tokens are emitted by token type name.</li>
+ * </ul>
+ */
+public class DuplicateMethodBodyCheck extends AbstractCheck {
+
+    /**
+     * Violation message key: at least one side references the enclosing instance state,
+     * so the duplication must be resolved in place.
+     */
+    static final String MSG_KEY = "duplicate.method.body";
+
+    /**
+     * Violation message key: both sides are independent of any instance state, so the
+     * duplication can be resolved by extracting a shared utility method.
+     */
+    static final String MSG_KEY_EXTRACTABLE = "duplicate.method.body.extractable";
+    private static final int[] TOKENS = {METHOD_DEF};
+
+    private static final int DEFAULT_MIN_STATEMENTS = 2;
+    private static final int DEFAULT_MIN_BODY_NODES = 30;
+    private static final int DEFAULT_MAX_BODY_NODES = 400;
+
+    private static final Set<Integer> LITERAL_TOKENS = Set.of(
+        STRING_LITERAL,
+        NUM_INT,
+        NUM_LONG,
+        NUM_FLOAT,
+        NUM_DOUBLE,
+        CHAR_LITERAL,
+        LITERAL_TRUE,
+        LITERAL_FALSE,
+        LITERAL_NULL,
+        TEXT_BLOCK_CONTENT);
+
+    private static final Set<Integer> NAMED_DECL_TOKENS = Set.of(VARIABLE_DEF, PARAMETER_DEF, RESOURCE);
+
+    private int minStatements = DEFAULT_MIN_STATEMENTS;
+    private int minBodyNodes = DEFAULT_MIN_BODY_NODES;
+    private int maxBodyNodes = DEFAULT_MAX_BODY_NODES;
+
+    private final Map<String, DuplicateMethodOccurrence> seenBodies = new HashMap<>();
+
+    /**
+     * Minimum number of top-level statements in the body for a method to be considered.
+     * Evaluated in conjunction with {@link #setMinBodyNodes(int)}: a method is skipped as
+     * trivial only if <em>both</em> its top-level statement count is below this threshold
+     * <em>and</em> its total AST-node count is below {@code minBodyNodes}. This lets single
+     * top-level {@code try} / {@code switch} / {@code for} statements with a non-trivial
+     * nested body still be considered.
+     */
+    public void setMinStatements(int minStatements) {
+        this.minStatements = minStatements;
+    }
+
+    /**
+     * Minimum total AST node count below which a single-statement method is considered
+     * trivial (getters, delegates, one-line returns). Works in AND with {@link
+     * #setMinStatements(int)} — see its javadoc.
+     */
+    public void setMinBodyNodes(int minBodyNodes) {
+        this.minBodyNodes = minBodyNodes;
+    }
+
+    /**
+     * Maximum number of AST nodes in a body above which the method is ignored
+     * (asymptotic safety cap).
+     */
+    public void setMaxBodyNodes(int maxBodyNodes) {
+        this.maxBodyNodes = maxBodyNodes;
+    }
+
+    @Override
+    public int[] getDefaultTokens() {
+        return TOKENS.clone();
+    }
+
+    @Override
+    public int[] getAcceptableTokens() {
+        return TOKENS.clone();
+    }
+
+    @Override
+    public int[] getRequiredTokens() {
+        return TOKENS.clone();
+    }
+
+    @Override
+    public void visitToken(DetailAST methodDef) {
+        if (hasAnnotationNamed(methodDef, "Override")) {
+            return;
+        }
+        DetailAST slist = methodDef.findFirstToken(SLIST);
+        if (slist == null) {
+            return;
+        }
+        int bodyNodes = countNodes(slist);
+        if (bodyNodes > maxBodyNodes || collectStatements(slist).size() < minStatements && bodyNodes < minBodyNodes) {
+            return;
+        }
+
+        String normalized = normalize(methodDef, slist);
+        String methodName = extractName(methodDef);
+        String className = extractEnclosingClassName(methodDef);
+        boolean stateless = isStateless(methodDef, slist);
+
+        DuplicateMethodOccurrence previous = seenBodies.get(normalized);
+        if (previous != null) {
+            log(methodDef, stateless && previous.stateless() ? MSG_KEY_EXTRACTABLE : MSG_KEY, methodName, previous.methodName(), previous.className());
+        } else {
+            seenBodies.put(normalized, new DuplicateMethodOccurrence(className, methodName, stateless));
+        }
+    }
+
+    private static boolean isStateless(DetailAST methodDef, DetailAST slist) {
+        if (hasModifier(methodDef, LITERAL_STATIC)) {
+            return true;
+        }
+        DetailAST typeDef = findEnclosingType(methodDef);
+        return typeDef == null || !referencesInstanceState(slist, collectScope(typeDef));
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        seenBodies.clear();
+    }
+
+    private static String extractName(DetailAST methodDef) {
+        DetailAST ident = methodDef.findFirstToken(IDENT);
+        return ident != null ? ident.getText() : "<anon>";
+    }
+
+    private static String extractEnclosingClassName(DetailAST methodDef) {
+        DetailAST typeDef = findEnclosingType(methodDef);
+        if (typeDef != null) {
+            DetailAST ident = typeDef.findFirstToken(IDENT);
+            if (ident != null) {
+                return ident.getText();
+            }
+        }
+        return "<unknown>";
+    }
+
+    private static int countNodes(DetailAST node) {
+        int count = 1;
+        for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
+            count += countNodes(child);
+        }
+        return count;
+    }
+
+    private static String normalize(DetailAST methodDef, DetailAST slist) {
+        Map<String, String> nameMap = new LinkedHashMap<>();
+        collectParamNames(methodDef, nameMap);
+        collectLocalNames(slist, nameMap, new HashSet<>());
+
+        StringBuilder sb = new StringBuilder();
+        serialize(slist, sb, nameMap);
+        return sb.toString();
+    }
+
+    private static void collectParamNames(DetailAST methodDef, Map<String, String> nameMap) {
+        DetailAST parameters = methodDef.findFirstToken(PARAMETERS);
+        if (parameters == null) {
+            return;
+        }
+        for (DetailAST child = parameters.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child.getType() == PARAMETER_DEF) {
+                DetailAST ident = child.findFirstToken(IDENT);
+                if (ident != null) {
+                    assignIfAbsent(nameMap, ident.getText());
+                }
+            }
+        }
+    }
+
+    private static void collectLocalNames(DetailAST node, Map<String, String> nameMap, Set<DetailAST> visited) {
+        if (!visited.add(node)) {
+            return;
+        }
+        if (NAMED_DECL_TOKENS.contains(node.getType())) {
+            DetailAST ident = node.findFirstToken(IDENT);
+            if (ident != null) {
+                assignIfAbsent(nameMap, ident.getText());
+            }
+        }
+        for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
+            collectLocalNames(child, nameMap, visited);
+        }
+    }
+
+    private static void assignIfAbsent(Map<String, String> nameMap, String name) {
+        nameMap.computeIfAbsent(name, k -> "$n" + nameMap.size());
+    }
+
+    private static void serialize(DetailAST node, StringBuilder sb, Map<String, String> nameMap) {
+        int type = node.getType();
+        if (type == IDENT) {
+            String replacement = nameMap.get(node.getText());
+            sb.append(replacement != null ? replacement : node.getText());
+        } else if (LITERAL_TOKENS.contains(type)) {
+            sb.append(node.getText());
+        } else {
+            sb.append(getTokenName(type));
+        }
+        sb.append('|');
+        for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
+            serialize(child, sb, nameMap);
+        }
+        sb.append('/');
+    }
+}

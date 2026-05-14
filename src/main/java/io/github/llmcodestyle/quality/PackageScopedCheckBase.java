@@ -12,7 +12,7 @@ import static io.github.llmcodestyle.utils.AstUtil.*;
  * {@code PACKAGE_DEF} is added automatically and handled by this class. The current package
  * name is exposed via {@link #currentPackage()}.
  */
-abstract class PackageScopedCheckBase extends AbstractCheck {
+public abstract class PackageScopedCheckBase extends AbstractCheck {
 
     private String pkgName = "";
 

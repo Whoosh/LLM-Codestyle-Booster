@@ -5,6 +5,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstIfUtil.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
 import java.util.List;
@@ -91,15 +92,10 @@ public class BooleanFromConditionCheck extends AbstractCheck {
     }
 
     private static boolean isFlipAssignmentIf(DetailAST stmt, String varName, int expectedLiteralType) {
-        if (stmt.getType() != LITERAL_IF || stmt.findFirstToken(LITERAL_ELSE) != null) {
+        if (stmt.getType() != LITERAL_IF || hasElseClause(stmt)) {
             return false;
         }
-        return matchesLiteralAssignment(extractSingleBodyStatement(stmt), varName, expectedLiteralType);
-    }
-
-    private static DetailAST extractSingleBodyStatement(DetailAST ifAst) {
-        DetailAST rparen = ifAst.findFirstToken(RPAREN);
-        return rparen == null ? null : unwrapSingleStatementBody(rparen.getNextSibling());
+        return matchesLiteralAssignment(unwrapSingleStatementBody(extractThenBody(stmt)), varName, expectedLiteralType);
     }
 
     @Nullable

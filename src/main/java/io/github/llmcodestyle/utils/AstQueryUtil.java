@@ -104,11 +104,43 @@ public final class AstQueryUtil {
     }
 
     /**
+     * Returns {@code true} if {@code variableDef} carries both explicit {@code static} and
+     * {@code final} modifiers. For fields inside an {@code interface} (where those modifiers
+     * are implicit), use {@link #isEffectivelyStaticFinal(DetailAST, boolean)} instead.
+     */
+    public static boolean isStaticFinal(DetailAST variableDef) {
+        return hasModifier(variableDef, LITERAL_STATIC) && hasModifier(variableDef, FINAL);
+    }
+
+    /**
      * Returns {@code true} if {@code variableDef} is effectively {@code static final}: either
      * {@code insideInterface} is {@code true} (interface fields are implicitly static final),
      * or its MODIFIERS child contains both {@code LITERAL_STATIC} and {@code FINAL}.
      */
     public static boolean isEffectivelyStaticFinal(DetailAST variableDef, boolean insideInterface) {
-        return insideInterface || hasModifier(variableDef, LITERAL_STATIC) && hasModifier(variableDef, FINAL);
+        return insideInterface || isStaticFinal(variableDef);
+    }
+
+    /**
+     * Returns the simple name of the type lexically enclosing {@code node}. Returns
+     * {@code defaultName} when {@code node} is not inside any type declaration or when
+     * the enclosing declaration has no resolvable {@code IDENT} child.
+     */
+    public static String extractEnclosingTypeName(DetailAST node, String defaultName) {
+        DetailAST typeDef = findEnclosingType(node);
+        if (typeDef == null) {
+            return defaultName;
+        }
+        DetailAST ident = typeDef.findFirstToken(IDENT);
+        return ident != null ? ident.getText() : defaultName;
+    }
+
+    /**
+     * Returns the text of the first {@code IDENT} child of {@code def}, or {@code defaultName}
+     * if no such child exists. Use for METHOD_DEF / CTOR_DEF / RECORD_DEF / CLASS_DEF etc.
+     */
+    public static String extractIdentText(DetailAST def, String defaultName) {
+        DetailAST ident = def.findFirstToken(IDENT);
+        return ident != null ? ident.getText() : defaultName;
     }
 }

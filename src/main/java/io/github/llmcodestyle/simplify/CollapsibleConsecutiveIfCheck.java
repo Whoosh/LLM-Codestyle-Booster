@@ -5,6 +5,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstIfUtil.*;
 import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
@@ -75,14 +76,10 @@ public class CollapsibleConsecutiveIfCheck extends AbstractCheck {
      */
     @Nullable
     private static DetailAST extractTerminatingBody(DetailAST stmt) {
-        if (stmt.getType() != LITERAL_IF || stmt.findFirstToken(LITERAL_ELSE) != null || isElseIf(stmt)) {
+        if (stmt.getType() != LITERAL_IF || hasElseClause(stmt) || isElseIf(stmt)) {
             return null;
         }
-        DetailAST rparen = stmt.findFirstToken(RPAREN);
-        if (rparen == null) {
-            return null;
-        }
-        DetailAST bodyNode = rparen.getNextSibling();
+        DetailAST bodyNode = extractThenBody(stmt);
         if (bodyNode == null) {
             return null;
         }

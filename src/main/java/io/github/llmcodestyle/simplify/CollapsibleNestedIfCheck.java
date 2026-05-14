@@ -5,6 +5,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstIfUtil.*;
 import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
@@ -61,18 +62,10 @@ public class CollapsibleNestedIfCheck extends AbstractCheck {
         log(outerIf.getLineNo(), outerIf.getColumnNo(), MSG_KEY);
     }
 
-    private static boolean hasElseClause(DetailAST ifAst) {
-        return ifAst.findFirstToken(LITERAL_ELSE) != null;
-    }
-
     @Nullable
     private static DetailAST extractBlockBody(DetailAST ifAst) {
-        DetailAST rparen = ifAst.findFirstToken(RPAREN);
-        if (rparen == null) {
-            return null;
-        }
-        DetailAST after = rparen.getNextSibling();
-        return after != null && after.getType() == SLIST ? after : null;
+        DetailAST then = extractThenBody(ifAst);
+        return then != null && then.getType() == SLIST ? then : null;
     }
 
     @Nullable

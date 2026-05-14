@@ -2,9 +2,9 @@ package io.github.llmcodestyle.simplify;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstIfUtil.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
 import java.util.List;
@@ -66,12 +66,8 @@ public class CollapsibleGuardClauseCheck extends AbstractCheck {
         return parent != null && METHOD_LIKE_PARENTS.contains(parent.getType());
     }
 
-    private static boolean hasElseClause(DetailAST ifAst) {
-        return ifAst.findFirstToken(LITERAL_ELSE) != null;
-    }
-
     private static boolean isVoidReturnOnly(DetailAST guardIf) {
-        DetailAST body = extractIfBody(guardIf);
+        DetailAST body = extractThenBody(guardIf);
         if (body == null) {
             return false;
         }
@@ -87,19 +83,5 @@ public class CollapsibleGuardClauseCheck extends AbstractCheck {
         }
         DetailAST single = innerStmts.get(0);
         return single.getType() == LITERAL_RETURN && single.findFirstToken(EXPR) == null;
-    }
-
-    @Nullable
-    private static DetailAST extractIfBody(DetailAST ifAst) {
-        DetailAST rparen = ifAst.findFirstToken(RPAREN);
-        if (rparen == null) {
-            return null;
-        }
-        DetailAST body = rparen.getNextSibling();
-        while (body != null && body.getType() != SLIST && body.getType() != LITERAL_RETURN
-            && body.getType() != EXPR && body.getType() != LITERAL_THROW) {
-            body = body.getNextSibling();
-        }
-        return body;
     }
 }

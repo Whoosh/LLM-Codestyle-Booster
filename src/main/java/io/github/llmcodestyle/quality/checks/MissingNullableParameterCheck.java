@@ -16,6 +16,7 @@ import java.util.Set;
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
 import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
 
 /**
@@ -41,6 +42,7 @@ public class MissingNullableParameterCheck extends AbstractCheck {
 
     private static final int[] TOKENS = {METHOD_DEF, CTOR_DEF, METHOD_CALL};
     private static final String NULLABLE = "Nullable";
+    private static final String INIT_FALLBACK = "<init>";
     private static final Set<Integer> METHOD_DEF_TOKENS = Set.of(METHOD_DEF, CTOR_DEF);
     private static final Set<Integer> NULL_COMP_TOKENS = Set.of(EQUAL, NOT_EQUAL);
     private static final Set<Integer> SCOPE_BOUNDARY_TOKENS = Set.of(CLASS_DEF, RECORD_DEF, ENUM_DEF, INTERFACE_DEF, LAMBDA);
@@ -87,7 +89,7 @@ public class MissingNullableParameterCheck extends AbstractCheck {
         if (params == null || body == null) {
             return;
         }
-        String name = methodName(def);
+        String name = extractIdentText(def, INIT_FALLBACK);
         for (DetailAST p = params.getFirstChild(); p != null; p = p.getNextSibling()) {
             if (p.getType() != PARAMETER_DEF || hasAnyAnnotationNamed(p, NULLABLE)) {
                 continue;
@@ -167,7 +169,7 @@ public class MissingNullableParameterCheck extends AbstractCheck {
         if (params == null || body == null) {
             return;
         }
-        map.computeIfAbsent(methodName(child), k -> new ArrayList<>()).add(analyzeParams(params, body));
+        map.computeIfAbsent(extractIdentText(child, INIT_FALLBACK), k -> new ArrayList<>()).add(analyzeParams(params, body));
     }
 
     private static MethodParamInfo analyzeParams(DetailAST params, DetailAST body) {
@@ -267,11 +269,6 @@ public class MissingNullableParameterCheck extends AbstractCheck {
     // ---- Utility ----
     private static boolean isIdent(DetailAST node, String name) {
         return node.getType() == IDENT && name.equals(node.getText());
-    }
-
-    private static String methodName(DetailAST def) {
-        DetailAST ident = def.findFirstToken(IDENT);
-        return ident != null ? ident.getText() : "<init>";
     }
 
     private static List<Integer> nullLiteralArgIndices(DetailAST elist) {

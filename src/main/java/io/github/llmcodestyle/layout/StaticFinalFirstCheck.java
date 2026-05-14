@@ -4,6 +4,7 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
 
 /**
@@ -59,9 +60,5 @@ public class StaticFinalFirstCheck extends AbstractCheck {
             }
             child = child.getNextSibling();
         }
-    }
-
-    private static boolean isStaticFinal(DetailAST variableDef) {
-        return hasModifier(variableDef, LITERAL_STATIC) && hasModifier(variableDef, FINAL);
     }
 }

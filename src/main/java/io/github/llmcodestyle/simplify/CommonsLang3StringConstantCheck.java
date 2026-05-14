@@ -5,6 +5,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.Map;
@@ -76,7 +77,7 @@ public class CommonsLang3StringConstantCheck extends AbstractCheck {
 
     private static boolean isStaticFinalStringField(DetailAST varDef) {
         DetailAST parent = varDef.getParent();
-        if (parent == null || parent.getType() != OBJBLOCK || !hasModifier(varDef, LITERAL_STATIC) || !hasModifier(varDef, FINAL)) {
+        if (parent == null || parent.getType() != OBJBLOCK || !isStaticFinal(varDef)) {
             return false;
         }
         return "String".equals(extractTypeName(varDef));

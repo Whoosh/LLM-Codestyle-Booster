@@ -5,6 +5,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstIfUtil.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
 import java.util.List;
@@ -45,10 +46,10 @@ public class IfReturnBooleanLiteralCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST ifAst) {
-        if (ifAst.findFirstToken(LITERAL_ELSE) != null) {
+        if (hasElseClause(ifAst)) {
             return;
         }
-        int thenLiteralKind = singleReturnLiteralKind(extractIfBody(ifAst));
+        int thenLiteralKind = singleReturnLiteralKind(extractThenBody(ifAst));
         if (thenLiteralKind == 0) {
             return;
         }
@@ -60,11 +61,6 @@ public class IfReturnBooleanLiteralCheck extends AbstractCheck {
         if (tailLiteralKind != 0 && tailLiteralKind != thenLiteralKind) {
             log(ifAst.getLineNo(), ifAst.getColumnNo(), MSG_KEY);
         }
-    }
-
-    private static DetailAST extractIfBody(DetailAST ifAst) {
-        DetailAST rparen = ifAst.findFirstToken(RPAREN);
-        return rparen != null ? rparen.getNextSibling() : null;
     }
 
     @Nullable

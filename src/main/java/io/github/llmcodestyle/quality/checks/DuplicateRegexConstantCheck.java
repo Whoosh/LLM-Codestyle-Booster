@@ -73,8 +73,8 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
             return;
         }
 
-        String constName = extractConstName(ast);
-        String className = extractEnclosingClassName(ast);
+        String constName = extractIdentText(ast, UNKNOWN);
+        String className = extractEnclosingTypeName(ast, UNKNOWN);
 
         RegexConstantOccurrence prev = seenRegex.get(regexValue);
         if (prev != null) {
@@ -88,10 +88,6 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
     public void destroy() {
         super.destroy();
         seenRegex.clear();
-    }
-
-    private static boolean isStaticFinal(DetailAST variableDef) {
-        return hasModifier(variableDef, LITERAL_STATIC) && hasModifier(variableDef, FINAL);
     }
 
     @Nullable
@@ -133,25 +129,6 @@ public class DuplicateRegexConstantCheck extends AbstractCheck {
         DetailAST target = dot.getFirstChild();
         DetailAST method = dot.getLastChild();
         return target != null && PATTERN_TYPE.equals(target.getText()) && method != null && "compile".equals(method.getText());
-    }
-
-    private static String extractConstName(DetailAST variableDef) {
-        DetailAST ident = variableDef.findFirstToken(IDENT);
-        return ident != null ? ident.getText() : UNKNOWN;
-    }
-
-    private static String extractEnclosingClassName(DetailAST ast) {
-        DetailAST parent = ast.getParent();
-        while (parent != null) {
-            if (TYPE_DECL_TOKENS.contains(parent.getType())) {
-                DetailAST ident = parent.findFirstToken(IDENT);
-                if (ident != null) {
-                    return ident.getText();
-                }
-            }
-            parent = parent.getParent();
-        }
-        return UNKNOWN;
     }
 
 }

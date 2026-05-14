@@ -5,6 +5,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
 
@@ -77,7 +78,7 @@ public class TrivialSingleUsePrivateMethodCheck extends AbstractCheck {
             if (child.getType() != METHOD_DEF) {
                 continue;
             }
-            String name = methodName(child);
+            String name = extractIdentText(child, "");
             if (name.isEmpty()) {
                 continue;
             }
@@ -176,10 +177,5 @@ public class TrivialSingleUsePrivateMethodCheck extends AbstractCheck {
             }
         }
         return true;
-    }
-
-    private static String methodName(DetailAST methodDef) {
-        DetailAST ident = methodDef.findFirstToken(IDENT);
-        return ident != null ? ident.getText() : "";
     }
 }

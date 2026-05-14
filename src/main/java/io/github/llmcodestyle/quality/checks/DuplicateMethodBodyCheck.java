@@ -82,7 +82,7 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
         LITERAL_NULL,
         TEXT_BLOCK_CONTENT);
 
-    private static final Set<Integer> NAMED_DECL_TOKENS = Set.of(VARIABLE_DEF, PARAMETER_DEF, RESOURCE);
+    private static final Set<Integer> NAMED_DECL_TOKENS = Set.of(VARIABLE_DEF, PARAMETER_DEF, RESOURCE, PATTERN_VARIABLE_DEF);
 
     private int minStatements = DEFAULT_MIN_STATEMENTS;
     private int minBodyNodes = DEFAULT_MIN_BODY_NODES;
@@ -149,8 +149,8 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
         }
 
         String normalized = normalize(methodDef, slist);
-        String methodName = extractName(methodDef);
-        String className = extractEnclosingClassName(methodDef);
+        String methodName = extractIdentText(methodDef, "<anon>");
+        String className = extractEnclosingTypeName(methodDef, "<unknown>");
         boolean stateless = isStateless(methodDef, slist);
 
         DuplicateMethodOccurrence previous = seenBodies.get(normalized);
@@ -173,22 +173,6 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
     public void destroy() {
         super.destroy();
         seenBodies.clear();
-    }
-
-    private static String extractName(DetailAST methodDef) {
-        DetailAST ident = methodDef.findFirstToken(IDENT);
-        return ident != null ? ident.getText() : "<anon>";
-    }
-
-    private static String extractEnclosingClassName(DetailAST methodDef) {
-        DetailAST typeDef = findEnclosingType(methodDef);
-        if (typeDef != null) {
-            DetailAST ident = typeDef.findFirstToken(IDENT);
-            if (ident != null) {
-                return ident.getText();
-            }
-        }
-        return "<unknown>";
     }
 
     private static int countNodes(DetailAST node) {

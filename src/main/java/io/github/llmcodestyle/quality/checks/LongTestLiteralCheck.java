@@ -5,6 +5,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
 
 /**
  * Flags long string literals in test method bodies. Strings longer than {@code maxLength} (default 30) should be extracted to resources.
@@ -117,7 +118,7 @@ public class LongTestLiteralCheck extends AbstractCheck {
         if (methodCall == null || methodCall.getType() != METHOD_CALL) {
             return false;
         }
-        return isAssertOrFailMethod(extractSimpleMethodName(methodCall)) && node.equals(findLastExprIn(elist));
+        return isAssertOrFailMethod(extractMethodName(methodCall)) && node.equals(findLastExprIn(elist));
     }
 
     private static DetailAST findLastExprIn(DetailAST parent) {
@@ -134,16 +135,6 @@ public class LongTestLiteralCheck extends AbstractCheck {
             }
         }
         return exprs;
-    }
-
-    private static String extractSimpleMethodName(DetailAST methodCall) {
-        DetailAST dot = methodCall.findFirstToken(DOT);
-        if (dot != null) {
-            DetailAST last = dot.getLastChild();
-            return last != null ? last.getText() : "";
-        }
-        DetailAST ident = methodCall.findFirstToken(IDENT);
-        return ident != null ? ident.getText() : "";
     }
 
     private static boolean isAssertOrFailMethod(String name) {

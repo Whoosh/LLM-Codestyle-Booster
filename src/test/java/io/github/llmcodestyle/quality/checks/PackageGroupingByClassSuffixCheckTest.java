@@ -17,9 +17,10 @@ class PackageGroupingByClassSuffixCheckTest {
 
         assertEquals(1, violations.size(), "Expected single violation, got: " + format(violations));
         String message = violations.get(0).getMessage();
-        assertTrue(message.contains("AlphaCheck"), "Message must contain class name: " + message);
-        assertTrue(message.contains("Check"), "Message must contain suffix: " + message);
-        assertTrue(message.contains("checks"), "Message must contain pluralized subpackage: " + message);
+        assertTrue(message.contains("'AlphaCheck'"), "Message must quote class name: " + message);
+        assertTrue(message.contains("'Check'"), "Message must quote suffix: " + message);
+        assertTrue(message.contains("'checks'"), "Message must quote pluralized subpackage: " + message);
+        assertTrue(message.contains("4 sibling"), "Message must report 4 others (group of 5 includes self): " + message);
     }
 
     @Test
@@ -81,9 +82,10 @@ class PackageGroupingByClassSuffixCheckTest {
 
     @Test
     void setMinGroupSizeIsDirectlyInvocable() {
-        PackageGroupingByClassSuffixCheck check = new PackageGroupingByClassSuffixCheck();
-        check.setMinGroupSize(7);
-        assertDoesNotThrow(() -> check.setMinGroupSize(3));
+        // Direct setter coverage: Checkstyle wires this via bean introspection,
+        // so the property test does not produce a textual reference that
+        // PublicMethodTestCoverageCheck can see.
+        assertDoesNotThrow(() -> new PackageGroupingByClassSuffixCheck().setMinGroupSize(2));
     }
 
     @Test

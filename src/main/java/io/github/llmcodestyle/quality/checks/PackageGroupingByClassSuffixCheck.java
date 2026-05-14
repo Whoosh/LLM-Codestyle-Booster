@@ -16,10 +16,12 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Locale.*;
+import static java.util.logging.Level.*;
 
 /**
  * Flags top-level types whose suffix-group reaches a configurable size in a package that still
@@ -33,8 +35,11 @@ public class PackageGroupingByClassSuffixCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "package.grouping.class.suffix";
+
+    private static final Logger LOGGER = Logger.getLogger(PackageGroupingByClassSuffixCheck.class.getName());
     private static final int[] TOKENS = {CLASS_DEF, RECORD_DEF, ENUM_DEF, INTERFACE_DEF};
     private static final int DEFAULT_MIN_GROUP_SIZE = 5;
+    private static final int MIN_MEANINGFUL_SUFFIX_LENGTH = 2;
 
     private static final Set<String> POJO_NAME_SUFFIXES = Set.of("Dto", "DTO", "Pojo");
     private static final Set<Integer> POJO_AST_TOKENS = Set.of(RECORD_DEF, ENUM_DEF, INTERFACE_DEF);
@@ -43,6 +48,7 @@ public class PackageGroupingByClassSuffixCheck extends AbstractCheck {
     private static final Pattern TYPE_DECL_PATTERN = Pattern.compile("\\b(class|record|enum|interface)\\s+(\\w+)");
     private static final Pattern BLOCK_COMMENT = Pattern.compile("(?s)/\\*.*?\\*/");
     private static final Pattern LINE_COMMENT = Pattern.compile("(?m)//[^\n]*");
+    private static final Pattern TEXT_BLOCK = Pattern.compile("(?s)\"\"\".*?\"\"\"");
     private static final Pattern STRING_LITERAL = Pattern.compile("\"(?:[^\"\\\\]|\\\\.)*\"");
     private static final Pattern CAMEL_BOUNDARY = Pattern.compile("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])");
 
@@ -72,6 +78,11 @@ public class PackageGroupingByClassSuffixCheck extends AbstractCheck {
     }
 
     @Override
+    public void beginTree(DetailAST rootAST) {
+        dirGroupCache.clear();
+    }
+
+    @Override
     public void visitToken(DetailAST ast) {
         if (typeNestingDepth(ast) > 0) {
             return;
@@ -90,14 +101,14 @@ public class PackageGroupingByClassSuffixCheck extends AbstractCheck {
         }
         Map<String, Integer> groupCounts = dirGroupCache.computeIfAbsent(dir, PackageGroupingByClassSuffixCheck::analyzeDir);
         String suffix = lastCamelWord(myName);
-        if (suffix == null) {
+        if (suffix == null || suffix.length() < MIN_MEANINGFUL_SUFFIX_LENGTH) {
             return;
         }
         Integer myGroupSize = groupCounts.get(suffix);
         if (myGroupSize == null || myGroupSize < minGroupSize || sumOf(groupCounts) <= myGroupSize) {
             return;
         }
-        log(ident.getLineNo(), ident.getColumnNo(), MSG_KEY, myName, suffix, myGroupSize, pluralize(suffix));
+        log(ident.getLineNo(), ident.getColumnNo(), MSG_KEY, myName, suffix, myGroupSize - 1, pluralize(suffix));
     }
 
     @Nullable
@@ -125,7 +136,8 @@ public class PackageGroupingByClassSuffixCheck extends AbstractCheck {
                     groupCounts.merge(suffix, 1, Integer::sum);
                 }
             }
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            LOGGER.log(WARNING, e, () -> "Failed to enumerate package directory: " + dir);
             return Map.of();
         }
         return Map.copyOf(groupCounts);
@@ -155,7 +167,10 @@ public class PackageGroupingByClassSuffixCheck extends AbstractCheck {
     }
 
     private static String stripNonCode(String text) {
-        return STRING_LITERAL.matcher(LINE_COMMENT.matcher(BLOCK_COMMENT.matcher(text).replaceAll("")).replaceAll("")).replaceAll(STRIPPED_STRING_LITERAL);
+        String stripped = TEXT_BLOCK.matcher(text).replaceAll(STRIPPED_STRING_LITERAL);
+        stripped = BLOCK_COMMENT.matcher(stripped).replaceAll("");
+        stripped = LINE_COMMENT.matcher(stripped).replaceAll("");
+        return STRING_LITERAL.matcher(stripped).replaceAll(STRIPPED_STRING_LITERAL);
     }
 
     private static boolean isPojoKind(String kind) {

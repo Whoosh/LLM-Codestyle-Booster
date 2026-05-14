@@ -96,10 +96,12 @@ class PingPongInvariantTest {
         "io.github.llmcodestyle.quality.checks.LongTestLiteralCheck");
 
     /**
-     * Checks that fundamentally cannot be tested via single-file fixtures. Each excluded
-     * check is still active in production via {@code mvn verify -Pself-check}.
+     * Checks that fundamentally cannot be tested via single-file fixtures (cross-file
+     * structural similarity, fixtures-as-test-data, directory-level layout). Each entry
+     * here is still expected to be a fixed point on the production source tree and is
+     * enforced via {@link #productionSourceTreeIsPingPongFree()}.
      */
-    private static final Map<String, String> EXCLUDED_FROM_MATRIX = Map.ofEntries(
+    private static final Map<String, String> EXCLUDED_FROM_FIXTURE_MATRIX = Map.ofEntries(
         Map.entry("io.github.llmcodestyle.quality.checks.PublicMethodTestCoverageCheck",
             "Requires test files to exist on the filesystem."),
         Map.entry("io.github.llmcodestyle.quality.checks.DuplicateMethodBodyCheck",
@@ -122,6 +124,17 @@ class PingPongInvariantTest {
             "Operates on directory-level class layout; fixture directories intentionally mix many *Valid / *Killer suffixes by design."),
         Map.entry("io.github.llmcodestyle.simplify.StaticImportCandidateCheck",
             "Suggestion-only check (not a transformation)."));
+
+    /**
+     * Checks that cannot run during the production-tree scan. Smaller than the fixture
+     * matrix exclusion set: most checks excluded above MUST be a fixed point on the
+     * project's own source.
+     */
+    private static final Map<String, String> EXCLUDED_FROM_PROD_SCAN = Map.of(
+        "io.github.llmcodestyle.simplify.StaticImportCandidateCheck",
+            "Suggestion-only check (not a transformation).",
+        "io.github.llmcodestyle.quality.checks.PublicMethodTestCoverageCheck",
+            "Reads test files from the filesystem; covered by mvn verify -Pself-check.");
 
     /**
      * Per-check property overrides matching the bundled checkstyle.xml. Any check not listed here uses defaults.
@@ -177,7 +190,7 @@ class PingPongInvariantTest {
         Map<String, Map<String, String>> applicable = new HashMap<>();
         for (Class<?> check : checks) {
             String fqn = check.getName();
-            if (EXCLUDED_FROM_MATRIX.containsKey(fqn) || TEST_ONLY.contains(fqn)) {
+            if (EXCLUDED_FROM_PROD_SCAN.containsKey(fqn) || TEST_ONLY.contains(fqn)) {
                 continue;
             }
             applicable.put(fqn, CHECK_PROPS.getOrDefault(fqn, Map.of()));
@@ -198,7 +211,7 @@ class PingPongInvariantTest {
         Map<String, Map<String, String>> applicable = new HashMap<>();
         for (Class<?> check : allChecks) {
             String fqn = check.getName();
-            if (EXCLUDED_FROM_MATRIX.containsKey(fqn) || fixtureExceptions.contains(fqn) || scope.isExcluded(fqn)) {
+            if (EXCLUDED_FROM_FIXTURE_MATRIX.containsKey(fqn) || fixtureExceptions.contains(fqn) || scope.isExcluded(fqn)) {
                 continue;
             }
             applicable.put(fqn, CHECK_PROPS.getOrDefault(fqn, Map.of()));

@@ -48,12 +48,13 @@ public class IdenticalCatchBodyDifferentLiteralsValid {
     }
 
     // Two catches differing only in null vs a string — distinct LITERAL_NULL fingerprint.
+    @jakarta.annotation.Nullable
     String differentNullLiterals(String input) {
         try {
             return input.trim();
         } catch (NullPointerException e) {
             return null;
-        } catch (RuntimeException e) {
+        } catch (IllegalStateException e) {
             return "fallback";
         }
     }

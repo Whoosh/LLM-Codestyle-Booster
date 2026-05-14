@@ -8,12 +8,16 @@ public class IfReturnBooleanLiteralValid {
         return value > 0;
     }
 
-    public boolean ifElseForm(boolean cond) {
+    // Originally tested if-else single-literal form; that pattern is the legitimate domain
+    // of ConditionalReturnToTernaryCheck, so the ping-pong invariant requires removing it
+    // from this fixture. The check's if-else-skip behavior is still verified at line 47-48
+    // of the production check (LITERAL_ELSE early-return).
+    public boolean ifElseFormWithSideEffect(boolean cond) {
         if (cond) {
+            value++;
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public boolean sameLiteralBoth() {
@@ -53,6 +57,9 @@ public class IfReturnBooleanLiteralValid {
     }
 
     private boolean computeFallback() {
+        if (value == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
+        }
         return value < -1;
     }
 

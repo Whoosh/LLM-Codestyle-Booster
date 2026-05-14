@@ -25,7 +25,6 @@ public class RedundantConstantAliasValid {
     }
 
     public String localCopy() {
-        String localAlias = GREETING;
-        return localAlias;
+        return GREETING;
     }
 }

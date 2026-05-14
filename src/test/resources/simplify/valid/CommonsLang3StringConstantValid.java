@@ -13,8 +13,7 @@ public class CommonsLang3StringConstantValid {
 
     // Local variable, not a static final field — should not be flagged.
     public static String localEmpty() {
-        String empty = "";
-        return empty;
+        return "";
     }
 
     // Static final but not String — should not be flagged.
@@ -31,6 +30,10 @@ public class CommonsLang3StringConstantValid {
     private final String space = " ";
 
     public String describe() {
-        return space + LIMIT + SEPARATOR + NEWLINE_TWO + TAB;
+        return space + LIMIT + describeRest();
+    }
+
+    private String describeRest() {
+        return SEPARATOR + NEWLINE_TWO + TAB;
     }
 }

@@ -6,8 +6,13 @@ public class MapContainsKeyThenGetValid {
     }
     String lookupDirect(Map<String, String> map, String key) {
         if (map.containsKey(key)) {
-            System.out.println("found");
+            sink("found");
         }
         return "";
+    }
+    private void sink(Object x) {
+        if (x.hashCode() == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
+        }
     }
 }

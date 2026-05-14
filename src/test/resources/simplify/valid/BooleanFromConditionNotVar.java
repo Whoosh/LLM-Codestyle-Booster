@@ -1,13 +1,12 @@
 package com.example;
 
 // Tests booleanLiteralVarName: non-VARIABLE_DEF followed by if — should NOT be flagged
-@SuppressWarnings("unused")
 public class BooleanFromConditionNotVar {
     // Expression statement followed by if — not a boolean-from-condition pattern
     void notAVarDef(int x) {
-        System.out.println(x);
+        sink(x);
         if (x > 0) {
-            System.out.println("positive");
+            sink("positive");
         }
     }
 
@@ -17,13 +16,21 @@ public class BooleanFromConditionNotVar {
         if (x > 0) {
             count = 1;
         }
+        sink(count);
     }
 
     // Boolean without literal initializer
     void booleanNoLiteral(int x) {
         boolean result = x > 0;
+        sink(result);
         if (result) {
-            System.out.println("true");
+            sink("true");
+        }
+    }
+
+    private void sink(Object x) {
+        if (x.hashCode() == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
         }
     }
 }

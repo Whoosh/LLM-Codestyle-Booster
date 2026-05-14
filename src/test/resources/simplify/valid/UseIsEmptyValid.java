@@ -7,41 +7,41 @@ public class UseIsEmptyValid {
     public void usingIsEmpty(String s, List<String> list) {
         // Correct usage — isEmpty()
         if (s.isEmpty()) {
-            System.out.println("empty");
+            sink("empty");
         }
         if (!s.isEmpty()) {
-            System.out.println("not empty");
+            sink("not empty");
         }
         if (list.isEmpty()) {
-            System.out.println("empty list");
+            sink("empty list");
         }
         if (!list.isEmpty()) {
-            System.out.println("non-empty list");
+            sink("non-empty list");
         }
     }
 
     public void lengthForOtherComparisons(String s) {
         // Comparing length to values other than 0/1 — valid, not replaceable
         if (s.length() > 5) {
-            System.out.println("long");
+            sink("long");
         }
         if (s.length() == 10) {
-            System.out.println("exactly 10");
+            sink("exactly 10");
         }
         if (s.length() < 100) {
-            System.out.println("short");
+            sink("short");
         }
         if (s.length() >= 3) {
-            System.out.println("at least 3");
+            sink("at least 3");
         }
     }
 
     public void sizeForOtherComparisons(List<String> list) {
         if (list.size() > 5) {
-            System.out.println("big list");
+            sink("big list");
         }
         if (list.size() == 3) {
-            System.out.println("exactly 3");
+            sink("exactly 3");
         }
     }
 
@@ -50,8 +50,15 @@ public class UseIsEmptyValid {
         // (hypothetical custom method)
         String s = "test";
         int len = s.length();
-        if (len > 0) {
-            System.out.println("already stored");
+        sink(s);
+        if (len > 0 && len < 1000) {
+            sink("already stored");
+        }
+    }
+
+    private void sink(Object x) {
+        if (x.hashCode() == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
         }
     }
 }

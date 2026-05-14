@@ -1,13 +1,12 @@
 package com.example;
 
 // Tests stringLiteralInitText returning null for non-string-literal initializers (NO_COVERAGE on L93)
-@SuppressWarnings("unused")
 public class CommonsLang3NoAssign {
     // static final String with non-literal initializer — should NOT be flagged
     static final String COMPUTED = String.valueOf(42);
 
-    // static final String with concatenation — should NOT be flagged
-    static final String CONCAT = "a" + "b";
+    // static final String with concatenation expression that isn't collapsible — should NOT be flagged
+    static final String CONCAT = "a" + COMPUTED;
 
     // static final non-String — should NOT be flagged
     static final int COUNT = 0;

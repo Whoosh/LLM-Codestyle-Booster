@@ -26,7 +26,7 @@ public class OrChainToSetContainsValid {
         return flag == true || flag == false;
     }
 
-    public boolean nullCheckChain(Object obj) {
+    public boolean nullCheckChain(@jakarta.annotation.Nullable Object obj) {
         return obj == null || obj == this || obj == "";
     }
 

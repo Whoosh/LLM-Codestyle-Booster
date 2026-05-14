@@ -1,6 +1,6 @@
 package test;
 
-import static java.lang.Math.PI;
+import static java.lang.Math.*;
 
 public class StaticImportCandidateValid {
 

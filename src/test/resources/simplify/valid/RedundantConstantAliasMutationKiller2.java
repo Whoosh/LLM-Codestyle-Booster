@@ -6,7 +6,8 @@ public class RedundantConstantAliasMutationKiller2 {
 
     // simpleIdentInitializer: varDef with ASSIGN but EXPR has childCount != 1 (multi-child expression)
     // Exercises simpleIdentInitializer line 140: expr.getChildCount() != 1
-    private static final int TOTAL = 1 + 2;
+    // Use multiplication to avoid CollapsibleConstantConcatenationCheck (which targets +)
+    private static final int TOTAL = 1 * 2;
 
     // patternCompileValue: Pattern.compile with no ASSIGN (impossible in valid Java, skip)
 

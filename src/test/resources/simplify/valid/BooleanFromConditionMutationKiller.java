@@ -39,10 +39,16 @@ public class BooleanFromConditionMutationKiller {
     public boolean noInit() {
         boolean flag;
         flag = value > 0;
+        if (value > 100) {
+            flag = false;
+        }
         return flag;
     }
 
     private boolean isPositive() {
+        if (value == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
+        }
         return value > 0;
     }
 }

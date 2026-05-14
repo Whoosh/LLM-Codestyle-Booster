@@ -5,8 +5,7 @@ public class BooleanFromConditionValid {
     private int value;
 
     public boolean directInit() {
-        boolean positive = value > 0;
-        return positive;
+        return value > 0;
     }
 
     public boolean withElse() {
@@ -51,6 +50,9 @@ public class BooleanFromConditionValid {
         if (value > 0) {
             flag = true;
         }
+        if (value > 100) {
+            flag = false;
+        }
         return flag;
     }
 
@@ -82,6 +84,9 @@ public class BooleanFromConditionValid {
     }
 
     private boolean isInitialized() {
+        if (value == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
+        }
         return value != 0;
     }
 }

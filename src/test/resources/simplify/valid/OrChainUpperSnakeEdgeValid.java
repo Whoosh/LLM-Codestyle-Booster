@@ -10,9 +10,11 @@ public class OrChainUpperSnakeEdgeValid {
 
     // Chain with lowercase identifiers as RHS (not UPPER_SNAKE_CASE)
     public boolean lowercaseRhs(int type) {
-        int alpha = 1;
-        int beta = 2;
-        int gamma = 3;
-        return type == alpha || type == beta || type == gamma;
+        int alpha = 1 + _1;
+        int beta = 2 + _2;
+        int gamma = 3 + _3;
+        boolean direct = type == alpha || type == beta || type == gamma;
+        boolean shifted = type == alpha + 10 || type == beta + 10 || type == gamma + 10;
+        return direct || shifted;
     }
 }

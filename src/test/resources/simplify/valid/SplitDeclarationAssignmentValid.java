@@ -4,6 +4,7 @@ public class SplitDeclarationAssignmentValid {
 
     public int directInit() {
         int x = 5;
+        x++;
         return x;
     }
 
@@ -39,7 +40,7 @@ public class SplitDeclarationAssignmentValid {
         int x;
         try {
             doSomething();
-        } catch (Exception ignored) {
+        } catch (IllegalStateException ignored) {
             // log
         }
         x = 1;
@@ -74,13 +75,16 @@ public class SplitDeclarationAssignmentValid {
         int x;
         try {
             x = parse();
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException e) {
             x = -1;
         }
         return x;
     }
 
     private int parse() {
+        if (Math.random() < 0) {
+            throw new IllegalStateException();
+        }
         return 1;
     }
 

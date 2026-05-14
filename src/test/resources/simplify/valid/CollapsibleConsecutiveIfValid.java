@@ -98,6 +98,8 @@ public class CollapsibleConsecutiveIfValid {
         if (x == 1) {
             if (x == 2) {
                 return;
+            } else {
+                doWork();
             }
         }
         if (x == 3) {

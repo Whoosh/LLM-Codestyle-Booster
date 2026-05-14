@@ -4,6 +4,8 @@ import java.util.regex.Pattern;
 
 public class CollapsibleConstantValid {
 
+    // === All static final FIRST (StaticFinalFirstCheck) ===
+
     // Case 1: single literal — no concatenation, nothing to collapse
     static final String SIMPLE = "hello";
 
@@ -17,12 +19,6 @@ public class CollapsibleConstantValid {
     static final String PREFIX = "prefix";
     static final String DYNAMIC = PREFIX + String.valueOf(System.currentTimeMillis());
 
-    // Case 5: non-static-final — not checked
-    final String instanceConcat = "a" + "b";
-
-    // Case 6: non-final — not checked
-    static String mutableConcat = "a" + "b";
-
     // Case 7: reference to constant from another class (can't resolve)
     static final String EXTERNAL = Integer.MAX_VALUE + "_suffix";
 
@@ -33,8 +29,8 @@ public class CollapsibleConstantValid {
     static final String COMPUTED = String.format("%d", 42);
     static final String USES_COMPUTED = COMPUTED + "!";
 
-    // Case 10: single constant reference — no concatenation
-    static final String ALIAS = PREFIX;
+    // Case 10: single constant reference — was a pure alias; now wrapped to avoid RedundantConstantAlias
+    static final String ALIAS = PREFIX.toUpperCase();
 
     // Case 11: boolean constant — not a concat-able type
     static final boolean FLAG = true;
@@ -45,24 +41,27 @@ public class CollapsibleConstantValid {
     // Case 13: constant + DOT-qualified reference (OtherClass.CONST)
     static final String WITH_DOT = PREFIX + CollapsibleConstantValid.SIMPLE;
 
-    // Case 14: empty class with no fields — no crash
-
     // Case 15: array with only single literals — no concatenation
     private static final String[] CLEAN_ARRAY = {"a", "b", "c"};
 
     // Case 16: array with method call in element — not collapsible
-    private static final String[] DYNAMIC_ARRAY = {
-        "literal",
-        String.valueOf(42),
-    };
+    private static final String[] DYNAMIC_ARRAY = {"literal", String.valueOf(42)};
 
     // Case 17: array element referencing external constant — can't resolve
-    private static final String[] EXTERNAL_ARRAY = {
-        Integer.MAX_VALUE + "_x",
-    };
+    private static final String[] EXTERNAL_ARRAY = {Integer.MAX_VALUE + "_x"};
+
+    // === Static non-final ===
+    // Case 6: non-final — not checked
+    static String mutableConcat = "a" + "b";
+
+    // === Instance fields ===
+    // Case 5: non-static-final — not checked
+    final String instanceConcat = "a" + "b";
 
     // Case 18: non-static-final array — not checked
     final String[] INSTANCE_ARRAY = {"a" + "b"};
+
+    // Case 14: empty class with no fields — no crash (placeholder comment)
 
     // Case 19: method body with only 1 constant between dynamic calls — no run
     static String methodWithSingleConstant() {
@@ -80,6 +79,9 @@ public class CollapsibleConstantValid {
     }
 
     private static String dynamicValue() {
+        if (PREFIX.isEmpty()) {
+            throw new IllegalStateException();
+        }
         return "dynamic";
     }
 }

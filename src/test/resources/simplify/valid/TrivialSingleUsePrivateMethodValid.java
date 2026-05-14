@@ -89,7 +89,10 @@ public class TrivialSingleUsePrivateMethodValid {
 
     // Body has more than three method calls (stream chain) — earned its name, do not flag.
     private String findFirstStarting(java.util.List<String> items, String prefix) {
-        return items.stream().filter(s -> s.startsWith(prefix)).findFirst().orElse("");
+        return items.stream()
+            .filter(s -> s.startsWith(prefix))
+            .findFirst()
+            .orElse("");
     }
 
     public String useChain(java.util.List<String> items) {
@@ -106,11 +109,12 @@ public class TrivialSingleUsePrivateMethodValid {
     }
 
     public int useViaNested() {
-        return new java.util.concurrent.Callable<Integer>() {
+        java.util.concurrent.Callable<Integer> callable = new java.util.concurrent.Callable<Integer>() {
             @Override
             public Integer call() {
                 return innerHelper() + 1;
             }
-        }.toString().length();
+        };
+        return callable.toString().length();
     }
 }

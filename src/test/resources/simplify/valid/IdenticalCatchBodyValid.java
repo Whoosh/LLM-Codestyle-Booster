@@ -4,9 +4,14 @@ public class IdenticalCatchBodyValid {
         try {
             Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            throw new RuntimeException("number error", e);
-        } catch (IllegalArgumentException e) {
-            System.out.println("arg error");
+            throw new IllegalArgumentException("number error", e);
+        } catch (IllegalStateException e) {
+            sink("state error");
+        }
+    }
+    private void sink(Object x) {
+        if (x.hashCode() == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
         }
     }
 }

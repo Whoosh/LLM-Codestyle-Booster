@@ -26,6 +26,10 @@
         <property name="checks" value="PublicMethodTestCoverageCheck"/>
         <property name="files" value="[\\/]src[\\/]test[\\/]"/>
     </module>
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="TestMethodNameCheck"/>
+        <property name="files" value="[\\/]src[\\/]main[\\/]"/>
+    </module>
 
     <!-- File-level checks -->
     <module name="FileTabCharacter">

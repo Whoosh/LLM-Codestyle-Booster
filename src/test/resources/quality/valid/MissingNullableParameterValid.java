@@ -58,4 +58,25 @@ public class MissingNullableParameterValid {
             throw new IllegalArgumentException();
         }
     }
+
+    // Compound rejection: s == null && verbose -> still a rejection -> no violation
+    public void compoundRejection(String s) {
+        boolean verbose = true;
+        if (s == null && verbose) {
+            throw new IllegalArgumentException();
+        }
+        s.length();
+    }
+
+    // Nested throw inside try inside if-block -> still a rejection -> no violation
+    public void nestedThrowRejection(String s) {
+        if (s == null) {
+            try {
+                throw new IllegalArgumentException();
+            } catch (Exception e) {
+                // ignored
+            }
+        }
+        s.length();
+    }
 }

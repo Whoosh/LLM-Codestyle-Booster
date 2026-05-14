@@ -77,7 +77,7 @@ public class RepeatedExceptionWrappingCheck extends AbstractCheck {
             if (child.getType() == LITERAL_CATCH) {
                 analyzeCatch(child);
             }
-            if (child.getType() != CLASS_DEF && child.getType() != ENUM_DEF && child.getType() != RECORD_DEF) {
+            if (!TYPE_DECL_TOKENS.contains(child.getType())) {
                 collectCatchBlocks(child);
             }
         }
@@ -116,6 +116,31 @@ public class RepeatedExceptionWrappingCheck extends AbstractCheck {
 
     private static String extractCaughtType(DetailAST catchAst) {
         DetailAST paramDef = catchAst.findFirstToken(PARAMETER_DEF);
-        return paramDef != null ? extractTypeName(paramDef) : "";
+        if (paramDef == null) {
+            return "";
+        }
+        DetailAST type = paramDef.findFirstToken(TYPE);
+        if (type == null) {
+            return "";
+        }
+        if (type.findFirstToken(BOR) == null) {
+            return extractTypeName(paramDef);
+        }
+        // Multi-catch: TYPE contains IDENTs (or DOTs for qualified names) separated by BOR operators
+        // as siblings (not nested). Collect simple names, sort for stable fingerprint, join with '|'.
+        // Intentionally distinct from single-catch fingerprints so they aren't conflated.
+        List<String> names = new ArrayList<>();
+        for (DetailAST child = type.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child.getType() == IDENT) {
+                names.add(child.getText());
+            } else if (child.getType() == DOT) {
+                DetailAST last = child.getLastChild();
+                if (last != null && last.getType() == IDENT) {
+                    names.add(last.getText());
+                }
+            }
+        }
+        names.sort(null);
+        return String.join("|", names);
     }
 }

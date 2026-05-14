@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MissingNullableParameterCheckTest {
 
     private static final Map<String, String> NO_PROPS = Map.of();
-    private static final int EXPECTED_VIOLATIONS = 5;
+    private static final int EXPECTED_VIOLATIONS = 6;
 
     @Test
     void invalidFileProducesExpectedViolationCount() throws Exception {
@@ -62,6 +62,26 @@ class MissingNullableParameterCheckTest {
         // null == text exercises matchesNullComparison reversed path (line 225)
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("'text'") && v.getMessage().contains("'reversed'")),
             "Reversed null comparison should be flagged: " + format(violations));
+    }
+
+    @Test
+    void compoundLandRejectionIsNotFlagged() throws Exception {
+        // 's == null && verbose' followed by throw is still a rejection -> no violation
+        assertTrue(run("quality/valid/MissingNullableParameterValid.java").isEmpty());
+    }
+
+    @Test
+    void nestedThrowInsideTryIsNotFlagged() throws Exception {
+        // throw inside nested try-block of if(s == null) is still a rejection -> no violation
+        assertTrue(run("quality/valid/MissingNullableParameterValid.java").isEmpty());
+    }
+
+    @Test
+    void compoundLorIsStillFlagged() throws Exception {
+        List<AuditEvent> violations = run("quality/invalid/MissingNullableParameterInvalid.java");
+        // 'maybe == null || other' does not guarantee null -> still missing @Nullable
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("'maybe'") && v.getMessage().contains("'lorNotRejection'")),
+            "LOR-guarded parameter should still be flagged: " + format(violations));
     }
 
     private static List<AuditEvent> run(String resource) throws Exception {

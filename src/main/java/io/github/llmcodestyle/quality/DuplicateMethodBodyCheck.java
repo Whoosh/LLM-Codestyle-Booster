@@ -3,11 +3,12 @@ package io.github.llmcodestyle.quality;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import io.github.llmcodestyle.pojos.DuplicateMethodOccurrence;
-import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static com.puppycrawl.tools.checkstyle.utils.TokenUtil.*;
+import static io.github.llmcodestyle.utils.AstAnnotationUtil.*;
 import static io.github.llmcodestyle.utils.AstInstanceStateUtil.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
 
@@ -81,8 +82,6 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
         LITERAL_NULL,
         TEXT_BLOCK_CONTENT);
 
-    private static final Set<Integer> NESTED_TYPE_TOKENS = Set.of(CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF, ANNOTATION_DEF);
-
     private static final Set<Integer> NAMED_DECL_TOKENS = Set.of(VARIABLE_DEF, PARAMETER_DEF, RESOURCE);
 
     private int minStatements = DEFAULT_MIN_STATEMENTS;
@@ -137,7 +136,7 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST methodDef) {
-        if (isOverride(methodDef)) {
+        if (hasAnnotationNamed(methodDef, "Override")) {
             return;
         }
         DetailAST slist = methodDef.findFirstToken(SLIST);
@@ -170,38 +169,10 @@ public class DuplicateMethodBodyCheck extends AbstractCheck {
         return typeDef == null || !referencesInstanceState(slist, collectScope(typeDef));
     }
 
-    @Nullable
-    private static DetailAST findEnclosingType(DetailAST methodDef) {
-        DetailAST parent = methodDef.getParent();
-        while (parent != null) {
-            if (NESTED_TYPE_TOKENS.contains(parent.getType())) {
-                return parent;
-            }
-            parent = parent.getParent();
-        }
-        return null;
-    }
-
     @Override
     public void destroy() {
         super.destroy();
         seenBodies.clear();
-    }
-
-    private static boolean isOverride(DetailAST methodDef) {
-        DetailAST modifiers = methodDef.findFirstToken(MODIFIERS);
-        if (modifiers == null) {
-            return false;
-        }
-        for (DetailAST mod = modifiers.getFirstChild(); mod != null; mod = mod.getNextSibling()) {
-            if (mod.getType() == ANNOTATION) {
-                DetailAST ident = mod.findFirstToken(IDENT);
-                if (ident != null && "Override".equals(ident.getText())) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private static String extractName(DetailAST methodDef) {

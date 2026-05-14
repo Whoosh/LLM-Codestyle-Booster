@@ -14,7 +14,7 @@ public class ChainedCallLineBreakCheck extends AbstractCheck {
 
     private static final String MSG_KEY = "chained.call.line.break";
     private static final int DEFAULT_MIN_CHAIN_LENGTH = 4;
-    private static final int[] REQUIRED_TOKENS = {METHOD_CALL};
+    private static final int[] TOKENS = {METHOD_CALL};
 
     private int minChainLength = DEFAULT_MIN_CHAIN_LENGTH;
 
@@ -24,17 +24,17 @@ public class ChainedCallLineBreakCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return REQUIRED_TOKENS.clone();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return REQUIRED_TOKENS.clone();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return REQUIRED_TOKENS.clone();
+        return TOKENS.clone();
     }
 
     @Override

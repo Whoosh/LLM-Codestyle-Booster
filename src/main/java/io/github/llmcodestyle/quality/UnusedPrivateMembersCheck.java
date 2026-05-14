@@ -24,7 +24,7 @@ public class UnusedPrivateMembersCheck extends AbstractCheck {
     private static final int[] TOKENS = {CLASS_DEF};
 
     private static final Set<String> EXCLUDED_NAMES = Set.of("serialVersionUID");
-    private static final Set<Integer> PRIVATE_DECL_TOKENS = Set.of(VARIABLE_DEF, METHOD_DEF, CLASS_DEF, ENUM_DEF);
+    private static final Set<Integer> PRIVATE_DECL_TOKENS = Set.of(VARIABLE_DEF, METHOD_DEF, CLASS_DEF, ENUM_DEF, RECORD_DEF, INTERFACE_DEF);
 
     @Override
     public int[] getDefaultTokens() {

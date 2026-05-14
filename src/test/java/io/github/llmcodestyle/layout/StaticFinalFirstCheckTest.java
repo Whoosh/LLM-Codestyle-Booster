@@ -13,13 +13,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class StaticFinalFirstCheckTest {
 
-    private static final int EXPECTED_VIOLATIONS = 2;
+    private static final int EXPECTED_VIOLATIONS = 3;
+    private static final String RECORD_CTOR_FAILURE_MSG = "Static final after canonical ctor in record should be flagged: ";
     private static final Map<String, String> NO_PROPS = Map.of();
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
         List<AuditEvent> violations = runTreeWalkerCheck(StaticFinalFirstCheck.class, "layout/invalid/StaticFinalFirstInvalid.java", NO_PROPS);
-        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 2 violations (2 static finals after instance field), got: " + format(violations));
+        assertEquals(EXPECTED_VIOLATIONS, violations.size(), "Expected 3 violations (2 in class + 1 in record), got: " + format(violations));
+    }
+
+    @Test
+    void recordWithStaticFinalAfterCanonicalCtorIsFlagged() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(StaticFinalFirstCheck.class, "layout/invalid/StaticFinalFirstInvalid.java", NO_PROPS);
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("RECORD_CONST_AFTER_CTOR")), RECORD_CTOR_FAILURE_MSG + format(violations));
     }
 
     @Test

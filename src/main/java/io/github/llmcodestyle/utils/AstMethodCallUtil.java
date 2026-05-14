@@ -58,6 +58,9 @@ public final class AstMethodCallUtil {
     @Nullable
     public static String extractLocalMethodName(DetailAST methodCall) {
         DetailAST firstChild = methodCall.getFirstChild();
+        if (firstChild == null) {
+            return null;
+        }
         if (firstChild.getType() == IDENT) {
             return firstChild.getText();
         }

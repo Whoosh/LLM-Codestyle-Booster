@@ -4,6 +4,7 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
 import static io.github.llmcodestyle.utils.AstSingleUseUtil.*;
 
 import java.util.List;
@@ -147,15 +148,6 @@ public class PureSingleUseLocalVariableCheck extends AbstractCheck {
 
     private static boolean isImpureToken(int type) {
         return CREATION_OR_MUTATION_TOKENS.contains(type) || COMPOUND_ASSIGN_TOKENS.contains(type);
-    }
-
-    private static String extractMethodName(DetailAST methodCall) {
-        DetailAST dot = methodCall.findFirstToken(DOT);
-        if (dot != null) {
-            return dot.getLastChild().getText();
-        }
-        DetailAST nameIdent = methodCall.findFirstToken(IDENT);
-        return nameIdent != null ? nameIdent.getText() : "";
     }
 
     /**

@@ -18,6 +18,7 @@ public class BlankLineAfterCommentCheck extends AbstractFileSetCheck {
         for (int i = 0; i < fileText.size(); i++) {
             scanner.processLine(fileText.get(i).stripLeading(), i);
         }
+        scanner.flushAndReset();
     }
 
     private final class CommentScanner {

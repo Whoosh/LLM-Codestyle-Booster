@@ -2,102 +2,49 @@ package io.github.llmcodestyle;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import org.junit.jupiter.api.Test;
-import io.github.llmcodestyle.simplify.BooleanFromConditionCheck;
-import io.github.llmcodestyle.simplify.CollapsibleConstantConcatenationCheck;
-import io.github.llmcodestyle.simplify.CollapsibleConsecutiveIfCheck;
-import io.github.llmcodestyle.simplify.OrChainToSetContainsCheck;
-import io.github.llmcodestyle.simplify.CommonsLang3StringConstantCheck;
-import io.github.llmcodestyle.simplify.CollapsibleGuardClauseCheck;
-import io.github.llmcodestyle.simplify.CollapsibleNestedIfCheck;
-import io.github.llmcodestyle.simplify.CollectionsToListOfCheck;
-import io.github.llmcodestyle.simplify.ConditionalReturnToTernaryCheck;
-import io.github.llmcodestyle.simplify.IdenticalCatchBodyCheck;
-import io.github.llmcodestyle.simplify.IfReturnBooleanLiteralCheck;
-import io.github.llmcodestyle.simplify.IndexOfToContainsCheck;
-import io.github.llmcodestyle.simplify.InlineRegexConstantCheck;
-import io.github.llmcodestyle.simplify.MapContainsKeyThenGetCheck;
+import org.junit.jupiter.api.function.Executable;
 import io.github.llmcodestyle.simplify.PureSingleUseLocalVariableCheck;
-import io.github.llmcodestyle.simplify.RedundantConstantAliasCheck;
 import io.github.llmcodestyle.simplify.SingleUseLocalVariableCheck;
-import io.github.llmcodestyle.simplify.SplitDeclarationAssignmentCheck;
-import io.github.llmcodestyle.simplify.StaticImportCandidateCheck;
-import io.github.llmcodestyle.simplify.TrivialSingleUsePrivateMethodCheck;
-import io.github.llmcodestyle.simplify.UseIsEmptyCheck;
-import io.github.llmcodestyle.quality.DuplicateMethodBodyCheck;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static io.github.llmcodestyle.utils.TestCheckSupportUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Verifies that our checks do not suggest fixes that would worsen asymptotic complexity.
+ * Verifies that our simplify checks do not crash, hang, or worsen asymptotic complexity
+ * when run against a stress fixture of trap patterns.
  *
- * <p>The test resource {@code AsymptoticSafetyTraps.java} contains 38 trap patterns where
+ * <p>The test resource {@code AsymptoticSafetyTraps.java} contains 38+ trap patterns where
  * inlining a variable would move computation into a more-frequently-executed context
  * (for, for-each, while, do-while, lambda, stream, nested loops).
  *
- * <h3>Simplify checks with potential asymptotic risk (tested with traps):</h3>
- * <ul>
- *   <li>{@link SingleUseLocalVariableCheck} — guarded by {@code isInsideRepeatingContext}
- *       for loops, lambdas, and by {@code isInsideNestedBlock} for conditionals</li>
- *   <li>{@link PureSingleUseLocalVariableCheck} — guarded by {@code isUsedInRepeatingContext};
- *       pure-method whitelist prevents flagging expensive calls</li>
- * </ul>
+ * <p>The dynamic loop {@link #everySimplifyCheckRunsOnTrapsWithoutCrashOrTimeout()} discovers
+ * every {@code *Check.java} class under {@code io.github.llmcodestyle.simplify} via the
+ * source tree, instantiates it, and runs it against the trap fixture under a 5-second
+ * preemptive timeout. The goal is "doesn't crash, doesn't time out" — violation counts are
+ * deliberately not asserted because many simplify checks legitimately fire on the trap
+ * patterns (e.g. {@code IfReturnBooleanLiteralCheck} flags real boolean returns; the trap
+ * fixture is constructed for the single-use checks only).
  *
- * <h3>Simplify checks with NO asymptotic risk:</h3>
- * <ul>
- *   <li>{@link CollapsibleConstantConcatenationCheck} — merges compile-time constants,
- *       zero runtime impact (string concatenation of finals resolved by javac)</li>
- *   <li>{@link IndexOfToContainsCheck} — indexOf and contains are both O(n) for String;
- *       no asymptotic change, only readability improvement</li>
- *   <li>{@link InlineRegexConstantCheck} — extracting regex to static final IMPROVES
- *       performance (Pattern.compile called once instead of per-method-call)</li>
- *   <li>{@link StaticImportCandidateCheck} — import style only, zero bytecode difference</li>
- *   <li>{@link UseIsEmptyCheck} — isEmpty() and length()/size() are both O(1);
- *       no asymptotic change, only readability improvement</li>
- *   <li>{@link IdenticalCatchBodyCheck} — merges identical catch clauses,
- *       zero runtime impact (control flow only)</li>
- *   <li>{@link MapContainsKeyThenGetCheck} — replaces double lookup with single,
- *       actually IMPROVES performance (fewer hash computations)</li>
- *   <li>{@link CollectionsToListOfCheck} — factory method replacement,
- *       no asymptotic change (both O(n) for n elements)</li>
- *   <li>{@link ConditionalReturnToTernaryCheck} — syntactic sugar only,
- *       zero bytecode difference in return paths</li>
- *   <li>{@link CollapsibleGuardClauseCheck} — collapses guard + conditional into a single
- *       boolean expression, identical bytecode after javac optimization</li>
- *   <li>{@link CollapsibleNestedIfCheck} — merges two boolean conditions with {@code &&},
- *       same short-circuit semantics, no asymptotic change</li>
- *   <li>{@link BooleanFromConditionCheck} — replaces if-flip with direct assignment,
- *       evaluates the condition exactly once in both forms</li>
- *   <li>{@link SplitDeclarationAssignmentCheck} — moves declaration to its initializer,
- *       no runtime impact</li>
- *   <li>{@link IfReturnBooleanLiteralCheck} — collapses if-return-literal pair to a single
- *       return of the condition, identical control flow</li>
- *   <li>{@link RedundantConstantAliasCheck} — flags useless static final aliases and
- *       same-class duplicate Pattern.compile, replacing two field reads with one</li>
- *   <li>{@link TrivialSingleUsePrivateMethodCheck} — inlines a method called from one site;
- *       executes its body the same number of times before and after, parameter usage cap
- *       prevents argument-expression duplication</li>
- *   <li>{@link CommonsLang3StringConstantCheck} — only renames a static final constant
- *       to its library equivalent, no runtime semantics change</li>
- *   <li>{@link CollapsibleConsecutiveIfCheck} — the fix merges conditions with {@code ||};
- *       short-circuit evaluation preserves the exact number of condition evaluations
- *       (first true → stop). Only single-statement terminating bodies are flagged, so the
- *       body cannot be executed more than once by the merged form — identical semantics</li>
- *   <li>{@link DuplicateMethodBodyCheck} — reporting duplicate bodies does not suggest any
- *       runtime change. The check itself runs in O(total source AST nodes) with a per-method
- *       body cap ({@code maxBodyNodes}, default 400) to bound the hash-key size</li>
- *   <li>{@link OrChainToSetContainsCheck} — the recommended fix is to extract literals into a
- *       {@code static final Set} and use {@code .contains()}; the call sites then do one
- *       hash-lookup per invocation instead of an N-way equality chain, which is either neutral
- *       or an improvement (JIT resolves the Set once at class init)</li>
- * </ul>
+ * <p>The two specific tests {@link #singleUseCheckDoesNotFlagLoopCachedVariables()} and
+ * {@link #pureSingleUseCheckDoesNotFlagLoopCachedVariables()} retain the strict-zero
+ * contract for the single-use family because that is the original asymptotic invariant the
+ * fixture was designed for: the cached locals must NOT be inlined into the loop bodies.
  */
 class AsymptoticSafetyTest {
 
     private static final String TRAPS_FILE = "valid/AsymptoticSafetyTraps.java";
+    private static final String SIMPLIFY_PACKAGE_PREFIX = "io.github.llmcodestyle.simplify.";
+    private static final String JAVA_EXT = ".java";
+    private static final Path SIMPLIFY_SOURCE_DIR = Path.of("src/main/java/io/github/llmcodestyle/simplify");
+    private static final Duration PER_CHECK_TIMEOUT = Duration.ofSeconds(5L);
 
     @Test
     void singleUseCheckDoesNotFlagLoopCachedVariables() throws Exception {
@@ -123,4 +70,44 @@ class AsymptoticSafetyTest {
         assertTrue(violations.isEmpty(), "Combined single-use checks must not flag any of 38 asymptotic traps (" + violations.size() + " violations): " + format(violations));
     }
 
+    @Test
+    void everySimplifyCheckRunsOnTrapsWithoutCrashOrTimeout() throws Exception {
+        List<Class<?>> simplifyChecks = discoverSimplifyChecks();
+        assertFalse(simplifyChecks.isEmpty(), "Failed to discover any simplify check classes under " + SIMPLIFY_SOURCE_DIR);
+        assertAll(simplifyChecks.stream().<Executable>map(checkClass -> () -> assertTimeoutPreemptively(
+            PER_CHECK_TIMEOUT,
+            () -> runTreeWalkerCheck(checkClass, TRAPS_FILE, Map.of()),
+            () -> String.format("%s exceeded %s on %s", checkClass.getSimpleName(), PER_CHECK_TIMEOUT, TRAPS_FILE))).toList());
+    }
+
+    /**
+     * Discovers every {@code *Check.java} source file under {@link #SIMPLIFY_SOURCE_DIR} and
+     * loads the corresponding {@link Class}. Source-tree discovery (rather than classpath
+     * scanning) is used because it requires no extra dependency and is what
+     * {@code CrossAnalyzerConsistencyTest} also relies on.
+     */
+    private static List<Class<?>> discoverSimplifyChecks() throws Exception {
+        if (!Files.isDirectory(SIMPLIFY_SOURCE_DIR)) {
+            return List.of();
+        }
+        List<Class<?>> classes = new ArrayList<>();
+        try (Stream<Path> files = Files.list(SIMPLIFY_SOURCE_DIR)) {
+            files
+                .filter(Files::isRegularFile)
+                .filter(p -> p.getFileName().toString().endsWith("Check.java"))
+                .sorted()
+                .forEach(source -> classes.add(loadCheckClass(source)));
+        }
+        return classes;
+    }
+
+    private static Class<?> loadCheckClass(Path source) {
+        String simpleName = source.getFileName().toString();
+        String fqn = SIMPLIFY_PACKAGE_PREFIX + simpleName.substring(0, simpleName.length() - JAVA_EXT.length());
+        try {
+            return Class.forName(fqn);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Failed to load simplify check class " + fqn, e);
+        }
+    }
 }

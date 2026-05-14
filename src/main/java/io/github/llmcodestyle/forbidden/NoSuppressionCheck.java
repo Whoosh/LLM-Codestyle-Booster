@@ -6,7 +6,8 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
 /**
- * Forbids suppression annotations and inline suppression comments. Catches {@code @SuppressWarnings}, {@code @SuppressFBWarnings}, and NOPMD/CHECKSTYLE:OFF comments.
+ * Forbids suppression annotations and inline suppression comments.
+ * Catches {@code @SuppressWarnings} (and its SpotBugs equivalent) plus inline directives in comments.
  */
 public class NoSuppressionCheck extends AbstractCheck {
 
@@ -39,11 +40,39 @@ public class NoSuppressionCheck extends AbstractCheck {
     @Override
     public void beginTree(DetailAST rootAST) {
         String[] lines = getLines();
+        boolean inBlock = false;
         for (int i = 0; i < lines.length; i++) {
-            if (hasSuppressComment(lines[i])) {
-                log(i + 1, 0, MSG_COMMENT, lines[i].trim());
-            }
+            inBlock = inBlock ? processInsideBlock(lines[i], i) : processOutsideBlock(lines[i], i);
         }
+    }
+
+    private boolean processOutsideBlock(String line, int idx) {
+        if (hasSuppressComment(line)) {
+            log(idx + 1, 0, MSG_COMMENT, line.trim());
+        }
+        return startsUnclosedBlock(line);
+    }
+
+    private boolean processInsideBlock(String line, int idx) {
+        if (containsSuppressionToken(line)) {
+            log(idx + 1, 0, MSG_COMMENT, line.trim());
+        }
+        int blockEnd = line.indexOf("*/");
+        if (blockEnd < 0) {
+            return true;
+        }
+        String afterBlock = line.substring(blockEnd + 2);
+        if (hasSuppressComment(afterBlock)) {
+            log(idx + 1, 0, MSG_COMMENT, line.trim());
+            return false;
+        }
+        int reopen = afterBlock.indexOf("/*");
+        return reopen >= 0 && afterBlock.indexOf("*/", reopen + 2) < 0;
+    }
+
+    private static boolean startsUnclosedBlock(String line) {
+        int blockOpen = findBlockCommentStart(line);
+        return blockOpen >= 0 && line.indexOf("*/", blockOpen + 2) < 0;
     }
 
     @Override
@@ -59,15 +88,46 @@ public class NoSuppressionCheck extends AbstractCheck {
     }
 
     private static boolean hasSuppressComment(String line) {
-        int commentStart = findCommentStart(line);
-        if (commentStart < 0) {
+        return hasSuppressInLineComment(line) || hasSuppressInBlockComment(line);
+    }
+
+    private static boolean hasSuppressInLineComment(String line) {
+        int lineCommentStart = findCommentStart(line);
+        return lineCommentStart >= 0 && containsSuppressionToken(line.substring(lineCommentStart));
+    }
+
+    private static boolean hasSuppressInBlockComment(String line) {
+        int blockStart = findBlockCommentStart(line);
+        if (blockStart < 0) {
             return false;
         }
-        String commentPart = line.substring(commentStart).toUpperCase(java.util.Locale.ROOT);
-        return commentPart.contains("NOPMD") || commentPart.contains("CHECKSTYLE:OFF") || commentPart.contains("SUPPRESSFBWARNINGS");
+        int blockEnd = line.indexOf("*/", blockStart + 2);
+        if (containsSuppressionToken(blockEnd >= 0 ? line.substring(blockStart, blockEnd + 2) : line.substring(blockStart))) {
+            return true;
+        }
+        if (blockEnd < 0) {
+            return false;
+        }
+        // A block comment may close mid-line and a // line-comment may follow with a token.
+        String tail = line.substring(blockEnd + 2);
+        int tailLineComment = findCommentStart(tail);
+        return tailLineComment >= 0 && containsSuppressionToken(tail.substring(tailLineComment));
+    }
+
+    private static boolean containsSuppressionToken(String text) {
+        String upper = text.toUpperCase(java.util.Locale.ROOT);
+        return upper.contains("NOPMD") || upper.contains("CHECKSTYLE:OFF") || upper.contains("SUPPRESSFBWARNINGS");
     }
 
     private static int findCommentStart(String line) {
+        return scanForComment(line, '/');
+    }
+
+    private static int findBlockCommentStart(String line) {
+        return scanForComment(line, '*');
+    }
+
+    private static int scanForComment(String line, char secondChar) {
         boolean inString = false;
         boolean inChar = false;
         boolean escape = false;
@@ -89,7 +149,7 @@ public class NoSuppressionCheck extends AbstractCheck {
                 inChar = !inChar;
                 continue;
             }
-            if (!inString && !inChar && c == '/' && line.charAt(i + 1) == '/') {
+            if (!inString && !inChar && c == '/' && line.charAt(i + 1) == secondChar) {
                 return i;
             }
         }

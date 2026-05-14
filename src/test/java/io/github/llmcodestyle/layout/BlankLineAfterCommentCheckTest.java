@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BlankLineAfterCommentCheckTest {
 
     private static final int EXPECTED_VIOLATIONS = 5;
+    private static final int TRAILING_COMMENT_LINE = 7;
     private static final Map<String, String> JAVA_EXT = Map.of("fileExtensions", "java");
 
     @Test
@@ -73,5 +74,14 @@ class BlankLineAfterCommentCheckTest {
         // If L50 is negated, this would be treated as comment, causing false positive.
         List<AuditEvent> violations = runFileSetCheck(BlankLineAfterCommentCheck.class, "layout/valid/BlankLineAfterBlockCommentWithCode.java", JAVA_EXT);
         assertTrue(violations.isEmpty(), "Block comment with code after */ should not produce violations: " + format(violations));
+    }
+
+    @Test
+    void trailingCommentBeforeEofWithBlankIsFlagged() throws Exception {
+        // processFiltered must call flushAndReset() after the loop so a comment
+        // followed by blank line(s) at EOF (no further code) is still reported.
+        List<AuditEvent> violations = runFileSetCheck(BlankLineAfterCommentCheck.class, "layout/invalid/BlankLineAfterCommentTrailingEof.java", JAVA_EXT);
+        assertEquals(1, violations.size(), "Expected exactly 1 trailing-EOF violation, got: " + format(violations));
+        assertEquals(TRAILING_COMMENT_LINE, violations.get(0).getLine(), "Violation should point to the comment line (7): " + format(violations));
     }
 }

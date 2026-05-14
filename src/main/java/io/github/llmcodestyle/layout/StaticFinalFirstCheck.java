@@ -15,7 +15,7 @@ public class StaticFinalFirstCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "static.final.after.instance";
-    private static final int[] TOKENS = {CLASS_DEF, INTERFACE_DEF, ENUM_DEF};
+    private static final int[] TOKENS = {CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF};
 
     @Override
     public int[] getDefaultTokens() {

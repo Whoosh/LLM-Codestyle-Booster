@@ -22,7 +22,16 @@ public class IdenticalCatchBodyCheck extends AbstractCheck {
      */
     static final String MSG_KEY = "identical.catch.body";
     private static final int[] TOKENS = {LITERAL_TRY};
-    private static final Set<Integer> FINGERPRINT_LITERALS = Set.of(STRING_LITERAL, NUM_INT, NUM_LONG);
+    private static final Set<Integer> FINGERPRINT_LITERALS = Set.of(
+        STRING_LITERAL,
+        NUM_INT,
+        NUM_LONG,
+        NUM_DOUBLE,
+        NUM_FLOAT,
+        CHAR_LITERAL,
+        LITERAL_TRUE,
+        LITERAL_FALSE,
+        LITERAL_NULL);
 
     @Override
     public int[] getDefaultTokens() {

@@ -86,6 +86,16 @@ class UnusedPrivateMembersCheckTest {
     }
 
     @Test
+    void unusedPrivateRecordAndInterfaceAreFlagged() throws Exception {
+        // PRIVATE_DECL_TOKENS must include RECORD_DEF and INTERFACE_DEF so that
+        // unused nested private records/interfaces are reported just like classes.
+        List<AuditEvent> violations = runTreeWalkerCheck(UnusedPrivateMembersCheck.class, "quality/invalid/UnusedPrivateMembersRecordsInterfaces.java", NO_PROPS);
+        assertEquals(2, violations.size(), "Expected exactly 2 violations (UnusedPair, UnusedSpi), got: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("UnusedPair")), "Should flag unused private record: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("UnusedSpi")), "Should flag unused private interface: " + format(violations));
+    }
+
+    @Test
     void isPrivateNonAnnotatedAnnotationBranch() throws Exception {
         // L109 SURVIVED: `mod.getType() == ANNOTATION`
         // L111 SURVIVED: `annotIdent != null && "Override".equals(annotIdent.getText())`

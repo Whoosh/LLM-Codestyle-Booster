@@ -15,17 +15,20 @@ class NoSuppressionCheckTest {
     private static final Map<String, String> NO_PROPS = Map.of();
     private static final int LINE_3 = 3;
     private static final int LINE_4 = 4;
+    private static final int LINE_5 = 5;
     private static final int LINE_6 = 6;
     private static final int LINE_8 = 8;
     private static final int LINE_9 = 9;
     private static final int LINE_10 = 10;
     private static final int LINE_12 = 12;
     private static final int LINE_15 = 15;
+    private static final int LINE_16 = 16;
     private static final int LINE_18 = 18;
     private static final int EDGE_CASE_VIOLATIONS = 5;
     private static final int STRING_ESCAPE_VIOLATIONS = 3;
     private static final int CHAR_STRING_EDGE_VIOLATIONS = 5;
     private static final int COMMENT_EDGE_VIOLATIONS = 3;
+    private static final int BLOCK_COMMENT_VIOLATIONS = 4;
 
     @Test
     void invalidCasesProduceViolations() throws Exception {
@@ -94,6 +97,22 @@ class NoSuppressionCheckTest {
     void suppressionKeywordsInsideStringsAndCharsNotFlagged() throws Exception {
         List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/valid/NoSuppressionCharStringValid.java", NO_PROPS);
         assertTrue(violations.isEmpty(), "Suppression keywords inside strings/chars should not be flagged: " + format(violations));
+    }
+
+    @Test
+    void blockCommentSuppressionsAreDetected() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/invalid/NoSuppressionBlockComment.java", NO_PROPS);
+        assertEquals(BLOCK_COMMENT_VIOLATIONS, violations.size(), "Expected 4 block-comment suppression violations: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == LINE_5), "inline /* NOPMD */ on line 5: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == LINE_8), "inline /* CHECKSTYLE:OFF */ on line 8: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == LINE_12), "multi-line block inner SUPPRESSFBWARNINGS on line 12: " + format(violations));
+        assertTrue(violations.stream().anyMatch(v -> v.getLine() == LINE_16), "inline /* SuppressFBWarnings */ on line 16: " + format(violations));
+    }
+
+    @Test
+    void plainBlockCommentsAreNotFlagged() throws Exception {
+        List<AuditEvent> violations = runTreeWalkerCheck(NoSuppressionCheck.class, "forbidden/valid/NoSuppressionBlockCommentValid.java", NO_PROPS);
+        assertTrue(violations.isEmpty(), "Plain block comments and javadoc should not be flagged: " + format(violations));
     }
 
     @Test

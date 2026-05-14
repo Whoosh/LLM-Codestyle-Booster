@@ -44,6 +44,14 @@ public class MissingNullableParameterInvalid {
         return input.toLowerCase();
     }
 
+    // 6. Compound LOR doesn't guarantee s is null -> NOT a rejection -> needs @Nullable
+    public void lorNotRejection(String maybe) {
+        boolean other = true;
+        if (maybe == null || other) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     // --- Should NOT flag ---
 
     // Already @Nullable -> no violation

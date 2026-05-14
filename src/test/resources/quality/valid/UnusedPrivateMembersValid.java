@@ -36,4 +36,20 @@ public class UnusedPrivateMembersValid {
             return "inner";
         }
     }
+
+    // Used private record — referenced by makePair below
+    private record Pair(String left, String right) { }
+
+    // Used private interface — referenced by getSpi below
+    private interface Spi {
+        String describe();
+    }
+
+    public Pair makePair() {
+        return new Pair("a", "b");
+    }
+
+    public Spi getSpi() {
+        return () -> "spi";
+    }
 }

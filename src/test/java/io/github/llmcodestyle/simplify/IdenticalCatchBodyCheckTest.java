@@ -14,6 +14,11 @@ class IdenticalCatchBodyCheckTest {
     private static final Map<String, String> NO_PROPS = Map.of();
     private static final int EXPECTED_VIOLATIONS = 2;
     private static final int EXPECTED_EDGE_CASE_VIOLATIONS = 5;
+    private static final int EXPECTED_IDENTICAL_LITERAL_VIOLATIONS = 4;
+    private static final int SAME_DOUBLE_FIRST_CATCH_LINE = 10;
+    private static final int SAME_DOUBLE_SECOND_CATCH_LINE = 12;
+    private static final int SAME_BOOLEAN_FIRST_CATCH_LINE = 21;
+    private static final int SAME_BOOLEAN_SECOND_CATCH_LINE = 23;
 
     @Test
     void identicalCatchBodiesProduceViolations() throws Exception {
@@ -72,6 +77,32 @@ class IdenticalCatchBodyCheckTest {
         // buildFingerprint IDENT check: if negated, method name differences are lost
         List<AuditEvent> violations = runCheck("simplify/valid/IdenticalCatchBodyMutKiller.java");
         assertTrue(violations.isEmpty(), "Catches calling different methods should not be treated as identical: " + format(violations));
+    }
+
+    @Test
+    void differentNonStringLiteralsAreNotFlagged() throws Exception {
+        // Regression: floating-point, boolean, char, and null literals must be part of the
+        // fingerprint so that catches differing only in those literals are NOT treated as identical.
+        List<AuditEvent> violations = runCheck("simplify/valid/IdenticalCatchBodyDifferentLiteralsValid.java");
+        assertTrue(violations.isEmpty(), "Catches differing only in double/float/boolean/char/null literals must not be flagged: " + format(violations));
+    }
+
+    @Test
+    void identicalNonStringLiteralBodiesAreStillFlagged() throws Exception {
+        // Regression guard: when the literal values truly match, the check must still fire.
+        List<AuditEvent> violations = runCheck("simplify/invalid/IdenticalCatchBodyIdenticalLiteralsInvalid.java");
+        assertEquals(
+            EXPECTED_IDENTICAL_LITERAL_VIOLATIONS,
+            violations.size(),
+            "Two pairs of truly-identical catches (double + boolean) should produce 4 violations: " + format(violations));
+        assertHasViolationAtLine(violations, SAME_DOUBLE_FIRST_CATCH_LINE, "sameDoubleLiteral first catch");
+        assertHasViolationAtLine(violations, SAME_DOUBLE_SECOND_CATCH_LINE, "sameDoubleLiteral second catch");
+        assertHasViolationAtLine(violations, SAME_BOOLEAN_FIRST_CATCH_LINE, "sameBooleanLiteral first catch");
+        assertHasViolationAtLine(violations, SAME_BOOLEAN_SECOND_CATCH_LINE, "sameBooleanLiteral second catch");
+    }
+
+    private static void assertHasViolationAtLine(List<AuditEvent> violations, int line, String description) {
+        assertTrue(violations.stream().anyMatch(e -> e.getLine() == line), String.format("Expected violation at line %d (%s): %s", line, description, format(violations)));
     }
 
     private static List<AuditEvent> runCheck(String resource) throws Exception {

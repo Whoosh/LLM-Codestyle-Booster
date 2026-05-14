@@ -1,15 +1,26 @@
 package io.github.llmcodestyle;
 
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import static javax.xml.XMLConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
+import static org.w3c.dom.Node.*;
 
 /**
  * Verifies that Checkstyle, PMD, and SpotBugs configurations are consistent.
@@ -102,23 +113,33 @@ class CrossAnalyzerConsistencyTest {
     }
 
     @Test
-    void everySimplifyCheckCoveredByAsymptoticSafetyTest() throws Exception {
+    void asymptoticSafetyTestExercisesAllSimplifyChecks() throws Exception {
         Path safetyTest = Path.of("src/test/java/io/github/llmcodestyle/AsymptoticSafetyTest.java");
         assumeTrue(Files.exists(safetyTest), "AsymptoticSafetyTest.java not found");
-        String safetyTestContent = Files.readString(safetyTest);
-        List<String> simplifyChecks = findCheckClassNamesInSubpackage();
-        assertFalse(simplifyChecks.isEmpty(), "No checks found in simplify subpackage");
-        List<String> missing = simplifyChecks.stream().filter(name -> !safetyTestContent.contains(name)).toList();
-        assertTrue(missing.isEmpty(), "Simplify checks not referenced in AsymptoticSafetyTest: " + missing);
+        String content = Files.readString(safetyTest);
+        // The dynamic loop in AsymptoticSafetyTest enumerates the simplify package via reflection;
+        // verify the discovery code path is present so this contract is not silently regressed.
+        assertTrue(content.contains("io.github.llmcodestyle.simplify"), "AsymptoticSafetyTest must enumerate the simplify package");
+        assertTrue(content.contains("assertTimeoutPreemptively"), "AsymptoticSafetyTest must enforce a per-check timeout");
     }
 
     @Test
     void everyCustomCheckIsRegisteredInCheckstyleXml() throws Exception {
-        String xml = readProjectFile("checkstyle.xml");
-        List<String> checkNames = findAllCheckClassNames();
-        assertFalse(checkNames.isEmpty(), "No *Check classes found in module");
-        List<String> missing = checkNames.stream().filter(name -> !xml.contains(name)).toList();
-        assertTrue(missing.isEmpty(), "Custom checks not registered in checkstyle.xml: " + missing);
+        Set<String> registeredFqns = readRegisteredCustomModuleFqns();
+        List<String> classFqns = findAllCheckClassFqns();
+        assertFalse(classFqns.isEmpty(), "No *Check classes found in module");
+
+        List<String> missingFromConfig = classFqns.stream()
+            .filter(fqn -> !registeredFqns.contains(fqn))
+            .sorted()
+            .toList();
+        assertTrue(missingFromConfig.isEmpty(), "Custom checks not registered in checkstyle.xml: " + missingFromConfig);
+
+        List<String> orphanedInConfig = registeredFqns.stream()
+            .filter(fqn -> !classFqns.contains(fqn))
+            .sorted()
+            .toList();
+        assertTrue(orphanedInConfig.isEmpty(), "Modules registered in checkstyle.xml without corresponding *Check class: " + orphanedInConfig);
     }
 
     @Test
@@ -160,18 +181,71 @@ class CrossAnalyzerConsistencyTest {
         }
     }
 
-    private static List<String> findCheckClassNamesInSubpackage() throws IOException {
-        Path dir = Path.of("src/main/java/io/github/llmcodestyle/simplify");
-        if (!Files.isDirectory(dir)) {
+    /**
+     * Walks the source tree and builds the fully-qualified name (e.g.
+     * {@code io.github.llmcodestyle.simplify.IndexOfToContainsCheck}) of every {@code *Check.java}
+     * source file under the {@code io.github.llmcodestyle} root.
+     */
+    private static List<String> findAllCheckClassFqns() throws IOException {
+        Path root = Path.of("src/main/java");
+        Path checkDir = root.resolve("io/github/llmcodestyle");
+        if (!Files.isDirectory(checkDir)) {
             return List.of();
         }
-        try (Stream<Path> files = Files.list(dir)) {
+        try (Stream<Path> files = Files.walk(checkDir)) {
             return files
-                .map(p -> p.getFileName().toString())
-                .filter(n -> n.endsWith("Check.java"))
-                .map(n -> n.replace(".java", ""))
+                .filter(Files::isRegularFile)
+                .filter(p -> p.getFileName().toString().endsWith("Check.java"))
+                .map(p -> {
+                    String relative = root.relativize(p).toString().replace(java.io.File.separatorChar, '.');
+                    return relative.substring(0, relative.length() - ".java".length());
+                })
                 .sorted()
                 .toList();
+        }
+    }
+
+    /**
+     * Parses {@code checkstyle.xml} as XML (NOT plain-text {@code contains()}) and recursively
+     * collects every {@code <module name="..."/>} attribute value whose value is in our
+     * {@code io.github.llmcodestyle} package. Comments and {@code <property>} elements are
+     * skipped by construction because the DOM only returns matching elements.
+     */
+    private static Set<String> readRegisteredCustomModuleFqns() throws Exception {
+        Path xmlPath = BUNDLED_CONFIG.resolve("checkstyle.xml");
+        if (!Files.exists(xmlPath)) {
+            xmlPath = Path.of("checkstyle.xml");
+        }
+        assumeTrue(Files.exists(xmlPath), "checkstyle.xml not found");
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        // Avoid network DTD lookup and XXE.
+        factory.setFeature(FEATURE_SECURE_PROCESSING, true);
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        // Resolve the DOCTYPE to an empty source so we never hit the network.
+        builder.setEntityResolver((publicId, systemId) -> new org.xml.sax.InputSource(new java.io.StringReader("")));
+        Document doc = builder.parse(xmlPath.toFile());
+
+        Set<String> result = new TreeSet<>();
+        collectModuleNames(doc.getDocumentElement(), result);
+        return result;
+    }
+
+    private static void collectModuleNames(Element element, Set<String> sink) {
+        if ("module".equals(element.getNodeName())) {
+            String name = element.getAttribute("name");
+            if (name.startsWith("io.github.llmcodestyle.")) {
+                sink.add(name);
+            }
+        }
+        NodeList children = element.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == ELEMENT_NODE) {
+                collectModuleNames((Element) child, sink);
+            }
         }
     }
 

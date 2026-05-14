@@ -5,6 +5,8 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstQueryUtil.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -211,37 +213,8 @@ public class RedundantConstantAliasCheck extends AbstractCheck {
         return ident == null ? null : ident.getText();
     }
 
-    private static String extractTypeName(DetailAST varDef) {
-        DetailAST type = varDef.findFirstToken(TYPE);
-        if (type == null) {
-            return "";
-        }
-        DetailAST ident = type.findFirstToken(IDENT);
-        return ident == null ? "" : ident.getText();
-    }
-
     private static boolean typesCompatible(@Nullable String left, String right) {
         return left != null && left.equals(right);
-    }
-
-    private static boolean isEffectivelyStaticFinal(DetailAST varDef, boolean insideInterface) {
-        if (insideInterface) {
-            return true;
-        }
-        DetailAST modifiers = varDef.findFirstToken(MODIFIERS);
-        if (modifiers == null) {
-            return false;
-        }
-        boolean hasStatic = false;
-        boolean hasFinal = false;
-        for (DetailAST mod = modifiers.getFirstChild(); mod != null; mod = mod.getNextSibling()) {
-            if (mod.getType() == LITERAL_STATIC) {
-                hasStatic = true;
-            } else if (mod.getType() == FINAL) {
-                hasFinal = true;
-            }
-        }
-        return hasStatic && hasFinal;
     }
 
 }

@@ -302,29 +302,4 @@ public class CollapsibleConstantConcatenationCheck extends AbstractCheck {
     private static boolean isSingleLiteral(@Nullable DetailAST node) {
         return node != null && SINGLE_LITERAL_TOKENS.contains(node.getType());
     }
-
-    /**
-     * Interface fields are implicitly static final even without explicit modifiers.
-     */
-    private static boolean isEffectivelyStaticFinal(DetailAST variableDef, boolean insideInterface) {
-        if (insideInterface) {
-            return true;
-        }
-        DetailAST modifiers = variableDef.findFirstToken(MODIFIERS);
-        if (modifiers == null) {
-            return false;
-        }
-        boolean hasStatic = false;
-        boolean hasFinal = false;
-        DetailAST mod = modifiers.getFirstChild();
-        while (mod != null) {
-            if (mod.getType() == LITERAL_STATIC) {
-                hasStatic = true;
-            } else if (mod.getType() == FINAL) {
-                hasFinal = true;
-            }
-            mod = mod.getNextSibling();
-        }
-        return hasStatic && hasFinal;
-    }
 }

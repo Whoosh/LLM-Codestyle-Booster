@@ -30,6 +30,16 @@ class RepeatedExceptionWrappingCheckTest {
         assertTrue(runTreeWalkerCheck(RepeatedExceptionWrappingCheck.class, "quality/invalid/RepeatedExceptionWrappingInvalid.java", Map.of("minOccurrences", "4")).isEmpty());
     }
 
+    @Test
+    void repeatedMultiCatchWrappingProducesViolations() throws Exception {
+        assertEquals(EXPECTED_VIOLATIONS, runCheck("quality/invalid/RepeatedExceptionWrappingMultiCatchInvalid.java").size());
+    }
+
+    @Test
+    void nestedInterfaceCatchIsNotCountedTowardOuter() throws Exception {
+        assertTrue(runCheck("quality/valid/RepeatedExceptionWrappingNestedInterfaceValid.java").isEmpty());
+    }
+
     private static List<AuditEvent> runCheck(String resource) throws Exception {
         return runTreeWalkerCheck(RepeatedExceptionWrappingCheck.class, resource, NO_PROPS);
     }

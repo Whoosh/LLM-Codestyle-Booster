@@ -4,6 +4,7 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstMethodCallUtil.*;
 
 /**
  * Flags inline regex string literals in methods that should be extracted to static final Pattern constants.
@@ -36,7 +37,7 @@ public class InlineRegexConstantCheck extends AbstractCheck {
         }
 
         String methodName = extractMethodName(ast);
-        if (methodName == null) {
+        if (methodName.isEmpty()) {
             return;
         }
 
@@ -62,15 +63,6 @@ public class InlineRegexConstantCheck extends AbstractCheck {
             parent = parent.getParent();
         }
         return false;
-    }
-
-    private static String extractMethodName(DetailAST methodCall) {
-        DetailAST dot = methodCall.findFirstToken(DOT);
-        if (dot != null) {
-            return dot.getLastChild().getText();
-        }
-        DetailAST ident = methodCall.findFirstToken(IDENT);
-        return ident != null ? ident.getText() : null;
     }
 
     private static boolean isRegexAcceptingMethod(String name) {

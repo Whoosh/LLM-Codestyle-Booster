@@ -53,6 +53,18 @@ class UtilClassNamingCheckTest {
         assertTrue(violations.isEmpty(), "Class with public static main is a JVM entry point, not a utility: " + format(violations));
     }
 
+    @Test
+    void nestedUtilShapedClassIsFlaggedButOuterIsNot() throws Exception {
+        // Guards against the bug where method-count state was held on the check
+        // instance and the inner CLASS_DEF's counts overwrote the outer's before
+        // the outer's evaluation completed. After the refactor, counts are local
+        // to each visitToken call.
+        List<AuditEvent> violations = run("quality/invalid/UtilClassNamingNestedInvalid.java");
+        assertEquals(1, violations.size(), "Only the inner util-shaped class should be flagged: " + format(violations));
+        AuditEvent only = violations.get(0);
+        assertTrue(only.getMessage().contains("StringHelper"), "Violation should be raised against the inner class StringHelper, but was: " + only.getMessage());
+    }
+
     private static List<AuditEvent> run(String resource) throws Exception {
         return runTreeWalkerCheck(UtilClassNamingCheck.class, resource, NO_PROPS);
     }

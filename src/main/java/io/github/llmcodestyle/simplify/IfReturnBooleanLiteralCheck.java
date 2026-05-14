@@ -26,21 +26,21 @@ public class IfReturnBooleanLiteralCheck extends AbstractCheck {
      * Violation message key.
      */
     static final String MSG_KEY = "if.return.boolean.literal";
-    private static final int[] LITERAL_IF_TOKEN = {LITERAL_IF};
+    private static final int[] TOKENS = {LITERAL_IF};
 
     @Override
     public int[] getDefaultTokens() {
-        return LITERAL_IF_TOKEN.clone();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return LITERAL_IF_TOKEN.clone();
+        return TOKENS.clone();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return LITERAL_IF_TOKEN.clone();
+        return TOKENS.clone();
     }
 
     @Override

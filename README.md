@@ -1,6 +1,6 @@
 # LLM Codestyle Booster
 
-One dependency that brings **50 custom Checkstyle checks** + fully configured **Checkstyle**, **PMD**, and **SpotBugs** rulesets to your Maven project.
+One dependency that brings **57 custom Checkstyle checks** + fully configured **Checkstyle**, **PMD**, and **SpotBugs** rulesets to your Maven project.
 
 Designed for teams that want strict, opinionated static analysis out of the box, with easy per-project overrides.
 
@@ -10,11 +10,11 @@ Designed for teams that want strict, opinionated static analysis out of the box,
 |----------|--------|---------|
 | **Forbidden** | 6 | No `System.out` in production, no `@SuppressWarnings`, no generic `catch(Exception)`, no commented-out code |
 | **Layout** | 8 | Chained calls must break after 4+ dots, unnecessary line wraps, compactable parameter lists, array init spacing, static star imports |
-| **Quality** | 14 | Test method naming, public method test coverage, unused private members, util class packaging & naming, may-be-static methods, duplicate regex constants, duplicate method bodies, Spring Boot main visibility, unrelated nested records |
+| **Quality** | 22 | Test method naming, public method test coverage, unused private members, util class packaging & naming, may-be-static methods, duplicate regex constants, duplicate method bodies, Spring Boot main visibility, unrelated nested records |
 | **Simplify** | 21 | `indexOf` &rarr; `contains`, `size() == 0` &rarr; `isEmpty()`, inline regex &rarr; `Pattern` constant, single-use variable inlining, identical catch bodies, `containsKey` + `get` &rarr; single lookup, collapsible guard clauses, nested ifs, consecutive ifs, or-chain &rarr; Set.contains, boolean-from-condition, split decl/assign, if-return literal, redundant constant alias, trivial single-use private methods, commons-lang3 string constants |
 
 Plus bundled configs:
-- **Checkstyle** &mdash; full config with all 47 custom checks + standard built-in checks
+- **Checkstyle** &mdash; full config with all 57 custom checks + standard built-in checks
 - **PMD** &mdash; paranoid-mode ruleset (all categories, strict thresholds)
 - **SpotBugs** &mdash; max effort, low threshold, with fb-contrib and findsecbugs plugins
 

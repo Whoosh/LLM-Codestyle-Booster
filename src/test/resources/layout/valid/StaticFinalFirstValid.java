@@ -14,3 +14,14 @@ public class StaticFinalFirstValid {
     public void method() {
     }
 }
+
+// Record with proper ordering: static final declared BEFORE the canonical constructor — no violation.
+record StaticFinalFirstValidRecord(int value) {
+
+    static final String RECORD_PREFIX = "ok";
+
+    StaticFinalFirstValidRecord(int value) {
+        this.value = value;
+    }
+}
+

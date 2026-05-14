@@ -2,7 +2,6 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstQueryUtil.*;
@@ -38,25 +37,34 @@ abstract class UnrelatedNestedTypeCheckBase extends AbstractCheck {
         ANNOTATION,
         TYPE);
 
+    private int[] cachedTokens;
+
     protected abstract int targetToken();
 
     protected abstract String messageKey();
 
     protected abstract void collectOwnDeclaredNames(DetailAST typeDef, Set<String> names);
 
+    private int[] tokens() {
+        if (cachedTokens == null) {
+            cachedTokens = new int[] {targetToken()};
+        }
+        return cachedTokens;
+    }
+
     @Override
     public final int[] getDefaultTokens() {
-        return new int[] {targetToken()};
+        return tokens().clone();
     }
 
     @Override
     public final int[] getAcceptableTokens() {
-        return new int[] {targetToken()};
+        return tokens().clone();
     }
 
     @Override
     public final int[] getRequiredTokens() {
-        return new int[] {targetToken()};
+        return tokens().clone();
     }
 
     @Override
@@ -85,18 +93,6 @@ abstract class UnrelatedNestedTypeCheckBase extends AbstractCheck {
                 addIdentTo(child, names);
             }
         }
-    }
-
-    @Nullable
-    private static DetailAST findEnclosingType(DetailAST typeDef) {
-        DetailAST parent = typeDef.getParent();
-        while (parent != null) {
-            if (TYPE_DECL_TOKENS.contains(parent.getType())) {
-                return parent;
-            }
-            parent = parent.getParent();
-        }
-        return null;
     }
 
     private static Set<String> collectOuterMemberNames(DetailAST outerType) {

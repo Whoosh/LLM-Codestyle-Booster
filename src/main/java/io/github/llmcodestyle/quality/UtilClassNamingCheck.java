@@ -2,6 +2,7 @@ package io.github.llmcodestyle.quality;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import io.github.llmcodestyle.pojos.MethodCounts;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 import static io.github.llmcodestyle.utils.AstUtil.*;
@@ -44,10 +45,6 @@ public class UtilClassNamingCheck extends AbstractCheck {
     private static final String MAIN_METHOD_NAME = "main";
     private static final int[] TOKENS = {CLASS_DEF};
 
-    private int totalMethods;
-    private int staticMethods;
-    private int publicMethods;
-
     @Override
     public int[] getDefaultTokens() {
         return TOKENS.clone();
@@ -73,18 +70,15 @@ public class UtilClassNamingCheck extends AbstractCheck {
             return;
         }
         DetailAST objBlock = classDef.findFirstToken(OBJBLOCK);
-        if (objBlock == null) {
+        if (objBlock == null || hasMainEntryPoint(objBlock)) {
             return;
         }
-        if (hasMainEntryPoint(objBlock)) {
-            return;
-        }
-        countMethods(objBlock);
+        MethodCounts counts = countMethods(objBlock);
         String name = nameIdent.getText();
-        if (name.endsWith(CONSTANTS_SUFFIX) && publicMethods > 0) {
+        if (name.endsWith(CONSTANTS_SUFFIX) && counts.publicCount() > 0) {
             log(nameIdent.getLineNo(), nameIdent.getColumnNo(), MSG_CONSTANTS_PUBLIC_METHOD, name);
         }
-        if (totalMethods > 0 && totalMethods == staticMethods && publicMethods > 0 && !isAcceptableUtilityName(name)) {
+        if (counts.total() > 0 && counts.total() == counts.staticCount() && counts.publicCount() > 0 && !isAcceptableUtilityName(name)) {
             log(nameIdent.getLineNo(), nameIdent.getColumnNo(), MSG_UTIL_NAME, name);
         }
     }
@@ -95,10 +89,7 @@ public class UtilClassNamingCheck extends AbstractCheck {
 
     private static boolean hasMainEntryPoint(DetailAST objBlock) {
         for (DetailAST child = objBlock.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if (child.getType() != METHOD_DEF) {
-                continue;
-            }
-            if (!hasModifier(child, LITERAL_PUBLIC) || !hasModifier(child, LITERAL_STATIC)) {
+            if (child.getType() != METHOD_DEF || !hasModifier(child, LITERAL_PUBLIC) || !hasModifier(child, LITERAL_STATIC)) {
                 continue;
             }
             DetailAST nameIdent = child.findFirstToken(IDENT);
@@ -109,22 +100,23 @@ public class UtilClassNamingCheck extends AbstractCheck {
         return false;
     }
 
-    private void countMethods(DetailAST objBlock) {
-        totalMethods = 0;
-        staticMethods = 0;
-        publicMethods = 0;
+    private static MethodCounts countMethods(DetailAST objBlock) {
+        int total = 0;
+        int staticCount = 0;
+        int publicCount = 0;
         for (DetailAST child = objBlock.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getType() != METHOD_DEF) {
                 continue;
             }
-            totalMethods++;
+            total++;
             if (hasModifier(child, LITERAL_STATIC)) {
-                staticMethods++;
+                staticCount++;
             }
             if (hasModifier(child, LITERAL_PUBLIC)) {
-                publicMethods++;
+                publicCount++;
             }
         }
+        return new MethodCounts(total, staticCount, publicCount);
     }
 
     private static boolean isAcceptableUtilityName(String name) {

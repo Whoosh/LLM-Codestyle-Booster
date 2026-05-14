@@ -226,7 +226,12 @@ public class MissingNullableParameterCheck extends AbstractCheck {
     }
 
     private static boolean isNullRejection(DetailAST comparison) {
-        DetailAST expr = comparison.getParent();
+        // Walk up through any chain of LAND parents (LOR interrupts the rejection).
+        DetailAST top = comparison;
+        for (DetailAST parent = top.getParent(); parent != null && parent.getType() == LAND; parent = parent.getParent()) {
+            top = parent;
+        }
+        DetailAST expr = top.getParent();
         if (expr == null || expr.getType() != EXPR) {
             return false;
         }
@@ -235,18 +240,24 @@ public class MissingNullableParameterCheck extends AbstractCheck {
             return false;
         }
         if (comparison.getType() == EQUAL) {
-            return blockContainsThrow(ifNode.findFirstToken(SLIST));
+            return containsThrow(ifNode.findFirstToken(SLIST));
         }
         DetailAST elseNode = ifNode.findFirstToken(LITERAL_ELSE);
-        return elseNode != null && blockContainsThrow(elseNode.findFirstToken(SLIST));
+        return elseNode != null && containsThrow(elseNode.findFirstToken(SLIST));
     }
 
-    private static boolean blockContainsThrow(@Nullable DetailAST slist) {
-        if (slist == null) {
+    private static boolean containsThrow(@Nullable DetailAST node) {
+        if (node == null) {
             return false;
         }
-        for (DetailAST c = slist.getFirstChild(); c != null; c = c.getNextSibling()) {
-            if (c.getType() == LITERAL_THROW) {
+        if (node.getType() == LITERAL_THROW) {
+            return true;
+        }
+        if (SCOPE_BOUNDARY_TOKENS.contains(node.getType())) {
+            return false;
+        }
+        for (DetailAST c = node.getFirstChild(); c != null; c = c.getNextSibling()) {
+            if (containsThrow(c)) {
                 return true;
             }
         }

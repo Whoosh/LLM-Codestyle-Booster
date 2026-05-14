@@ -4,6 +4,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import jakarta.annotation.Nullable;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
+import static io.github.llmcodestyle.utils.AstUtil.*;
 
 import java.util.Set;
 
@@ -83,5 +84,47 @@ public final class AstQueryUtil {
             node = node.findFirstToken(tokenType);
         }
         return node != null ? node.getText() : "";
+    }
+
+    /**
+     * Walks up from {@code node} and returns the nearest ancestor whose token type is in
+     * {@link AstUtil#TYPE_DECL_TOKENS} (class, interface, enum, or record). Returns {@code null}
+     * when {@code node} is not lexically nested inside any type declaration.
+     */
+    @Nullable
+    public static DetailAST findEnclosingType(DetailAST node) {
+        DetailAST parent = node.getParent();
+        while (parent != null) {
+            if (TYPE_DECL_TOKENS.contains(parent.getType())) {
+                return parent;
+            }
+            parent = parent.getParent();
+        }
+        return null;
+    }
+
+    /**
+     * Returns {@code true} if {@code variableDef} is effectively {@code static final}: either
+     * {@code insideInterface} is {@code true} (interface fields are implicitly static final),
+     * or its MODIFIERS child contains both {@code LITERAL_STATIC} and {@code FINAL}.
+     */
+    public static boolean isEffectivelyStaticFinal(DetailAST variableDef, boolean insideInterface) {
+        if (insideInterface) {
+            return true;
+        }
+        DetailAST modifiers = variableDef.findFirstToken(MODIFIERS);
+        if (modifiers == null) {
+            return false;
+        }
+        boolean hasStatic = false;
+        boolean hasFinal = false;
+        for (DetailAST mod = modifiers.getFirstChild(); mod != null; mod = mod.getNextSibling()) {
+            if (mod.getType() == LITERAL_STATIC) {
+                hasStatic = true;
+            } else if (mod.getType() == FINAL) {
+                hasFinal = true;
+            }
+        }
+        return hasStatic && hasFinal;
     }
 }

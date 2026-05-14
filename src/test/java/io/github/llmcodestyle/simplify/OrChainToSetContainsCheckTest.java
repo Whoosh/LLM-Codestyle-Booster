@@ -188,6 +188,13 @@ class OrChainToSetContainsCheckTest {
     }
 
     @Test
+    void parenthesizedSubChainsAreFlattened() throws Exception {
+        List<AuditEvent> violations = run("simplify/invalid/OrChainParenthesizedSubChain.java");
+        assertEquals(3, violations.size(),
+            "Three 3-operand chains (right-paren, left-paren, full-wrap) must be flagged: " + format(violations));
+    }
+
+    @Test
     void renderExpressionLiteralThisPath() throws Exception {
         // L224 SURVIVED: `node.getType() == LITERAL_THIS`
         // If negated: `this` keyword would fall through to the default getText() path,

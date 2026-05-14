@@ -239,6 +239,16 @@ class DuplicateMethodBodyCheckTest {
     }
 
     @Test
+    void patternVariableBindersAreNormalized() throws Exception {
+        List<AuditEvent> violations = runSingle("quality/invalid/DuplicateMethodBodyPatternVariable.java");
+        assertEquals(1, violations.size(),
+            "Methods identical modulo `instanceof String NAME` binder should be detected as duplicates: " + formatWithFile(violations));
+        String msg = violations.get(0).getMessage();
+        assertTrue(msg.contains("describeA") && msg.contains("describeB"),
+            "Should mention both methods: " + msg);
+    }
+
+    @Test
     void extractEnclosingClassNameInNestedClass() throws Exception {
         // L220 NO_COVERAGE: `return "<unknown>"` when no enclosing type found
         // This test uses nested inner classes to ensure extractEnclosingClassName is reached

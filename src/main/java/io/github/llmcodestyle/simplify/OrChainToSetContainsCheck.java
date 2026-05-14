@@ -87,8 +87,12 @@ public class OrChainToSetContainsCheck extends AbstractCheck {
 
     private static void flatten(DetailAST node, List<DetailAST> out) {
         if (node.getType() == LOR) {
-            flatten(node.getFirstChild(), out);
-            flatten(node.getLastChild(), out);
+            for (DetailAST child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
+                int t = child.getType();
+                if (t != LPAREN && t != RPAREN) {
+                    flatten(child, out);
+                }
+            }
         } else {
             out.add(node);
         }

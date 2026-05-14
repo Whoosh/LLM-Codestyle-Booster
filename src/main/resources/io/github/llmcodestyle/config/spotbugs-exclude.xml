@@ -13,16 +13,6 @@
         <Bug pattern="SPRING_ENDPOINT"/>
     </Match>
 
-    <!-- CRLF in logs: suppress if logged values are internal, not user input -->
-    <Match>
-        <Bug pattern="CRLF_INJECTION_LOGS"/>
-    </Match>
-
-    <!-- Modification after validation: no actual validation happening -->
-    <Match>
-        <Bug pattern="MODIFICATION_AFTER_VALIDATION"/>
-    </Match>
-
     <!-- ============================================================ -->
     <!-- fb-contrib exclusions                                         -->
     <!-- ============================================================ -->

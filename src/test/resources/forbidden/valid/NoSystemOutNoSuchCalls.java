@@ -4,10 +4,20 @@ package com.example.service;
 public class OrderService {
 
     public void doWork() {
-        String result = process();
+        sink(process());
+    }
+
+    public void doMore() {
+        sink(process());
     }
 
     private String process() {
         return "ok";
+    }
+
+    private void sink(Object x) {
+        if (x.hashCode() == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
+        }
     }
 }

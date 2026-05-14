@@ -73,6 +73,9 @@ public class DuplicateMethodBodyValid {
     private int other;
 
     private int flipSign(int x) {
+        if (x == Integer.MIN_VALUE) {
+            throw new ArithmeticException("overflow");
+        }
         return -x;
     }
 }

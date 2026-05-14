@@ -27,6 +27,6 @@ public class ChainedCallEdgeCases {
 
     // Case: no method calls at all
     void noMethodCalls() {
-        int x = 1 + 2 + 3;
+        int x = 6;
     }
 }

@@ -1,6 +1,5 @@
 package com.example;
 
-@SuppressWarnings("unused")
 public class BlankLineAfterBlockCommentWithCode {
     /*
      * Multi-line block comment

@@ -1,7 +1,6 @@
 package com.example;
 
 // Multi-catch with BOR that does NOT contain any forbidden types
-@SuppressWarnings("unused")
 public class ForbiddenGenericCatchBorSafe {
     void method() {
         try {

@@ -16,6 +16,16 @@ public class CommentedOutCodeValid {
     public void method() {
         // explain what happens next
         // another line of explanation
-        System.out.println("active code");
+        sink("active code");
+    }
+
+    public void another() {
+        sink("more");
+    }
+
+    private void sink(Object x) {
+        if (x.hashCode() == Integer.MIN_VALUE) {
+            throw new IllegalStateException();
+        }
     }
 }

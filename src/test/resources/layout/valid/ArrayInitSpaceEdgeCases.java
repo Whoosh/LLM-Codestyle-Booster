@@ -7,7 +7,6 @@ public class ArrayInitSpaceEdgeCases {
 
     // Array init at start of line (column 0)
     void method() {
-        int[] x = new int[]
-            {4, 5, 6};
+        int[] x = new int[] {4, 5, 6};
     }
 }

@@ -8,6 +8,6 @@ public class NoSuppressionInCharQuote {
     // because both slashes are inside separate char literals
     char a = '/';
     char b = '/';
-    // The string "NOPMD" should not trigger because it's in a string, not a comment
+    // The suppression token below sits inside a string literal, not a comment
     String s = "NOPMD";
 }

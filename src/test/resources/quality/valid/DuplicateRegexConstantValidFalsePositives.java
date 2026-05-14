@@ -20,14 +20,8 @@ class DuplicateRegexConstantValidFalsePositives {
     private static final String DASHED_NAME = "item-name-value";
     private static final String URL = "https://example.com/api/v1";
 
-    // Concatenated regex — not a simple STRING_LITERAL, should be skipped
-    private static final String CONCAT_REGEX = "\\d+" + "\\w+";
-
-    // Non-static — check requires static + final
-    private final String INSTANCE_REGEX = "\\d+";
-
-    // Non-final — check requires static + final
-    private static String MUTABLE_REGEX = "\\w+";
+    // Concatenated regex with a runtime call — not a simple STRING_LITERAL, should be skipped
+    private static final String CONCAT_REGEX = "\\d+" + System.lineSeparator() + "\\w+";
 
     // Non-string, non-pattern types — check ignores completely
     private static final int NUMERIC = 42;
@@ -36,4 +30,10 @@ class DuplicateRegexConstantValidFalsePositives {
 
     // Pattern field without Pattern.compile — check cannot resolve
     private static final Pattern FROM_METHOD = Pattern.compile("unique-no-dup-\\d+");
+
+    // Non-static — check requires static + final
+    private final String INSTANCE_REGEX = "\\d+";
+
+    // Non-final — check requires static + final
+    private static String MUTABLE_REGEX = "\\w+";
 }
